@@ -1,250 +1,115 @@
 <!DOCTYPE html>
-<html lang="pt-br">
+<html lang="pt-BR">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dona Fer Bijuterias</title>
-    <link rel="stylesheet" href="style.css">
-    <script defer src="script.js"></script>
-    <style>
-        body {
-            font-family: 'Arial', sans-serif;
-            background-color: #fe6f2;
-            color: #333;
-            margin: 0;
-            padding: 0;
-            overflow-x: hidden;
-        }
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cardápio</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Baloo+2:wght@600&display=swap');
 
-        header {
-            background-color: #ff66b2;
-            color: white;
-            padding: 20px 10px;
-            text-align: center;
-            position: relative;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
-        }
+    body {
+      margin: 0;
+      font-family: 'Baloo 2', cursive;
+      background: #111;
+      color: #fff;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 20px;
+      overflow-x: hidden;
+    }
 
-        header img {
-            width: 100px;
-            position: absolute;
-            top: 10px;
-            left: 10px;
-            border-radius: 50%;
-        }
+    /* Fundo animado com brigadeiros */
+    .background {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      z-index: -1;
+      pointer-events: none;
+    }
 
-        nav ul {
-            list-style: none;
-            padding: 0;
-        }
+    .brigadeiro {
+      position: absolute;
+      width: 80px;
+      height: 80px;
+      background: url("brigadeiro.png") no-repeat center/contain;
+      opacity: 0.15;
+      animation: mover 25s linear infinite;
+    }
 
-        nav ul li {
-            display: inline;
-            margin: 0 10px;
-        }
+    @keyframes mover {
+      from { transform: translateX(100vw); }
+      to { transform: translateX(-120vw); }
+    }
 
-        nav ul li a {
-            color: white;
-            text-decoration: none;
-            font-size: 18px;
-            font-weight: bold;
-        }
+    h1 {
+      font-size: 28px;
+      margin-bottom: 20px;
+      text-align: center;
+      color: #fff; /* branco */
+      text-shadow: 2px 2px 6px rgba(0,0,0,0.5);
+    }
 
-        nav ul li a:hover {
-            color: #ff3399;
-        }
+    .card {
+      width: 100%;
+      max-width: 400px;
+      margin: 15px 0;
+      border-radius: 15px;
+      overflow: hidden;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+      transition: transform 0.3s, box-shadow 0.3s;
+      background: #222;
+      cursor: pointer;
+    }
 
-        .carousel {
-            display: flex;
-            overflow: hidden;
-            width: 100%;
-            justify-content: center;
-            align-items: center;
-            margin: 30px 0;
-            animation: slide 10s infinite;
-        }
+    .card img {
+      width: 100%;
+      height: auto;
+      display: block;
+    }
 
-        .carousel img {
-            width: 100%;
-            max-height: 400px;
-            object-fit: cover;
-            border-radius: 10px;
-            transition: transform 0.5s ease;
-            margin-right: 20px;
-        }
+    .card:hover {
+      transform: scale(1.05);
+      box-shadow: 0 8px 20px rgba(255,0,0,0.4); /* vermelho */
+    }
 
-        @keyframes slide {
-            0% { transform: translateX(0); }
-            33% { transform: translateX(-100%); }
-            66% { transform: translateX(-200%); }
-            100% { transform: translateX(0); }
-        }
-
-        .cart {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            background: white;
-            padding: 10px;
-            border-radius: 50%;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
-            cursor: pointer;
-            font-size: 25px;
-            transition: transform 0.3s ease-in-out;
-        }
-
-        .cart:hover {
-            transform: scale(1.2);
-        }
-
-        .produtos {
-            text-align: center;
-            padding: 50px 20px;
-            background-color: #ffe6f1;
-        }
-
-        .container {
-            display: flex;
-            justify-content: center;
-            gap: 20px;
-            flex-wrap: wrap;
-        }
-
-        .produto {
-            background-color: white;
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-            width: 250px;
-            text-align: center;
-            transform: scale(0.95);
-            transition: transform 0.3s ease;
-        }
-
-        .produto:hover {
-            transform: scale(1.05);
-        }
-
-        .produto img {
-            width: 100%;
-            height: 200px;
-            object-fit: cover;
-            border-radius: 10px;
-        }
-
-        .produto h3 {
-            color: #ff3399;
-            margin: 10px 0;
-        }
-
-        .produto p {
-            font-size: 18px;
-            color: #333;
-        }
-
-        .contato {
-            text-align: center;
-            padding: 50px 20px;
-            background-color: #ffccdd;
-        }
-
-        form {
-            max-width: 400px;
-            margin: auto;
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-        }
-
-        input, textarea, button {
-            padding: 10px;
-            border: none;
-            border-radius: 5px;
-        }
-
-        button {
-            background-color: #ff3399;
-            color: white;
-            font-size: 16px;
-            cursor: pointer;
-            transition: background-color 0.3s;
-        }
-
-        button:hover {
-            background-color: #ff66b2;
-        }
-
-        footer {
-            text-align: center;
-            background-color: #ff66b2;
-            color: white;
-            padding: 20px;
-        }
-
-        footer a {
-            color: white;
-            text-decoration: none;
-            margin: 0 10px;
-        }
-    </style>
+    .card.selecionado {
+      box-shadow: 0 8px 20px rgba(255,255,0,0.6); /* amarelo */
+      transform: scale(1.05);
+    }
+  </style>
 </head>
 <body>
-    <header>
-        <img src="imagens/logo.png" alt="Dona Fer Bijuterias">
-        <h1>Dona Fer Bijuterias</h1>
-        <nav>
-            <ul>
-                <li><a href="#home">Início</a></li>
-                <li><a href="#produtos">Produtos</a></li>
-                <li><a href="#contato">Contato</a></li>
-            </ul>
-        </nav>
-        <div class="cart">🛒</div>
-    </header>
 
-    <section class="carousel">
-        <img src="imagens/2-6996fd4d85f191b55e17127174127048-1024-1024.jpg" alt="Promoção">
-        <img src="imagens/344c1e79-f37c-4c9a-9271-b2d0883e7f7a.jpg" alt="Novidades">
-        <img src="imagens/351-8492f948fec3cadb5616813332676539-640-0.png" alt="Destaques">
-    </section>
+  <div class="background">
+    <div class="brigadeiro" style="top:10%; animation-delay:0s;"></div>
+    <div class="brigadeiro" style="top:30%; animation-delay:5s;"></div>
+    <div class="brigadeiro" style="top:50%; animation-delay:10s;"></div>
+    <div class="brigadeiro" style="top:70%; animation-delay:15s;"></div>
+    <div class="brigadeiro" style="top:85%; animation-delay:20s;"></div>
+  </div>
 
-    <section id="produtos" class="produtos">
-        <h2>Nossos Produtos</h2>
-        <div class="container">
-            <div class="produto">
-        <a href="https://shopee.com.br/Polaroids-personalizados-com-musicas-i.1506166769.20499666507">
-                <img src="imagens/01.jfif" alt="Polaroids com Qr code">
-                <h3>Polaroids com Qr code</h3>
-                <p>R$ 20,00</p>
-            </div>
-            <div class="produto">
-        <a href="https://shopee.com.br/Polaroids-Alta-qualidade-i.1506166769.22798353545">
-                <img src="imagens/03.jfif" alt="Polaroids">
-                <h3>Polaroids personalizados</h3>
-                <p>R$ 15,00</p>
-            </div>
-            <div class="produto">
-        <a href="https://shopee.com.br/Caderno-personalizado-sua-imagem-logo-i.1506166769.20299676831">
-                <img src="imagens/02.jfif" alt="Caderno">
-                <h3>Caderno Personalizado</h3>
-                <p>R$ 15,00</p>
-            </div>
-        </div>
-    </section>
+  <h1>Opções de Brigadeiros</h1>
 
-    <section id="contato" class="contato">
-        <h2>Entre em Contato</h2>
-        <form>
-            <input type="text" placeholder="Seu Nome" required>
-            <input type="email" placeholder="Seu E-mail" required>
-            <textarea placeholder="Sua Mensagem" required></textarea>
-            <button type="submit">Enviar</button>
-        </form>
-    </section>
+  <div class="card"><img src="1.png" alt="Item 1"></div>
+  <div class="card"><img src="2.png" alt="Item 2"></div>
+  <div class="card"><img src="3.png" alt="Item 3"></div>
+  <div class="card"><img src="4.png" alt="Item 4"></div>
+  <div class="card"><img src="5.png" alt="Item 5"></div>
 
-    <footer>
-        <p>&copy; 2025 Dona Fer Bijuterias | Todos os direitos reservados.</p>
-        <a href="#home">Voltar ao topo</a>
-    </footer>
+  <script>
+    const cards = document.querySelectorAll('.card');
+
+    cards.forEach(card => {
+      card.addEventListener('click', () => {
+        cards.forEach(c => c.classList.remove('selecionado')); // remove amarelo dos outros
+        card.classList.add('selecionado'); // aplica amarelo no clicado
+      });
+    });
+  </script>
+
 </body>
 </html>
