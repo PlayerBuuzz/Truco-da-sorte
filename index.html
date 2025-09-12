@@ -49,7 +49,7 @@
       font-size: 28px;
       margin-bottom: 20px;
       text-align: center;
-      color: #fff; /* branco */
+      color: #fff;
       text-shadow: 2px 2px 6px rgba(0,0,0,0.5);
     }
 
@@ -63,6 +63,7 @@
       transition: transform 0.3s, box-shadow 0.3s;
       background: #222;
       cursor: pointer;
+      padding-bottom: 15px;
     }
 
     .card img {
@@ -71,14 +72,68 @@
       display: block;
     }
 
-    .card:hover {
-      transform: scale(1.05);
-      box-shadow: 0 8px 20px rgba(255,0,0,0.4); /* vermelho */
+    .info {
+      padding: 10px;
+      text-align: center;
     }
 
-    .card.selecionado {
-      box-shadow: 0 8px 20px rgba(255,255,0,0.6); /* amarelo */
-      transform: scale(1.05);
+    .info h2 {
+      margin: 5px 0;
+      font-size: 20px;
+      color: #fff;
+    }
+
+    .info p {
+      margin: 0;
+      font-size: 16px;
+      color: #ffcc00;
+    }
+
+    .quantidade {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      margin-top: 10px;
+    }
+
+    .quantidade button {
+      background: #ff6f61;
+      border: none;
+      color: #fff;
+      font-size: 20px;
+      padding: 5px 12px;
+      margin: 0 10px;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+
+    .quantidade button:hover {
+      background: #ffcc00;
+      color: #000;
+    }
+
+    .quantidade span {
+      font-size: 18px;
+      min-width: 20px;
+      display: inline-block;
+      text-align: center;
+    }
+
+    .btn-whatsapp {
+      margin-top: 30px;
+      padding: 15px 25px;
+      font-size: 18px;
+      border: none;
+      border-radius: 12px;
+      background: #25d366;
+      color: white;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+
+    .btn-whatsapp:hover {
+      background: #1ebe5a;
     }
   </style>
 </head>
@@ -94,20 +149,120 @@
 
   <h1>Opções de Brigadeiros</h1>
 
-  <div class="card"><img src="1.png" alt="Item 1"></div>
-  <div class="card"><img src="2.png" alt="Item 2"></div>
-  <div class="card"><img src="3.png" alt="Item 3"></div>
-  <div class="card"><img src="4.png" alt="Item 4"></div>
-  <div class="card"><img src="5.png" alt="Item 5"></div>
+  <div class="card" data-nome="Versão normal" data-preco="3.00">
+    <img src="1.png" alt="Opção 1">
+    <div class="info">
+      <h2>Opção 1 - Versão normal</h2>
+      <p>R$ 3,00</p>
+      <div class="quantidade">
+        <button class="menos">-</button>
+        <span>0</span>
+        <button class="mais">+</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="card" data-nome="Versão morango" data-preco="3.50">
+    <img src="2.png" alt="Opção 2">
+    <div class="info">
+      <h2>Opção 2 - Versão morango</h2>
+      <p>R$ 3,50</p>
+      <div class="quantidade">
+        <button class="menos">-</button>
+        <span>0</span>
+        <button class="mais">+</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="card" data-nome="Versão uva" data-preco="3.50">
+    <img src="3.png" alt="Opção 3">
+    <div class="info">
+      <h2>Opção 3 - Versão uva</h2>
+      <p>R$ 3,50</p>
+      <div class="quantidade">
+        <button class="menos">-</button>
+        <span>0</span>
+        <button class="mais">+</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="card" data-nome="Versão granulado" data-preco="3.50">
+    <img src="4.png" alt="Opção 4">
+    <div class="info">
+      <h2>Opção 4 - Versão granulado</h2>
+      <p>R$ 3,50</p>
+      <div class="quantidade">
+        <button class="menos">-</button>
+        <span>0</span>
+        <button class="mais">+</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="card" data-nome="Versão limão" data-preco="3.50">
+    <img src="5.png" alt="Opção 5">
+    <div class="info">
+      <h2>Opção 5 - Versão limão</h2>
+      <p>R$ 3,50</p>
+      <div class="quantidade">
+        <button class="menos">-</button>
+        <span>0</span>
+        <button class="mais">+</button>
+      </div>
+    </div>
+  </div>
+
+  <button class="btn-whatsapp" id="enviar">Enviar Pedido</button>
 
   <script>
     const cards = document.querySelectorAll('.card');
 
+    // Botões + e -
     cards.forEach(card => {
-      card.addEventListener('click', () => {
-        cards.forEach(c => c.classList.remove('selecionado')); // remove amarelo dos outros
-        card.classList.add('selecionado'); // aplica amarelo no clicado
+      const menos = card.querySelector('.menos');
+      const mais = card.querySelector('.mais');
+      const span = card.querySelector('span');
+
+      menos.addEventListener('click', () => {
+        let qtd = parseInt(span.textContent);
+        if (qtd > 0) span.textContent = qtd - 1;
       });
+
+      mais.addEventListener('click', () => {
+        let qtd = parseInt(span.textContent);
+        span.textContent = qtd + 1;
+      });
+    });
+
+    // Enviar para WhatsApp
+    document.getElementById('enviar').addEventListener('click', () => {
+      let mensagem = "🍫 Pedido de Brigadeiros:%0A%0A";
+      let total = 0;
+
+      cards.forEach(card => {
+        const nome = card.getAttribute('data-nome');
+        const preco = parseFloat(card.getAttribute('data-preco'));
+        const qtd = parseInt(card.querySelector('span').textContent);
+
+        if (qtd > 0) {
+          let subtotal = (preco * qtd).toFixed(2);
+          mensagem += `${qtd}x ${nome} - R$ ${subtotal}%0A`;
+          total += parseFloat(subtotal);
+        }
+      });
+
+      if (total === 0) {
+        alert("Selecione pelo menos 1 opção antes de enviar.");
+        return;
+      }
+
+      mensagem += `%0A💰 Total: R$ ${total.toFixed(2)}`;
+
+      const numero = "5517992421961"; // formato com DDI +55
+      const url = `https://wa.me/${numero}?text=${mensagem}`;
+      window.open(url, "_blank");
     });
   </script>
 
