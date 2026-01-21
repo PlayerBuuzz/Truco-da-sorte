@@ -70,7 +70,7 @@ body {
 const status = document.getElementById("status");
 const oponente = document.getElementById("oponente");
 
-// ✅ URL CORRETA DO SEU SERVIDOR NO RENDER
+// ✅ ESTE É O ENDEREÇO CORRETO DO SEU SERVIDOR
 const ws = new WebSocket("wss://amigos-bet.onrender.com");
 
 ws.onopen = () => {
@@ -98,7 +98,7 @@ ws.onmessage = (msg) => {
 };
 
 ws.onerror = () => {
-  status.innerHTML = "❌ Erro de conexão";
+  status.innerHTML = "❌ Erro de conexão com o servidor";
 };
 </script>
 
