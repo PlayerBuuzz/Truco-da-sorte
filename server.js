@@ -5,10 +5,10 @@ const PORT = process.env.PORT || 3000;
 const server = http.createServer();
 const wss = new WebSocketServer({ server });
 
-let fila = [];      // jogadores aguardando
-let mesas = [];     // mesas ativas
+let fila = [];
+let mesas = [];
 
-// 🃏 Baralho simplificado
+// 🃏 Baralho
 const baralhoBase = [
   "4♣","5♣","6♣","7♣","Q♣","J♣","K♣","A♣","2♣","3♣",
   "4♦","5♦","6♦","7♦","Q♦","J♦","K♦","A♦","2♦","3♦",
@@ -34,21 +34,20 @@ function criarMesa(j1, j2) {
 
   j1.mesa = mesa;
   j2.mesa = mesa;
-
   mesas.push(mesa);
 
-  // 🎮 Início do jogo
-  mesa.jogadores.forEach(j =>
-    j.send(JSON.stringify({ type: "START_GAME" }))
-  );
+  // 🎮 START GAME + CARTAS (CORRETO)
+  j1.send(JSON.stringify({
+    type: "START_GAME",
+    cartas: mesa.maos[0],
+    turno: true
+  }));
 
-  // 🃏 Distribui cartas
-  j1.send(JSON.stringify({ type: "HAND", cartas: mesa.maos[0] }));
-  j2.send(JSON.stringify({ type: "HAND", cartas: mesa.maos[1] }));
-
-  // 👉 Turno inicial
-  j1.send(JSON.stringify({ type: "YOUR_TURN" }));
-  j2.send(JSON.stringify({ type: "WAIT_TURN" }));
+  j2.send(JSON.stringify({
+    type: "START_GAME",
+    cartas: mesa.maos[1],
+    turno: false
+  }));
 }
 
 wss.on("connection", (ws) => {
