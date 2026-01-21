@@ -120,9 +120,14 @@ ws.onmessage = (msg) => {
     status.innerHTML = "👉 Sua vez de jogar";
   }
 
+  // ✅ ISSO AQUI ESTAVA FALTANDO
+  if (data.type === "WAIT_TURN") {
+    minhaVez = false;
+    status.innerHTML = "⏳ Vez do oponente";
+  }
+
   if (data.type === "OPPONENT_PLAY") {
     mostrarCartaMesa(data.carta);
-    status.innerHTML = "⏳ Vez do oponente";
   }
 };
 
