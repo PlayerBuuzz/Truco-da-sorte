@@ -70,6 +70,13 @@ body {
 const status = document.getElementById("status");
 const oponente = document.getElementById("oponente");
 
+// 🔑 cria ou reaproveita ID do jogador
+let playerId = localStorage.getItem("playerId");
+if (!playerId) {
+  playerId = crypto.randomUUID();
+  localStorage.setItem("playerId", playerId);
+}
+
 // 🔌 URL DO SERVIDOR
 const ws = new WebSocket("wss://truco-da-sorte.onrender.com");
 
@@ -90,16 +97,19 @@ ws.onmessage = (msg) => {
     status.className = "centro jogando";
     oponente.innerHTML = "🧑 Oponente conectado";
 
-    // 👉 REDIRECIONA PARA O JOGO
-    setTimeout(() => {
-      window.location.href = "jogo.html";
-    }, 800);
+    iniciarJogo();
   }
 };
 
 ws.onerror = () => {
-  status.innerHTML = "❌ Erro ao conectar ao servidor";
+  status.innerHTML = "❌ Erro ao conectar";
 };
+
+function iniciarJogo() {
+  setTimeout(() => {
+    window.location.href = "jogo.html";
+  }, 800);
+}
 </script>
 
 </body>
