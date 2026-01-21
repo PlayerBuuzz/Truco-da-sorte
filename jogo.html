@@ -2,164 +2,74 @@
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
-<title>Truco Paulista • Jogo</title>
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-
+<title>Jogo</title>
 <style>
-body {
-  margin: 0;
-  background: radial-gradient(circle at top, #1a1a1a, #000 70%);
-  font-family: Arial, sans-serif;
-  color: #fff;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  height: 100vh;
+body{
+  background:#121212;
+  color:#fff;
+  font-family:Arial;
+  text-align:center;
 }
-
-#mesa {
-  width: 380px;
-  height: 600px;
-  background: linear-gradient(180deg, #1e7f3b, #145c2a);
-  border-radius: 20px;
-  border: 4px solid #00ff88;
-  box-shadow: 0 0 30px rgba(0,255,136,0.4);
-  padding: 16px;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-}
-
-.topo, .base {
-  text-align: center;
-  font-weight: bold;
-}
-
-.mesa-cartas {
-  display: flex;
-  justify-content: center;
-  gap: 15px;
-  min-height: 130px;
-}
-
-.carta {
-  width: 80px;
-  height: 120px;
-  background: #fff;
-  color: #000;
-  border-radius: 10px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 28px;
-  font-weight: bold;
-  cursor: pointer;
-}
-
-.carta.mesa {
-  cursor: default;
-}
-
-.status {
-  text-align: center;
-  background: rgba(0,0,0,0.4);
-  padding: 10px;
-  border-radius: 10px;
+#cartas button{
+  margin:10px;
+  padding:15px;
+  font-size:18px;
 }
 </style>
 </head>
-
 <body>
 
-<div id="mesa">
-  <div class="topo">🧑 Oponente</div>
-
-  <div class="mesa-cartas" id="mesaCartas"></div>
-
-  <div class="status" id="status">🔄 Conectando...</div>
-
-  <div class="mesa-cartas" id="minhasCartas"></div>
-
-  <div class="base">🧑 Você</div>
-</div>
+<h2 id="status">Conectando...</h2>
+<div id="cartas"></div>
 
 <script>
 const status = document.getElementById("status");
-const minhasCartasDiv = document.getElementById("minhasCartas");
-const mesaCartasDiv = document.getElementById("mesaCartas");
+const cartasDiv = document.getElementById("cartas");
 
-let minhasCartas = [];
-let minhaVez = false;
-
-const playerId = localStorage.getItem("playerId");
-const ws = new WebSocket("wss://truco-da-sorte.onrender.com");
+const ws = new WebSocket("ws://localhost:3000");
 
 ws.onopen = () => {
-  ws.send(JSON.stringify({
-    type: "RECONNECT",
-    playerId
-  }));
+  status.innerText = "Conectado. Aguardando jogador...";
 };
 
-ws.onmessage = (msg) => {
-  const data = JSON.parse(msg.data);
+ws.onmessage = (event) => {
+  const data = JSON.parse(event.data);
 
-  if (data.type === "HAND") {
-    minhasCartas = data.cartas;
-    renderizarCartas();
-    status.innerHTML = "🃏 Cartas distribuídas";
+  if (data.type === "WAIT") {
+    status.innerText = "Aguardando oponente...";
+  }
+
+  if (data.type === "START") {
+    status.innerText = data.turno ? "Sua vez" : "Vez do oponente";
+    cartasDiv.innerHTML = "";
+
+    data.cartas.forEach(carta => {
+      const btn = document.createElement("button");
+      btn.innerText = carta;
+      btn.onclick = () => {
+        ws.send(JSON.stringify({ type: "PLAY", carta }));
+        btn.disabled = true;
+      };
+      cartasDiv.appendChild(btn);
+    });
   }
 
   if (data.type === "YOUR_TURN") {
-    minhaVez = true;
-    status.innerHTML = "👉 Sua vez";
+    status.innerText = "Sua vez";
   }
 
   if (data.type === "WAIT_TURN") {
-    minhaVez = false;
-    status.innerHTML = "⏳ Vez do oponente";
+    status.innerText = "Aguarde";
   }
 
-  if (data.type === "OPPONENT_PLAY") {
-    mostrarCartaMesa(data.carta);
+  if (data.type === "OPPONENT") {
+    alert("Oponente jogou: " + data.carta);
   }
 };
 
-function renderizarCartas() {
-  minhasCartasDiv.innerHTML = "";
-  minhasCartas.forEach((carta, index) => {
-    const div = document.createElement("div");
-    div.className = "carta";
-    div.innerHTML = carta;
-    div.onclick = () => jogarCarta(index);
-    minhasCartasDiv.appendChild(div);
-  });
-}
-
-function jogarCarta(index) {
-  if (!minhaVez) return;
-
-  const carta = minhasCartas[index];
-  minhasCartas.splice(index, 1);
-  renderizarCartas();
-  mostrarCartaMesa(carta);
-
-  ws.send(JSON.stringify({
-    type: "PLAY_CARD",
-    carta
-  }));
-
-  minhaVez = false;
-  status.innerHTML = "⏳ Vez do oponente";
-}
-
-function mostrarCartaMesa(carta) {
-  mesaCartasDiv.innerHTML = "";
-  const div = document.createElement("div");
-  div.className = "carta mesa";
-  div.innerHTML = carta;
-  mesaCartasDiv.appendChild(div);
-}
+ws.onerror = () => {
+  status.innerText = "Erro na conexão";
+};
 </script>
 
 </body>
