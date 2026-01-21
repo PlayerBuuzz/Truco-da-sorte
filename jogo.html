@@ -9,7 +9,7 @@
 body {
   margin: 0;
   background: radial-gradient(circle at top, #1a1a1a, #000 70%);
-  font-family: 'Poppins', Arial, sans-serif;
+  font-family: Arial, sans-serif;
   color: #fff;
   display: flex;
   align-items: center;
@@ -38,8 +38,8 @@ body {
 .mesa-cartas {
   display: flex;
   justify-content: center;
-  gap: 20px;
-  min-height: 140px;
+  gap: 15px;
+  min-height: 130px;
 }
 
 .carta {
@@ -54,11 +54,6 @@ body {
   font-size: 28px;
   font-weight: bold;
   cursor: pointer;
-  transition: transform 0.2s;
-}
-
-.carta:hover {
-  transform: translateY(-10px);
 }
 
 .carta.mesa {
@@ -70,7 +65,6 @@ body {
   background: rgba(0,0,0,0.4);
   padding: 10px;
   border-radius: 10px;
-  font-size: 16px;
 }
 </style>
 </head>
@@ -90,8 +84,6 @@ body {
 </div>
 
 <script>
-const ws = new WebSocket("wss://truco-da-sorte.onrender.com");
-
 const status = document.getElementById("status");
 const minhasCartasDiv = document.getElementById("minhasCartas");
 const mesaCartasDiv = document.getElementById("mesaCartas");
@@ -99,28 +91,30 @@ const mesaCartasDiv = document.getElementById("mesaCartas");
 let minhasCartas = [];
 let minhaVez = false;
 
+const playerId = localStorage.getItem("playerId");
+const ws = new WebSocket("wss://truco-da-sorte.onrender.com");
+
 ws.onopen = () => {
-  status.innerHTML = "🔌 Conectado, aguardando jogo...";
+  ws.send(JSON.stringify({
+    type: "RECONNECT",
+    playerId
+  }));
 };
 
 ws.onmessage = (msg) => {
   const data = JSON.parse(msg.data);
 
-  if (data.type === "START_GAME") {
-    status.innerHTML = "🃏 Jogo iniciado!";
-  }
-
   if (data.type === "HAND") {
     minhasCartas = data.cartas;
     renderizarCartas();
+    status.innerHTML = "🃏 Cartas distribuídas";
   }
 
   if (data.type === "YOUR_TURN") {
     minhaVez = true;
-    status.innerHTML = "👉 Sua vez de jogar";
+    status.innerHTML = "👉 Sua vez";
   }
 
-  // ✅ ISSO AQUI ESTAVA FALTANDO
   if (data.type === "WAIT_TURN") {
     minhaVez = false;
     status.innerHTML = "⏳ Vez do oponente";
@@ -148,7 +142,6 @@ function jogarCarta(index) {
   const carta = minhasCartas[index];
   minhasCartas.splice(index, 1);
   renderizarCartas();
-
   mostrarCartaMesa(carta);
 
   ws.send(JSON.stringify({
