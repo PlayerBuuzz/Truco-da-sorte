@@ -88,6 +88,7 @@ ws.onmessage = (msg) => {
   console.log("Mensagem recebida:", data);
 
   if (data.type === "DEAL_CARDS") {
+    console.log("Cartas recebidas:", data.cards);
     const mao = document.getElementById("mao");
     mao.innerHTML = "";
     data.cards.forEach(carta => {
@@ -120,7 +121,7 @@ ws.onmessage = (msg) => {
 function jogarCarta(carta, div) {
   ws.send(JSON.stringify({ type: "PLAY_CARD", card: carta }));
   document.getElementById("mesa-cartas").innerText = `Você jogou: ${carta}`;
-  div.remove(); // remove carta da mão
+  div.remove();
 }
 </script>
 
