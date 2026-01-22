@@ -26,7 +26,7 @@ function criarMesa(ws) {
     id: Date.now(),
     jogadores: [ws],
     baralho: criarBaralho(),
-    hands: []
+    hands: [] // agora é array, não objeto
   };
   mesas.push(mesa);
   return mesa;
@@ -55,7 +55,7 @@ wss.on("connection", (ws) => {
     mesa.jogadores.forEach((jogador, idx) => {
       jogador.send(JSON.stringify({
         type: "START_GAME",
-        hand: mesa.hands[idx],
+        hand: mesa.hands[idx], // ✅ agora funciona
         player: idx
       }));
     });
