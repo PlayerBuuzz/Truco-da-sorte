@@ -7,6 +7,16 @@ const wss = new WebSocketServer({ server });
 
 let mesas = [];
 
+// força das cartas (simplificada para Truco Paulista)
+const ranking = {
+  "4": 1, "5": 2, "6": 3, "7": 4,
+  "Q": 5, "J": 6, "K": 7, "A": 8
+};
+
+function valorCarta(carta) {
+  return ranking[carta[0]]; // pega só o número/letra
+}
+
 function criarMesa(ws) {
   const mesa = {
     id: Date.now(),
@@ -23,22 +33,14 @@ function procurarMesa() {
 }
 
 function distribuirCartas() {
-  const baralho = ["4♠","5♠","6♠","7♠","Q♠","J♠","K♠","A♠",
-                   "4♥","5♥","6♥","7♥","Q♥","J♥","K♥","A♥",
-                   "4♦","5♦","6♦","7♦","Q♦","J♦","K♦","A♦",
-                   "4♣","5♣","6♣","7♣","Q♣","J♣","K♣","A♣"];
+  const baralho = [
+    "4♠","5♠","6♠","7♠","Q♠","J♠","K♠","A♠",
+    "4♥","5♥","6♥","7♥","Q♥","J♥","K♥","A♥",
+    "4♦","5♦","6♦","7♦","Q♦","J♦","K♦","A♦",
+    "4♣","5♣","6♣","7♣","Q♣","J♣","K♣","A♣"
+  ];
   const embaralhado = baralho.sort(() => Math.random() - 0.5);
   return embaralhado.slice(0, 6); // 3 cartas pra cada
-}
-
-// força das cartas (simplificada)
-const ranking = {
-  "4": 1, "5": 2, "6": 3, "7": 4,
-  "Q": 5, "J": 6, "K": 7, "A": 8
-};
-
-function valorCarta(carta) {
-  return ranking[carta[0]]; // pega só o número/letra
 }
 
 wss.on("connection", (ws) => {
