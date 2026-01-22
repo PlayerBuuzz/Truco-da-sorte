@@ -92,7 +92,7 @@ wss.on("connection", (ws) => {
             }
 
             // avisa resultado
-            mesa.jogadores.forEach((p, i) => {
+            mesa.jogadores.forEach((p) => {
               p.send(JSON.stringify({
                 type: "ROUND_RESULT",
                 vencedor,
