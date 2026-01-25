@@ -1,25 +1,109 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-<meta charset="UTF-8">
-<title>Truco Paulista 1x1</title>
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8">
+  <title>TôComFome 🍔 | Colina - SP</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <style>
+    :root{
+      --laranja:#ff7a00;
+      --laranja-escuro:#e56b00;
+      --preto:#1e1e1e;
+      --cinza:#f5f5f5;
+    }
+
+    *{
+      margin:0;
+      padding:0;
+      box-sizing:border-box;
+      font-family: Arial, Helvetica, sans-serif;
+    }
+
+    body{
+      background: var(--cinza);
+      color: var(--preto);
+      display:flex;
+      justify-content:center;
+      align-items:center;
+      height:100vh;
+    }
+
+    .container{
+      background:#fff;
+      width:100%;
+      max-width:420px;
+      padding:30px;
+      border-radius:16px;
+      box-shadow:0 10px 30px rgba(0,0,0,0.15);
+      text-align:center;
+    }
+
+    h1{
+      color:var(--laranja);
+      font-size:2.2em;
+      margin-bottom:5px;
+    }
+
+    .cidade{
+      font-size:0.95em;
+      color:#666;
+      margin-bottom:25px;
+    }
+
+    .card{
+      background:var(--laranja);
+      color:#fff;
+      padding:18px;
+      border-radius:14px;
+      margin-bottom:15px;
+      cursor:pointer;
+      transition:0.3s;
+    }
+
+    .card:hover{
+      background:var(--laranja-escuro);
+      transform:scale(1.03);
+    }
+
+    .card h2{
+      font-size:1.3em;
+      margin-bottom:5px;
+    }
+
+    .card p{
+      font-size:0.9em;
+      opacity:0.9;
+    }
+
+    footer{
+      margin-top:20px;
+      font-size:0.8em;
+      color:#999;
+    }
+  </style>
 </head>
+
 <body>
-<div id="mesa">
-  <div class="jogador" id="oponente">❓ Oponente</div>
-  <div class="mao" id="mao-oponente"></div>
 
-  <div class="centro" id="status">🔌 Conectando ao servidor...</div>
+  <div class="container">
+    <h1>🍔 TôComFome</h1>
+    <div class="cidade">Colina • São Paulo</div>
 
-  <div class="mao" id="mao-jogador"></div>
-  <div class="jogador">🧑 Você</div>
+    <div class="card" onclick="location.href='cliente.html'">
+      <h2>Sou Cliente</h2>
+      <p>Quero pedir comida perto de mim</p>
+    </div>
 
-  <div id="acoes">
-    <button onclick="pedirTruco()">Truco</button>
+    <div class="card" onclick="location.href='comercio.html'">
+      <h2>Sou Comércio</h2>
+      <p>Quero vender no TôComFome</p>
+    </div>
+
+    <footer>
+      Feito para cidades pequenas ❤️
+    </footer>
   </div>
-</div>
-<script src="client.js"></script>
+
 </body>
 </html>
