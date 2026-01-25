@@ -1,109 +1,103 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8">
-  <title>TôComFome 🍔 | Colina - SP</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta charset="UTF-8">
+<title>TôComFome 🍔 | Colina - SP</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <style>
-    :root{
-      --laranja:#ff7a00;
-      --laranja-escuro:#e56b00;
-      --preto:#1e1e1e;
-      --cinza:#f5f5f5;
-    }
+<style>
+:root{
+  --laranja:#ff8c1a;
+  --laranja-escuro:#e67300;
+  --branco:#fff;
+  --cinza:#f2f2f2;
+}
 
-    *{
-      margin:0;
-      padding:0;
-      box-sizing:border-box;
-      font-family: Arial, Helvetica, sans-serif;
-    }
+*{
+  margin:0;
+  padding:0;
+  box-sizing:border-box;
+  font-family: 'Segoe UI', Arial, sans-serif;
+}
 
-    body{
-      background: var(--cinza);
-      color: var(--preto);
-      display:flex;
-      justify-content:center;
-      align-items:center;
-      height:100vh;
-    }
+body{
+  background:var(--laranja);
+  min-height:100vh;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+}
 
-    .container{
-      background:#fff;
-      width:100%;
-      max-width:420px;
-      padding:30px;
-      border-radius:16px;
-      box-shadow:0 10px 30px rgba(0,0,0,0.15);
-      text-align:center;
-    }
+.container{
+  background:var(--branco);
+  width:100%;
+  max-width:430px;
+  border-radius:24px 24px 0 0;
+  padding:30px 20px;
+  text-align:center;
+}
 
-    h1{
-      color:var(--laranja);
-      font-size:2.2em;
-      margin-bottom:5px;
-    }
+.logo{
+  font-size:2.4em;
+  font-weight:bold;
+  color:var(--laranja);
+}
 
-    .cidade{
-      font-size:0.95em;
-      color:#666;
-      margin-bottom:25px;
-    }
+.city{
+  font-size:0.9em;
+  color:#777;
+  margin-bottom:30px;
+}
 
-    .card{
-      background:var(--laranja);
-      color:#fff;
-      padding:18px;
-      border-radius:14px;
-      margin-bottom:15px;
-      cursor:pointer;
-      transition:0.3s;
-    }
+.btn{
+  width:100%;
+  padding:18px;
+  margin-bottom:15px;
+  border:none;
+  border-radius:14px;
+  font-size:1.1em;
+  font-weight:600;
+  cursor:pointer;
+}
 
-    .card:hover{
-      background:var(--laranja-escuro);
-      transform:scale(1.03);
-    }
+.btn-cliente{
+  background:var(--laranja);
+  color:#fff;
+}
 
-    .card h2{
-      font-size:1.3em;
-      margin-bottom:5px;
-    }
+.btn-comercio{
+  background:var(--cinza);
+  color:#333;
+}
 
-    .card p{
-      font-size:0.9em;
-      opacity:0.9;
-    }
+.btn:active{
+  transform:scale(0.97);
+}
 
-    footer{
-      margin-top:20px;
-      font-size:0.8em;
-      color:#999;
-    }
-  </style>
+footer{
+  font-size:0.8em;
+  color:#aaa;
+  margin-top:20px;
+}
+</style>
 </head>
 
 <body>
-
   <div class="container">
-    <h1>🍔 TôComFome</h1>
-    <div class="cidade">Colina • São Paulo</div>
+    <div class="logo">🍔 TôComFome</div>
+    <div class="city">Colina • SP</div>
 
-    <div class="card" onclick="location.href='cliente.html'">
-      <h2>Sou Cliente</h2>
-      <p>Quero pedir comida perto de mim</p>
-    </div>
+    <button class="btn btn-cliente" onclick="location.href='cliente.html'">
+      Sou Cliente
+    </button>
 
-    <div class="card" onclick="location.href='comercio.html'">
-      <h2>Sou Comércio</h2>
-      <p>Quero vender no TôComFome</p>
-    </div>
+    <button class="btn btn-comercio" onclick="location.href='comercio.html'">
+      Sou Comércio
+    </button>
 
     <footer>
-      Feito para cidades pequenas ❤️
+      Comida perto de você 😋
     </footer>
   </div>
-
 </body>
 </html>
