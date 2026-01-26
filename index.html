@@ -149,10 +149,11 @@ function toggleMenu(){
 }
 </script>
 
-<!-- FIREBASE -->
+<!-- FIREBASE + AUTH -->
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
 import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyD6a29L24aFSgVjmC7NFGXpdWW4g1uQsio",
@@ -165,6 +166,7 @@ const firebaseConfig = {
 
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
+const auth = getAuth(app);
 
 const lista = document.getElementById("listaProdutos");
 
@@ -183,10 +185,6 @@ async function carregarProdutos(){
     produtosSnap.forEach(prodDoc => {
       const p = prodDoc.data();
 
-      const msg = encodeURIComponent(
-        `Olá! Quero pedir o *${p.nome}* (${comercio.nome})`
-      );
-
       lista.innerHTML += `
         <div class="card">
           <h4>${p.nome}</h4>
@@ -196,13 +194,28 @@ async function carregarProdutos(){
             ${comercio.endereco.bairro} • ${comercio.endereco.cidade}
           </div>
           <button class="btn"
-            onclick="window.open('https://wa.me/55${comercio.telefone}?text=${msg}','_blank')">
-            Pedir no WhatsApp
+            onclick='verificarLogin(
+              ${JSON.stringify(p)},
+              ${JSON.stringify(comercio)}
+            )'>
+            Pedir
           </button>
         </div>
       `;
     });
   }
+}
+
+window.verificarLogin = function(produto, comercio){
+  onAuthStateChanged(auth, (user)=>{
+    if(user){
+      localStorage.setItem("produtoSelecionado", JSON.stringify(produto));
+      localStorage.setItem("comercioSelecionado", JSON.stringify(comercio));
+      window.location.href = "produto.html";
+    }else{
+      window.location.href = "cadastro.html";
+    }
+  });
 }
 
 carregarProdutos();
