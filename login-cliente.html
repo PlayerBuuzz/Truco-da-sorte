@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<title>Tôcomfome 🍔 | Login Cliente</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<style>
+:root{
+  --laranja:#ff8c1a;
+  --laranja-escuro:#e67300;
+  --branco:#fff;
+  --cinza:#f4f4f4;
+  --texto:#333;
+}
+
+*{
+  margin:0;
+  padding:0;
+  box-sizing:border-box;
+  font-family:'Segoe UI', Arial, sans-serif;
+}
+
+body{
+  background:var(--laranja);
+  min-height:100vh;
+  display:flex;
+  justify-content:center;
+  align-items:flex-end;
+}
+
+.container{
+  background:var(--branco);
+  width:100%;
+  max-width:420px;
+  border-radius:20px 20px 0 0;
+  padding:22px;
+}
+
+.logo{
+  text-align:center;
+  font-size:1.9em;
+  font-weight:700;
+  color:var(--laranja);
+}
+
+.sub{
+  text-align:center;
+  font-size:0.9em;
+  color:#666;
+  margin-top:6px;
+}
+
+form{
+  margin-top:22px;
+}
+
+input{
+  width:100%;
+  padding:14px;
+  margin-bottom:14px;
+  border-radius:12px;
+  border:1px solid #ddd;
+  font-size:0.95em;
+}
+
+input:focus{
+  outline:none;
+  border-color:var(--laranja);
+}
+
+button{
+  width:100%;
+  padding:14px;
+  background:var(--laranja);
+  border:none;
+  border-radius:14px;
+  color:#fff;
+  font-size:1em;
+  font-weight:600;
+  cursor:pointer;
+}
+
+button:active{
+  transform:scale(0.97);
+}
+
+.link{
+  margin-top:14px;
+  text-align:center;
+  font-size:0.85em;
+}
+
+.link a{
+  color:var(--laranja);
+  text-decoration:none;
+  font-weight:600;
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+  <div class="logo">🍔 Tôcomfome</div>
+  <div class="sub">Login do Cliente</div>
+
+  <form id="loginCliente">
+    <input type="email" id="email" placeholder="Email" required>
+    <input type="password" id="senha" placeholder="Senha" required>
+
+    <button type="submit">Entrar</button>
+  </form>
+
+  <div class="link">
+    Não tem conta?
+    <a href="cadastro-cliente.html">Criar agora</a>
+  </div>
+</div>
+
+<!-- FIREBASE -->
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+import { getAuth, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyD6a29L24aFSgVjmC7NFGXpdWW4g1uQsio",
+  authDomain: "tocomfome-754e1.firebaseapp.com",
+  projectId: "tocomfome-754e1",
+  storageBucket: "tocomfome-754e1.firebasestorage.app",
+  messagingSenderId: "997975886937",
+  appId: "1:997975886937:web:9bf408c35f1ed8aea13548"
+};
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
+
+document.getElementById("loginCliente").addEventListener("submit", async (e)=>{
+  e.preventDefault();
+
+  const email = document.getElementById("email").value;
+  const senha = document.getElementById("senha").value;
+
+  try{
+    const cred = await signInWithEmailAndPassword(auth, email, senha);
+
+    const snap = await getDoc(doc(db, "clientes", cred.user.uid));
+
+    if(!snap.exists()){
+      alert("Conta não é de cliente");
+      auth.signOut();
+      return;
+    }
+
+    window.location.href = "index.html";
+
+  }catch(err){
+    alert("Erro ao entrar: " + err.message);
+  }
+});
+</script>
+
+</body>
+</html>
