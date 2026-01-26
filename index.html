@@ -32,15 +32,25 @@ body{background:var(--cinza)}
   padding:20px;transition:.3s;z-index:10
 }
 .sidebar.active{left:0}
-.lista{padding:15px}
+.sidebar h3{color:var(--laranja);margin-bottom:10px}
+.sidebar a{
+  display:block;margin-bottom:10px;color:var(--texto);
+  text-decoration:none;font-weight:500;padding:6px 0;
+  border-bottom:1px solid #eee;border-radius:6px;
+}
+.lista{padding:15px;margin-top:10px}
 .card{
   background:#fff;border-radius:14px;padding:15px;margin-bottom:12px;
-  box-shadow:0 2px 8px rgba(0,0,0,.08)
+  box-shadow:0 2px 8px rgba(0,0,0,.08);
+  display:flex;gap:10px;align-items:center;
 }
-.preco{color:var(--laranja);font-weight:700}
+.card img{width:80px;height:80px;border-radius:12px;object-fit:cover}
+.card-info{flex:1}
+.card-info h4{margin-bottom:6px}
+.preco{color:var(--laranja);font-weight:700;margin-bottom:6px}
 .btn{
   margin-top:10px;width:100%;padding:10px;border:none;
-  border-radius:10px;background:var(--laranja);color:#fff
+  border-radius:10px;background:var(--laranja);color:#fff;cursor:pointer;
 }
 </style>
 </head>
@@ -48,14 +58,20 @@ body{background:var(--cinza)}
 <body>
 
 <div class="sidebar" id="sidebar">
-  <h3>🍔 Categorias</h3>
-  <a href="#">Hambúrguer</a>
-  <a href="#">Pizza</a>
+  <h3>🍔 Menu</h3>
+  <a href="#" onclick="filtrarCategoria('Hambúrguer')">Hambúrguer</a>
+  <a href="#" onclick="filtrarCategoria('Pizza')">Pizza</a>
+  <a href="#" onclick="filtrarCategoria('Pastel')">Pastel</a>
+  <a href="#" onclick="filtrarCategoria('Lanches')">Lanches</a>
+  <a href="#" onclick="filtrarMaisProcurados()">Mais Procurados</a>
+  <a href="#" onclick="filtrarDescontos()">Descontos</a>
+  <a href="#" onclick="irPerfil()">Meu Perfil</a>
+  <a href="#" onclick="logoff()">Sair</a>
 </div>
 
 <div class="header">
   <div class="menu-btn" onclick="toggleMenu()">☰</div>
-  <input placeholder="Buscar comida...">
+  <input id="buscaInput" placeholder="Buscar comida..." oninput="filtrarBusca()">
   <div class="usuario" id="usuario">Visitante</div>
 </div>
 
@@ -65,11 +81,30 @@ body{background:var(--cinza)}
 function toggleMenu(){
   document.getElementById("sidebar").classList.toggle("active");
 }
+
+function usuarioLogado(){
+  return localStorage.getItem("sessaoLogin") ? true : false;
+}
+
+function logoff(){
+  localStorage.removeItem("sessaoLogin");
+  alert("Saiu da conta");
+  location.reload();
+}
+
+function irPerfil(){
+  if(usuarioLogado()){
+    window.location.href = "perfil.html";
+  } else {
+    alert("Faça login primeiro!");
+    window.location.href = "login-cliente.html";
+  }
+}
 </script>
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-import { getFirestore, collection, getDocs, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
 const firebaseConfig = {
@@ -84,47 +119,102 @@ const auth = getAuth(app);
 
 const lista = document.getElementById("listaProdutos");
 const usuarioEl = document.getElementById("usuario");
+let produtosCarregados = [];
 
 /* USUÁRIO NO TOPO */
 onAuthStateChanged(auth, async (user)=>{
   if(user){
-    const snap = await getDoc(doc(db,"clientes",user.uid));
-    usuarioEl.innerText = snap.exists() ? snap.data().nome : "Usuário";
-  }else{
+    usuarioEl.innerText = user.email;
+  } else{
     usuarioEl.innerText = "Visitante";
   }
 });
 
-/* PRODUTOS */
+/* CARREGAR PRODUTOS */
 async function carregarProdutos(){
+  lista.innerHTML = "";
   const comercios = await getDocs(collection(db,"comercios"));
 
-  comercios.forEach(async comercioDoc=>{
+  for(const comercioDoc of comercios.docs){
     const comercio = comercioDoc.data();
     const produtos = await getDocs(collection(db,"comercios",comercioDoc.id,"produtos"));
 
     produtos.forEach(prodDoc=>{
       const p = prodDoc.data();
+      p.comercio = comercio.nome;
+      p.bairro = comercio.endereco?.bairro || "";
+      p.cidade = comercio.endereco?.cidade || "";
+      p.img = p.img || "https://via.placeholder.com/80"; // imagem pré-definida
+      produtosCarregados.push(p);
+
       lista.innerHTML += `
         <div class="card">
-          <h4>${p.nome}</h4>
-          <div class="preco">R$ ${Number(p.valor).toFixed(2)}</div>
-          <div>${comercio.nome}</div>
-          <button class="btn" onclick='pedir(${JSON.stringify(p)})'>
-            Pedir
-          </button>
+          <img src="${p.img}" alt="${p.nome}">
+          <div class="card-info">
+            <h4>${p.nome}</h4>
+            <div class="preco">R$ ${Number(p.valor).toFixed(2)}</div>
+            <div>${p.comercio}</div>
+            <div>${p.bairro} • ${p.cidade}</div>
+            <button class="btn" onclick='pedir(${JSON.stringify(p)})'>Pedir</button>
+          </div>
         </div>
       `;
     });
-  });
+  }
 }
 
 window.pedir = (produto)=>{
   localStorage.setItem("produtoSelecionado", JSON.stringify(produto));
   window.location.href = "produto.html";
-};
+}
+
+/* FILTROS */
+function filtrarBusca(){
+  const termo = document.getElementById("buscaInput").value.toLowerCase();
+  lista.innerHTML = "";
+  produtosCarregados
+    .filter(p=>p.nome.toLowerCase().includes(termo))
+    .forEach(p=>renderCard(p));
+}
+
+function filtrarCategoria(categoria){
+  lista.innerHTML = "";
+  produtosCarregados
+    .filter(p=>p.categoria === categoria)
+    .forEach(p=>renderCard(p));
+}
+
+function filtrarMaisProcurados(){
+  lista.innerHTML = "";
+  produtosCarregados
+    .filter(p=>p.maisProcurado)
+    .forEach(p=>renderCard(p));
+}
+
+function filtrarDescontos(){
+  lista.innerHTML = "";
+  produtosCarregados
+    .filter(p=>p.desconto)
+    .forEach(p=>renderCard(p));
+}
+
+function renderCard(p){
+  lista.innerHTML += `
+    <div class="card">
+      <img src="${p.img}" alt="${p.nome}">
+      <div class="card-info">
+        <h4>${p.nome}</h4>
+        <div class="preco">R$ ${Number(p.valor).toFixed(2)}</div>
+        <div>${p.comercio}</div>
+        <div>${p.bairro} • ${p.cidade}</div>
+        <button class="btn" onclick='pedir(${JSON.stringify(p)})'>Pedir</button>
+      </div>
+    </div>
+  `;
+}
 
 carregarProdutos();
 </script>
+
 </body>
 </html>
