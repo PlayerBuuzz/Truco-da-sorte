@@ -30,7 +30,7 @@ body{
   padding:14px;
   display:flex;
   align-items:center;
-  gap:12px;
+  gap:10px;
 }
 
 .menu-btn{
@@ -44,6 +44,12 @@ body{
   border:none;
   border-radius:10px;
   font-size:1em;
+}
+
+.usuario{
+  font-size:0.8em;
+  white-space:nowrap;
+  opacity:0.95;
 }
 
 /* MENU */
@@ -129,8 +135,8 @@ body{
 <div class="sidebar" id="sidebar">
   <h3>🍔 Categorias</h3>
   <a href="#">Hambúrguer</a>
-  <a href="#">Pastel</a>
   <a href="#">Pizza</a>
+  <a href="#">Pastel</a>
   <a href="#">Lanches</a>
 </div>
 
@@ -138,6 +144,7 @@ body{
 <div class="header">
   <div class="menu-btn" onclick="toggleMenu()">☰</div>
   <input type="text" placeholder="Buscar comida...">
+  <div class="usuario" id="usuario">Usuário anônimo</div>
 </div>
 
 <!-- LISTA -->
@@ -147,12 +154,26 @@ body{
 function toggleMenu(){
   document.getElementById("sidebar").classList.toggle("active");
 }
+
+function usuarioLogado(){
+  const sessao = localStorage.getItem("sessaoLogin");
+  if(!sessao) return false;
+
+  const agora = Date.now();
+  const diff = agora - Number(sessao);
+
+  if(diff > 1800000){ // 30 minutos
+    localStorage.removeItem("sessaoLogin");
+    return false;
+  }
+  return true;
+}
 </script>
 
-<!-- FIREBASE + AUTH -->
+<!-- FIREBASE -->
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+import { getFirestore, collection, getDocs, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
 const firebaseConfig = {
@@ -169,7 +190,25 @@ const db = getFirestore(app);
 const auth = getAuth(app);
 
 const lista = document.getElementById("listaProdutos");
+const usuarioEl = document.getElementById("usuario");
 
+/* USUÁRIO NO TOPO */
+onAuthStateChanged(auth, async (user)=>{
+  if(user && usuarioLogado()){
+    const ref = doc(db, "clientes", user.uid);
+    const snap = await getDoc(ref);
+
+    if(snap.exists()){
+      usuarioEl.innerText = snap.data().nome;
+    }else{
+      usuarioEl.innerText = "Usuário";
+    }
+  }else{
+    usuarioEl.innerText = "Usuário anônimo";
+  }
+});
+
+/* CARREGAR PRODUTOS */
 async function carregarProdutos(){
   lista.innerHTML = "";
 
@@ -207,15 +246,13 @@ async function carregarProdutos(){
 }
 
 window.verificarLogin = function(produto, comercio){
-  onAuthStateChanged(auth, (user)=>{
-    if(user){
-      localStorage.setItem("produtoSelecionado", JSON.stringify(produto));
-      localStorage.setItem("comercioSelecionado", JSON.stringify(comercio));
-      window.location.href = "produto.html";
-    }else{
-      window.location.href = "cadastro.html";
-    }
-  });
+  if(usuarioLogado()){
+    localStorage.setItem("produtoSelecionado", JSON.stringify(produto));
+    localStorage.setItem("comercioSelecionado", JSON.stringify(comercio));
+    window.location.href = "produto.html";
+  }else{
+    window.location.href = "cadastro.html";
+  }
 }
 
 carregarProdutos();
