@@ -105,7 +105,7 @@ button:active{
     <input type="text" id="cpf" placeholder="CPF">
     <input type="text" id="celular" placeholder="Celular (WhatsApp)" required>
     <input type="text" id="bairro" placeholder="Bairro" required>
-    <input type="text" id="cidade" value="Colina - SP" disabled>
+    <input type="text" value="Colina - SP" disabled>
     <input type="email" id="email" placeholder="Email" required>
     <input type="password" id="senha" placeholder="Senha" required>
 
@@ -136,17 +136,15 @@ const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
 
-const form = document.getElementById("formCliente");
-
-form.addEventListener("submit", async (e)=>{
+document.getElementById("formCliente").addEventListener("submit", async (e)=>{
   e.preventDefault();
 
-  const nome = nomeInput.value;
-  const cpf = cpfInput.value;
-  const celular = celularInput.value;
-  const bairro = bairroInput.value;
-  const email = emailInput.value;
-  const senha = senhaInput.value;
+  const nome = document.getElementById("nome").value;
+  const cpf = document.getElementById("cpf").value;
+  const celular = document.getElementById("celular").value;
+  const bairro = document.getElementById("bairro").value;
+  const email = document.getElementById("email").value;
+  const senha = document.getElementById("senha").value;
 
   try{
     const cred = await createUserWithEmailAndPassword(auth, email, senha);
@@ -163,10 +161,10 @@ form.addEventListener("submit", async (e)=>{
     });
 
     alert("Cadastro realizado com sucesso 🍔");
-    window.location.href = "index.html";
+    window.location.href = "login-cliente.html";
 
   }catch(err){
-    alert("Erro: " + err.message);
+    alert("Erro ao cadastrar: " + err.message);
   }
 });
 </script>
