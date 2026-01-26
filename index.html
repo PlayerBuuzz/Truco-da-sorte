@@ -16,7 +16,7 @@
   margin:0;
   padding:0;
   box-sizing:border-box;
-  font-family: 'Segoe UI', Arial, sans-serif;
+  font-family:'Segoe UI', Arial, sans-serif;
 }
 
 body{
@@ -46,7 +46,7 @@ body{
   font-size:1em;
 }
 
-/* MENU LATERAL */
+/* MENU */
 .sidebar{
   position:fixed;
   top:0;
@@ -140,31 +140,72 @@ body{
   <input type="text" placeholder="Buscar comida...">
 </div>
 
-<!-- LISTA DE PRODUTOS -->
-<div class="lista">
-
-  <div class="card">
-    <h4>X-Burger</h4>
-    <div class="preco">R$ 16,00</div>
-    <div class="comercio">Lanchonete do Zé</div>
-    <div class="endereco">Centro • Colina</div>
-    <button class="btn">Pedir</button>
-  </div>
-
-  <div class="card">
-    <h4>X-Salada</h4>
-    <div class="preco">R$ 18,00</div>
-    <div class="comercio">Burger House</div>
-    <div class="endereco">Bairro São José</div>
-    <button class="btn">Pedir</button>
-  </div>
-
-</div>
+<!-- LISTA -->
+<div class="lista" id="listaProdutos"></div>
 
 <script>
 function toggleMenu(){
   document.getElementById("sidebar").classList.toggle("active");
 }
+</script>
+
+<!-- FIREBASE -->
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyD6a29L24aFSgVjmC7NFGXpdWW4g1uQsio",
+  authDomain: "tocomfome-754e1.firebaseapp.com",
+  projectId: "tocomfome-754e1",
+  storageBucket: "tocomfome-754e1.firebasestorage.app",
+  messagingSenderId: "997975886937",
+  appId: "1:997975886937:web:9bf408c35f1ed8aea13548"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+
+const lista = document.getElementById("listaProdutos");
+
+async function carregarProdutos(){
+  lista.innerHTML = "";
+
+  const comerciosSnap = await getDocs(collection(db, "comercios"));
+
+  for (const comercioDoc of comerciosSnap.docs) {
+    const comercio = comercioDoc.data();
+
+    const produtosSnap = await getDocs(
+      collection(db, "comercios", comercioDoc.id, "produtos")
+    );
+
+    produtosSnap.forEach(prodDoc => {
+      const p = prodDoc.data();
+
+      const msg = encodeURIComponent(
+        `Olá! Quero pedir o *${p.nome}* (${comercio.nome})`
+      );
+
+      lista.innerHTML += `
+        <div class="card">
+          <h4>${p.nome}</h4>
+          <div class="preco">R$ ${Number(p.valor).toFixed(2)}</div>
+          <div class="comercio">${comercio.nome}</div>
+          <div class="endereco">
+            ${comercio.endereco.bairro} • ${comercio.endereco.cidade}
+          </div>
+          <button class="btn"
+            onclick="window.open('https://wa.me/55${comercio.telefone}?text=${msg}','_blank')">
+            Pedir no WhatsApp
+          </button>
+        </div>
+      `;
+    });
+  }
+}
+
+carregarProdutos();
 </script>
 
 </body>
