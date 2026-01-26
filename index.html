@@ -11,8 +11,15 @@
   --cinza:#f5f5f5;
   --texto:#333;
 }
-*{margin:0;padding:0;box-sizing:border-box;font-family:'Segoe UI',Arial}
-body{background:var(--cinza)}
+*{
+  margin:0;
+  padding:0;
+  box-sizing:border-box;
+  font-family:'Segoe UI',Arial
+}
+body{
+  background:var(--cinza)
+}
 .header{
   background:var(--laranja);
   color:#fff;
@@ -21,9 +28,15 @@ body{background:var(--cinza)}
   align-items:center;
   gap:10px;
 }
-.menu-btn{font-size:1.4em;cursor:pointer}
+.menu-btn{
+  font-size:1.4em;
+  cursor:pointer
+}
 .header input{
-  flex:1;padding:10px;border:none;border-radius:10px
+  flex:1;
+  padding:10px;
+  border:none;
+  border-radius:10px
 }
 .usuario{
   font-size:.85em;
@@ -31,36 +44,80 @@ body{background:var(--cinza)}
   white-space:nowrap;
 }
 .sidebar{
-  position:fixed;top:0;left:-260px;width:260px;height:100%;
-  background:#fff;box-shadow:2px 0 10px rgba(0,0,0,.2);
-  padding:20px;transition:.3s;z-index:10
+  position:fixed;
+  top:0;
+  left:-260px;
+  width:260px;
+  height:100%;
+  background:#fff;
+  box-shadow:2px 0 10px rgba(0,0,0,.2);
+  padding:20px;
+  transition:.3s;
+  z-index:10
 }
-.sidebar.active{left:0}
-.sidebar h3{color:var(--laranja);margin-bottom:10px}
+.sidebar.active{
+  left:0
+}
+.sidebar h3{
+  color:var(--laranja);
+  margin-bottom:10px
+}
 .sidebar a{
-  display:block;margin-bottom:10px;color:var(--texto);
-  text-decoration:none;font-weight:500;padding:6px 0;
+  display:block;
+  margin-bottom:10px;
+  color:var(--texto);
+  text-decoration:none;
+  font-weight:500;
+  padding:6px 0;
   border-bottom:1px solid #eee;
 }
-.lista{padding:15px;margin-top:10px}
-.card{
-  background:#fff;border-radius:14px;padding:15px;margin-bottom:12px;
-  box-shadow:0 2px 8px rgba(0,0,0,.08);
-  display:flex;gap:10px;align-items:center;
+.lista{
+  padding:15px;
+  margin-top:10px
 }
-.card img{width:80px;height:80px;border-radius:12px;object-fit:cover}
-.card-info{flex:1}
-.card-info h4{margin-bottom:6px}
-.preco{color:var(--laranja);font-weight:700;margin-bottom:6px}
+.card{
+  background:#fff;
+  border-radius:14px;
+  padding:15px;
+  margin-bottom:12px;
+  box-shadow:0 2px 8px rgba(0,0,0,.08);
+  display:flex;
+  gap:10px;
+  align-items:center;
+}
+.card img{
+  width:80px;
+  height:80px;
+  border-radius:12px;
+  object-fit:cover
+}
+.card-info{
+  flex:1
+}
+.card-info h4{
+  margin-bottom:6px
+}
+.preco{
+  color:var(--laranja);
+  font-weight:700;
+  margin-bottom:6px
+}
 .btn{
-  margin-top:10px;width:100%;padding:10px;border:none;
-  border-radius:10px;background:var(--laranja);color:#fff;cursor:pointer;
+  margin-top:10px;
+  width:100%;
+  padding:10px;
+  border:none;
+  border-radius:10px;
+  background:var(--laranja);
+  color:#fff;
+  cursor:pointer;
 }
 </style>
 </head>
 
 <body>
 
+<!-- MENU LATERAL -->
 <div class="sidebar" id="sidebar">
   <h3>🍔 Menu</h3>
   <a href="#" onclick="filtrarCategoria('Hambúrguer')">Hambúrguer</a>
@@ -73,21 +130,31 @@ body{background:var(--cinza)}
   <a href="#" onclick="logoff()">Sair</a>
 </div>
 
+<!-- TOPO -->
 <div class="header">
   <div class="menu-btn" onclick="toggleMenu()">☰</div>
   <input id="buscaInput" placeholder="Buscar comida..." oninput="filtrarBusca()">
   <div class="usuario" id="usuario">Carregando...</div>
 </div>
 
+<!-- LISTA -->
 <div class="lista" id="listaProdutos"></div>
 
-<!-- ================= FIREBASE ================= -->
+<!-- FIREBASE -->
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-import { getFirestore, collection, getDocs, doc, getDoc } 
-from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
-import { getAuth, onAuthStateChanged, signOut } 
-from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+import { 
+  getFirestore, 
+  collection, 
+  getDocs, 
+  doc, 
+  getDoc 
+} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+import { 
+  getAuth, 
+  onAuthStateChanged, 
+  signOut 
+} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyD6a29L24aFSgVjmC7NFGXpdWW4g1uQsio",
@@ -103,44 +170,46 @@ const lista = document.getElementById("listaProdutos");
 const usuarioEl = document.getElementById("usuario");
 let produtosCarregados = [];
 
-/* ================= MENU ================= */
+/* MENU */
 window.toggleMenu = () =>{
   document.getElementById("sidebar").classList.toggle("active");
 }
 
-/* ================= PERFIL ================= */
+/* PERFIL */
 window.irPerfil = () =>{
   window.location.href = auth.currentUser ? "perfil.html" : "login-cliente.html";
 }
 
-/* ================= LOGOFF ================= */
+/* LOGOFF */
 window.logoff = async () =>{
   await signOut(auth);
   window.location.href = "index.html";
 }
 
-/* ================= USUÁRIO (NOME REAL DO CLIENTE) ================= */
+/* USUÁRIO - SOMENTE PRIMEIRO NOME */
 onAuthStateChanged(auth, async (user)=>{
   if(user){
     try{
-      const ref = doc(db,"clientes",user.uid); // 🔥 AQUI ESTAVA O ERRO
+      const ref = doc(db,"clientes",user.uid);
       const snap = await getDoc(ref);
 
       if(snap.exists()){
-        usuarioEl.innerText = snap.data().nome;
-      } else {
+        const nomeCompleto = snap.data().nome;
+        const primeiroNome = nomeCompleto.split(" ")[0];
+        usuarioEl.innerText = primeiroNome;
+      }else{
         usuarioEl.innerText = "Usuário";
       }
     }catch(e){
       console.error(e);
       usuarioEl.innerText = "Usuário";
     }
-  } else {
+  }else{
     usuarioEl.innerText = "Visitante";
   }
 });
 
-/* ================= PRODUTOS ================= */
+/* PRODUTOS */
 async function carregarProdutos(){
   lista.innerHTML = "";
   produtosCarregados = [];
@@ -149,7 +218,9 @@ async function carregarProdutos(){
 
   for(const comercioDoc of comercios.docs){
     const comercio = comercioDoc.data();
-    const produtos = await getDocs(collection(db,"comercios",comercioDoc.id,"produtos"));
+    const produtos = await getDocs(
+      collection(db,"comercios",comercioDoc.id,"produtos")
+    );
 
     produtos.forEach(prodDoc=>{
       const p = prodDoc.data();
@@ -163,33 +234,33 @@ async function carregarProdutos(){
   }
 }
 
-/* ================= FILTROS ================= */
-window.filtrarBusca = ()=>{
+/* FILTROS */
+window.filtrarBusca = () =>{
   const termo = document.getElementById("buscaInput").value.toLowerCase();
   lista.innerHTML = "";
   produtosCarregados
-    .filter(p=>p.nome.toLowerCase().includes(termo))
+    .filter(p => p.nome.toLowerCase().includes(termo))
     .forEach(renderCard);
 }
 
 window.filtrarCategoria = (cat)=>{
   lista.innerHTML = "";
   produtosCarregados
-    .filter(p=>p.categoria === cat)
+    .filter(p => p.categoria === cat)
     .forEach(renderCard);
 }
 
 window.filtrarMaisProcurados = ()=>{
   lista.innerHTML = "";
   produtosCarregados
-    .filter(p=>p.maisProcurado)
+    .filter(p => p.maisProcurado)
     .forEach(renderCard);
 }
 
 window.filtrarDescontos = ()=>{
   lista.innerHTML = "";
   produtosCarregados
-    .filter(p=>p.desconto)
+    .filter(p => p.desconto)
     .forEach(renderCard);
 }
 
