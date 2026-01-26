@@ -25,7 +25,11 @@ body{background:var(--cinza)}
 .header input{
   flex:1;padding:10px;border:none;border-radius:10px
 }
-.usuario{font-size:.85em;font-weight:600}
+.usuario{
+  font-size:.85em;
+  font-weight:600;
+  white-space:nowrap;
+}
 .sidebar{
   position:fixed;top:0;left:-260px;width:260px;height:100%;
   background:#fff;box-shadow:2px 0 10px rgba(0,0,0,.2);
@@ -72,12 +76,12 @@ body{background:var(--cinza)}
 <div class="header">
   <div class="menu-btn" onclick="toggleMenu()">☰</div>
   <input id="buscaInput" placeholder="Buscar comida..." oninput="filtrarBusca()">
-  <div class="usuario" id="usuarioNome">Visitante</div>
+  <div class="usuario" id="usuario">Carregando...</div>
 </div>
 
 <div class="lista" id="listaProdutos"></div>
 
-<!-- ================= FIREBASE + SISTEMA ================= -->
+<!-- ================= FIREBASE ================= -->
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
 import { getFirestore, collection, getDocs, doc, getDoc } 
@@ -85,7 +89,6 @@ from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 import { getAuth, onAuthStateChanged, signOut } 
 from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
-/* 🔥 CONFIG */
 const firebaseConfig = {
   apiKey: "AIzaSyD6a29L24aFSgVjmC7NFGXpdWW4g1uQsio",
   authDomain: "tocomfome-754e1.firebaseapp.com",
@@ -96,25 +99,18 @@ const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 const auth = getAuth(app);
 
-/* 🔗 ELEMENTOS */
 const lista = document.getElementById("listaProdutos");
-const usuarioEl = document.getElementById("usuarioNome");
-const sidebar = document.getElementById("sidebar");
-
+const usuarioEl = document.getElementById("usuario");
 let produtosCarregados = [];
 
 /* ================= MENU ================= */
 window.toggleMenu = () =>{
-  sidebar.classList.toggle("active");
+  document.getElementById("sidebar").classList.toggle("active");
 }
 
 /* ================= PERFIL ================= */
 window.irPerfil = () =>{
-  if(auth.currentUser){
-    window.location.href = "perfil.html";
-  } else {
-    window.location.href = "login-cliente.html";
-  }
+  window.location.href = auth.currentUser ? "perfil.html" : "login-cliente.html";
 }
 
 /* ================= LOGOFF ================= */
@@ -123,14 +119,22 @@ window.logoff = async () =>{
   window.location.href = "index.html";
 }
 
-/* ================= USUÁRIO ================= */
+/* ================= USUÁRIO (NOME REAL) ================= */
 onAuthStateChanged(auth, async (user)=>{
   if(user){
     try{
       const ref = doc(db,"usuarios",user.uid);
       const snap = await getDoc(ref);
-      usuarioEl.innerText = snap.exists() ? snap.data().nome : "Usuário";
-    }catch{
+
+      if(snap.exists() && snap.data().nome){
+        usuarioEl.innerText = snap.data().nome;
+      } else if(user.displayName){
+        usuarioEl.innerText = user.displayName;
+      } else {
+        usuarioEl.innerText = "Usuário";
+      }
+    }catch(e){
+      console.error("Erro ao buscar nome:", e);
       usuarioEl.innerText = "Usuário";
     }
   } else {
@@ -161,15 +165,9 @@ async function carregarProdutos(){
   }
 }
 
-/* ================= PEDIR ================= */
-window.pedir = (produto)=>{
-  localStorage.setItem("produtoSelecionado", JSON.stringify(produto));
-  window.location.href = "produto.html";
-}
-
 /* ================= FILTROS ================= */
-window.filtrarBusca = ()=>{
-  const termo = buscaInput.value.toLowerCase();
+window.filtrarBusca = () =>{
+  const termo = document.getElementById("buscaInput").value.toLowerCase();
   lista.innerHTML = "";
   produtosCarregados
     .filter(p=>p.nome.toLowerCase().includes(termo))
@@ -197,7 +195,11 @@ window.filtrarDescontos = ()=>{
     .forEach(renderCard);
 }
 
-/* ================= CARD ================= */
+window.pedir = (produto)=>{
+  localStorage.setItem("produtoSelecionado", JSON.stringify(produto));
+  window.location.href = "produto.html";
+}
+
 function renderCard(p){
   lista.innerHTML += `
     <div class="card">
