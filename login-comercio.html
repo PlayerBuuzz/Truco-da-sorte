@@ -67,6 +67,7 @@ form{
 }
 
 input{
+  width:100%;
   padding:14px;
   border-radius:12px;
   border:1px solid #ddd;
@@ -78,13 +79,13 @@ input:focus{
   border-color:var(--laranja);
 }
 
-/* 👁️ OLHO DA SENHA */
+/* 👁️ CAMPO DE SENHA COM OLHO */
 .senha-box{
   position:relative;
 }
 
 .senha-box input{
-  padding-right:44px;
+  padding-right:46px;
 }
 
 .olho{
@@ -130,6 +131,7 @@ button:active{
 </head>
 
 <body>
+
 <div class="container">
   <div class="logo">🍔 Tôcomfome</div>
   <div class="slogan">Login do Comércio</div>
@@ -141,14 +143,14 @@ button:active{
 
     <div class="senha-box">
       <input id="senha" type="password" placeholder="Senha" required>
-      <span class="olho" onclick="toggleSenha()">👁️</span>
+      <span class="olho" id="btnOlho">👁️</span>
     </div>
 
     <button type="submit">Entrar</button>
   </form>
 
   <div class="link">
-    Não tem cadastro?  
+    Não tem cadastro?
     <a href="cadastro-comercio.html">Cadastrar comércio</a>
   </div>
 </div>
@@ -158,7 +160,7 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebas
 import { getAuth, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-// 🔥 CONFIG FIREBASE
+// 🔥 FIREBASE CONFIG
 const firebaseConfig = {
   apiKey: "AIzaSyD6a29L24aFSgVjmC7NFGXpdWW4g1uQsio",
   authDomain: "tocomfome-754e1.firebaseapp.com",
@@ -173,24 +175,25 @@ const auth = getAuth(app);
 const db = getFirestore(app);
 
 /* 👁️ MOSTRAR / OCULTAR SENHA */
-window.toggleSenha = ()=>{
-  const senhaInput = document.getElementById("senha");
-  const olho = document.querySelector(".olho");
+const senhaInput = document.getElementById("senha");
+const btnOlho = document.getElementById("btnOlho");
 
-  if(senhaInput.type === "password"){
+btnOlho.addEventListener("click", () => {
+  if (senhaInput.type === "password") {
     senhaInput.type = "text";
-    olho.textContent = "🙈";
-  }else{
+    btnOlho.textContent = "🙈";
+  } else {
     senhaInput.type = "password";
-    olho.textContent = "👁️";
+    btnOlho.textContent = "👁️";
   }
-};
+});
 
+/* 🔐 LOGIN */
 document.getElementById("formLogin").addEventListener("submit", async (e) => {
   e.preventDefault();
 
-  const email = document.getElementById("email").value;
-  const senha = document.getElementById("senha").value;
+  const email = emailInput = document.getElementById("email").value;
+  const senha = senhaInput.value;
 
   try {
     const cred = await signInWithEmailAndPassword(auth, email, senha);
@@ -199,13 +202,12 @@ document.getElementById("formLogin").addEventListener("submit", async (e) => {
     const snap = await getDoc(doc(db, "comercios", uid));
     if (!snap.exists()) {
       alert("❌ Conta não é de comércio");
-      auth.signOut();
+      await auth.signOut();
       return;
     }
 
     window.location.href = "painel-comercio.html";
-
-  } catch (err) {
+  } catch (error) {
     alert("❌ Email ou senha inválidos");
   }
 });
