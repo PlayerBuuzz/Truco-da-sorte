@@ -53,6 +53,7 @@ import {
   doc, 
   getDoc, 
   addDoc, 
+  setDoc, 
   collection, 
   serverTimestamp 
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
@@ -62,6 +63,9 @@ const firebaseConfig = {
   apiKey: "AIzaSyD6a29L24aFSgVjmC7NFGXpdWW4g1uQsio",
   authDomain: "tocomfome-754e1.firebaseapp.com",
   projectId: "tocomfome-754e1",
+  storageBucket: "tocomfome-754e1.appspot.com", // ✅ corrigido
+  messagingSenderId: "997975886937",
+  appId: "1:997975886937:web:9bf408c35f1ed8aea13548"
 };
 
 const app = initializeApp(firebaseConfig);
@@ -97,12 +101,7 @@ function carregarProduto(){
     produtoSelecionado = null;
   }
 
-  if(
-    !produtoSelecionado ||
-    !produtoSelecionado.nome ||
-    !produtoSelecionado.valor ||
-    !produtoSelecionado.comercioId
-  ){
+  if(!produtoSelecionado || !produtoSelecionado.nome || !produtoSelecionado.valor || !produtoSelecionado.comercioId){
     alert("Produto inválido.");
     window.location.href = "index.html";
     return;
@@ -110,10 +109,8 @@ function carregarProduto(){
 
   document.getElementById("conteudo").style.display = "block";
   document.getElementById("nome").innerText = produtoSelecionado.nome;
-  document.getElementById("preco").innerText =
-    "R$ " + Number(produtoSelecionado.valor).toFixed(2);
-  document.getElementById("descricao").innerText =
-    produtoSelecionado.descricao || "Descrição não informada";
+  document.getElementById("preco").innerText = "R$ " + Number(produtoSelecionado.valor).toFixed(2);
+  document.getElementById("descricao").innerText = produtoSelecionado.descricao || "Descrição não informada";
 }
 
 /* ✅ FINALIZAR PEDIDO */
@@ -121,7 +118,7 @@ window.finalizarPedido = async () =>{
   const user = auth.currentUser;
   if(!user || !produtoSelecionado) return;
 
-  await addDoc(collection(db, "pedidos"), {
+  const pedidoRef = await addDoc(collection(db, "pedidos"), {
     comercioId: produtoSelecionado.comercioId,
     comercioNome: produtoSelecionado.comercio || "",
     clienteId: user.uid,
@@ -132,12 +129,14 @@ window.finalizarPedido = async () =>{
     criadoEm: serverTimestamp()
   });
 
+  // incluir o ID do pedido no documento
+  await setDoc(pedidoRef, { pedidoId: pedidoRef.id }, { merge: true });
+
   localStorage.removeItem("produtoSelecionado");
 
   alert("✅ Pedido enviado com sucesso!");
   window.location.href = "index.html";
 };
 </script>
-
 </body>
 </html>
