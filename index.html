@@ -140,7 +140,6 @@ body{
 <!-- LISTA -->
 <div class="lista" id="listaProdutos"></div>
 
-<!-- FIREBASE -->
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
 import { 
@@ -156,6 +155,7 @@ import {
   signOut 
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
+/* FIREBASE */
 const firebaseConfig = {
   apiKey: "AIzaSyD6a29L24aFSgVjmC7NFGXpdWW4g1uQsio",
   authDomain: "tocomfome-754e1.firebaseapp.com",
@@ -168,6 +168,7 @@ const auth = getAuth(app);
 
 const lista = document.getElementById("listaProdutos");
 const usuarioEl = document.getElementById("usuario");
+
 let produtosCarregados = [];
 
 /* MENU */
@@ -186,22 +187,13 @@ window.logoff = async () =>{
   window.location.href = "index.html";
 }
 
-/* USUÁRIO - SOMENTE PRIMEIRO NOME */
+/* USUÁRIO */
 onAuthStateChanged(auth, async (user)=>{
   if(user){
-    try{
-      const ref = doc(db,"clientes",user.uid);
-      const snap = await getDoc(ref);
-
-      if(snap.exists()){
-        const nomeCompleto = snap.data().nome;
-        const primeiroNome = nomeCompleto.split(" ")[0];
-        usuarioEl.innerText = primeiroNome;
-      }else{
-        usuarioEl.innerText = "Usuário";
-      }
-    }catch(e){
-      console.error(e);
+    const snap = await getDoc(doc(db,"clientes",user.uid));
+    if(snap.exists()){
+      usuarioEl.innerText = snap.data().nome.split(" ")[0];
+    }else{
       usuarioEl.innerText = "Usuário";
     }
   }else{
@@ -214,29 +206,40 @@ async function carregarProdutos(){
   lista.innerHTML = "";
   produtosCarregados = [];
 
-  const comercios = await getDocs(collection(db,"comercios"));
+  const comerciosSnap = await getDocs(collection(db,"comercios"));
 
-  for(const comercioDoc of comercios.docs){
+  for(const comercioDoc of comerciosSnap.docs){
     const comercio = comercioDoc.data();
-    const produtos = await getDocs(
+
+    const produtosSnap = await getDocs(
       collection(db,"comercios",comercioDoc.id,"produtos")
     );
 
-    produtos.forEach(prodDoc=>{
+    produtosSnap.forEach(prodDoc=>{
       const p = prodDoc.data();
-      p.comercio = comercio.nome;
-      p.bairro = comercio.endereco?.bairro || "";
-      p.cidade = comercio.endereco?.cidade || "";
-      p.img = p.img || "https://via.placeholder.com/80";
-      produtosCarregados.push(p);
-      renderCard(p);
+
+      const produtoFinal = {
+        id: prodDoc.id,
+        nome: p.nome,
+        valor: p.valor,
+        descricao: p.descricao || "",
+        img: p.img || "https://via.placeholder.com/80",
+
+        comercioId: comercioDoc.id,
+        comercio: comercio.nome,
+        bairro: comercio.endereco?.bairro || "",
+        cidade: comercio.endereco?.cidade || ""
+      };
+
+      produtosCarregados.push(produtoFinal);
+      renderCard(produtoFinal);
     });
   }
 }
 
 /* FILTROS */
 window.filtrarBusca = () =>{
-  const termo = document.getElementById("buscaInput").value.toLowerCase();
+  const termo = buscaInput.value.toLowerCase();
   lista.innerHTML = "";
   produtosCarregados
     .filter(p => p.nome.toLowerCase().includes(termo))
@@ -264,11 +267,13 @@ window.filtrarDescontos = ()=>{
     .forEach(renderCard);
 }
 
+/* PEDIR */
 window.pedir = (produto)=>{
   localStorage.setItem("produtoSelecionado", JSON.stringify(produto));
   window.location.href = "produto.html";
 }
 
+/* CARD */
 function renderCard(p){
   lista.innerHTML += `
     <div class="card">
