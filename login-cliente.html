@@ -70,6 +70,26 @@ input:focus{
   border-color:var(--laranja);
 }
 
+/* 👁️ SENHA */
+.senha-box{
+  position:relative;
+}
+
+.senha-box input{
+  padding-right:46px;
+}
+
+.olho{
+  position:absolute;
+  right:14px;
+  top:50%;
+  transform:translateY(-50%);
+  font-size:1.2em;
+  cursor:pointer;
+  color:#999;
+  user-select:none;
+}
+
 button{
   width:100%;
   padding:14px;
@@ -108,7 +128,12 @@ button:active{
 
   <form id="loginCliente">
     <input type="email" id="email" placeholder="Email" required>
-    <input type="password" id="senha" placeholder="Senha" required>
+
+    <div class="senha-box">
+      <input type="password" id="senha" placeholder="Senha" required>
+      <span class="olho" onclick="toggleSenha()">👁️</span>
+    </div>
+
     <button type="submit">Entrar</button>
   </form>
 
@@ -136,26 +161,36 @@ const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
 
+/* 👁️ MOSTRAR / OCULTAR SENHA */
+window.toggleSenha = ()=>{
+  const senha = document.getElementById("senha");
+  const olho = document.querySelector(".olho");
+
+  if(senha.type === "password"){
+    senha.type = "text";
+    olho.textContent = "🙈";
+  }else{
+    senha.type = "password";
+    olho.textContent = "👁️";
+  }
+};
+
 document.getElementById("loginCliente").addEventListener("submit", async (e) => {
   e.preventDefault();
 
-  const email = document.getElementById("email").value;
-  const senha = document.getElementById("senha").value;
+  const email = email.value;
+  const senha = senha.value;
 
   try {
-    // Login Firebase Auth
     const cred = await signInWithEmailAndPassword(auth, email, senha);
 
-    // Verifica se é cliente
     const snap = await getDoc(doc(db, "clientes", cred.user.uid));
     if (!snap.exists()) {
       alert("❌ Conta não é de cliente");
       return;
     }
 
-    // Redireciona para página principal
     window.location.href = "index.html";
-
   } catch (err) {
     alert("❌ Email ou senha inválidos");
   }
