@@ -2,23 +2,19 @@
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
-<title>Tô com fome 🍔 | Meu Perfil</title>
+<title>Tôcomfome 🍔 | Meu Perfil</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <style>
 :root{
   --laranja:#ff8c1a;
   --cinza:#f5f5f5;
-  --texto:#333;
 }
-
 body{
   margin:0;
   background:var(--cinza);
   font-family:'Segoe UI', Arial;
-  color:var(--texto);
 }
-
 .header{
   background:var(--laranja);
   color:#fff;
@@ -27,27 +23,28 @@ body{
   font-size:1.2em;
   font-weight:600;
 }
-
 .card{
   background:#fff;
   margin:20px;
   padding:18px;
   border-radius:16px;
 }
-
-.label{
-  font-size:.85em;
-  color:#777;
-  margin-top:12px;
+label{
+  font-size:.8em;
+  color:#666;
 }
-
-.valor{
-  font-size:1em;
-  font-weight:600;
-  margin-top:2px;
+input{
+  width:100%;
+  padding:12px;
+  margin-top:4px;
+  margin-bottom:14px;
+  border-radius:12px;
+  border:1px solid #ddd;
 }
-
-.btn{
+input[disabled]{
+  background:#f1f1f1;
+}
+button{
   width:100%;
   padding:14px;
   border:none;
@@ -56,48 +53,37 @@ body{
   color:#fff;
   font-size:1em;
   font-weight:600;
-  cursor:pointer;
-  margin-top:16px;
+  margin-top:10px;
 }
-
-.btn.sair{
-  background:#444;
-}
+.sair{background:#444}
 </style>
 </head>
 
 <body>
 
-<div class="header">
-  👤 Meu Perfil
-</div>
+<div class="header">👤 Meu Perfil</div>
 
 <div class="card" id="conteudo" style="display:none">
-  <div class="label">Nome</div>
-  <div class="valor" id="nome"></div>
+  <label>Nome</label>
+  <input id="nome" disabled>
 
-  <div class="label">E-mail</div>
-  <div class="valor" id="email"></div>
+  <label>CPF</label>
+  <input id="cpf" disabled>
 
-  <div class="label">CPF</div>
-  <div class="valor" id="cpf"></div>
+  <label>Email</label>
+  <input id="email">
 
-  <div class="label">Celular</div>
-  <div class="valor" id="celular"></div>
+  <label>Celular</label>
+  <input id="celular">
 
-  <div class="label">Bairro</div>
-  <div class="valor" id="bairro"></div>
+  <label>Bairro</label>
+  <input id="bairro">
 
-  <div class="label">Cidade</div>
-  <div class="valor" id="cidade"></div>
+  <label>Cidade</label>
+  <input id="cidade">
 
-  <button class="btn" onclick="window.location.href='index.html'">
-    🍔 Voltar para o início
-  </button>
-
-  <button class="btn sair" onclick="sair()">
-    🚪 Sair da conta
-  </button>
+  <button onclick="salvar()">💾 Salvar alterações</button>
+  <button class="sair" onclick="sair()">🚪 Sair</button>
 </div>
 
 <script type="module">
@@ -105,66 +91,88 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebas
 import { 
   getAuth, 
   onAuthStateChanged, 
-  signOut 
+  signOut,
+  updateEmail
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-
 import { 
   getFirestore, 
   doc, 
-  getDoc 
+  getDoc,
+  updateDoc
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-/* 🔥 CONFIG FIREBASE */
 const firebaseConfig = {
-  apiKey: "SUA_API_KEY",
-  authDomain: "SEU_DOMINIO",
-  projectId: "SEU_PROJECT_ID",
+  apiKey: "AIzaSyD6a29L24aFSgVjmC7NFGXpdWW4g1uQsio",
+  authDomain: "tocomfome-754e1.firebaseapp.com",
+  projectId: "tocomfome-754e1",
 };
 
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
 
+let usuarioAtual;
+
 /* 🔐 VERIFICA LOGIN */
-onAuthStateChanged(auth, async (user) => {
-  if (!user) {
-    window.location.href = "login-cliente.html";
+onAuthStateChanged(auth, async (user)=>{
+  if(!user){
+    location.href = "login-cliente.html";
     return;
   }
 
-  const ref = doc(db, "clientes", user.uid);
+  usuarioAtual = user;
+
+  const ref = doc(db,"clientes",user.uid);
   const snap = await getDoc(ref);
 
-  if (!snap.exists()) {
-    alert("Perfil não encontrado.");
-    window.location.href = "index.html";
+  if(!snap.exists()){
+    alert("Perfil não encontrado");
+    location.href = "index.html";
     return;
   }
 
-  const dados = snap.data();
-
-  // ❌ segurança extra
-  if (dados.tipo !== "cliente") {
-    alert("Acesso inválido.");
-    window.location.href = "index.html";
+  const d = snap.data();
+  if(d.tipo !== "cliente"){
+    alert("Acesso inválido");
+    location.href = "index.html";
     return;
   }
 
-  document.getElementById("nome").innerText = dados.nome;
-  document.getElementById("email").innerText = dados.email;
-  document.getElementById("cpf").innerText = dados.cpf;
-  document.getElementById("celular").innerText = dados.celular;
-  document.getElementById("bairro").innerText = dados.bairro;
-  document.getElementById("cidade").innerText = dados.cidade;
+  nome.value = d.nome;
+  cpf.value = d.cpf;
+  email.value = d.email;
+  celular.value = d.celular;
+  bairro.value = d.bairro;
+  cidade.value = d.cidade;
 
-  document.getElementById("conteudo").style.display = "block";
+  conteudo.style.display = "block";
 });
 
+/* 💾 SALVAR */
+window.salvar = async ()=>{
+  try{
+    if(email.value !== usuarioAtual.email){
+      await updateEmail(usuarioAtual, email.value);
+    }
+
+    await updateDoc(doc(db,"clientes",usuarioAtual.uid),{
+      email: email.value,
+      celular: celular.value,
+      bairro: bairro.value,
+      cidade: cidade.value
+    });
+
+    alert("Dados atualizados com sucesso 🍔");
+  }catch(e){
+    alert("Erro: " + e.message);
+  }
+}
+
 /* 🚪 SAIR */
-window.sair = async () => {
+window.sair = async ()=>{
   await signOut(auth);
-  window.location.href = "login-cliente.html";
-};
+  location.href = "login-cliente.html";
+}
 </script>
 
 </body>
