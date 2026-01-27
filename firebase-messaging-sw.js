@@ -5,7 +5,7 @@ firebase.initializeApp({
   apiKey: "AIzaSyD6a29L24aFSgVjmC7NFGXpdWW4g1uQsio",
   authDomain: "tocomfome-754e1.firebaseapp.com",
   projectId: "tocomfome-754e1",
-  storageBucket: "tocomfome-754e1.firebasestorage.app",
+  storageBucket: "tocomfome-754e1.appspot.com", // ✅ corrigido
   messagingSenderId: "997975886937",
   appId: "1:997975886937:web:9bf408c35f1ed8aea13548"
 });
@@ -23,7 +23,7 @@ messaging.onBackgroundMessage(function(payload) {
     body: payload.notification?.body || "Você recebeu um novo pedido",
     icon: "/icon.png",
     data: {
-      url: "/painel-comercio.html"
+      url: payload.data?.url || "/painel-comercio.html" // ✅ flexível
     }
   };
 
