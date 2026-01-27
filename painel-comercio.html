@@ -161,7 +161,8 @@ textarea{
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
 import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-import { getFirestore, doc, getDoc, collection, addDoc, getDocs, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+import { getFirestore, doc, getDoc, collection, addDoc, getDocs, serverTimestamp, setDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+import { getMessaging, getToken, onMessage } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-messaging.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyD6a29L24aFSgVjmC7NFGXpdWW4g1uQsio",
@@ -175,6 +176,7 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
+const messaging = getMessaging(app);
 
 const nomeComercio = document.getElementById("nomeComercio");
 const endereco = document.getElementById("endereco");
@@ -201,7 +203,18 @@ onAuthStateChanged(auth, async (user) => {
   telefone.textContent = `📞 ${c.telefone}`;
 
   carregarProdutos(uid);
-  carregarPedidos(uid); // 🔥 agora também carrega pedidos
+  carregarPedidos(uid);
+
+  // 🔥 Registrar token FCM do comércio
+  try {
+    const token = await getToken(messaging, { vapidKey: "SUA_VAPID_KEY" }); // substitua pela sua VAPID KEY
+    if(token){
+      await setDoc(doc(db, "comercios", uid), { fcmToken: token }, { merge: true });
+      console.log("Token FCM do comércio salvo:", token);
+    }
+  } catch(err){
+    console.error("Erro ao obter token FCM:", err);
+  }
 });
 
 async function carregarProdutos(uid){
@@ -257,6 +270,12 @@ form.addEventListener("submit", async (e) => {
 window.toggleForm = function(){
   form.style.display = form.style.display === "flex" ? "none" : "flex";
 }
+
+// 🔔 Receber notificações em tempo real no painel
+onMessage(messaging, (payload) => {
+  console.log("Mensagem recebida:", payload);
+  alert(`🔔 Notificação: ${payload.notification.title}\n${payload.notification.body}`);
+});
 </script>
 
 </body>
