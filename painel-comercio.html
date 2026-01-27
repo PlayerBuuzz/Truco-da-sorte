@@ -108,7 +108,7 @@ textarea{
   height:70px;
 }
 
-.produto, .pedido{
+.produto{
   background:#fff;
   border:1px solid #eee;
   border-radius:12px;
@@ -116,7 +116,7 @@ textarea{
   margin-top:10px;
 }
 
-.produto strong, .pedido strong{
+.produto strong{
   font-size:0.95em;
 }
 
@@ -152,16 +152,12 @@ textarea{
 
   <div id="listaProdutos"></div>
 
-  <div class="area">Pedidos</div>
-  <div id="listaPedidos"></div>
-
 </div>
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
 import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-import { getFirestore, doc, getDoc, collection, addDoc, getDocs, serverTimestamp, setDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
-import { getMessaging, getToken, onMessage } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-messaging.js";
+import { getFirestore, doc, getDoc, collection, addDoc, getDocs, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyD6a29L24aFSgVjmC7NFGXpdWW4g1uQsio",
@@ -175,25 +171,13 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
-const messaging = getMessaging(app);
 
 const nomeComercio = document.getElementById("nomeComercio");
 const endereco = document.getElementById("endereco");
 const telefone = document.getElementById("telefone");
 const listaProdutos = document.getElementById("listaProdutos");
-const listaPedidos = document.getElementById("listaPedidos");
-const form = document.getElementById("formProduto");
 
-// Registrar o service worker
-if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.register('/firebase-messaging-sw.js')
-    .then((registration) => {
-      console.log("Service Worker registrado:", registration);
-    })
-    .catch((err) => {
-      console.error("Erro ao registrar Service Worker:", err);
-    });
-}
+const form = document.getElementById("formProduto");
 
 onAuthStateChanged(auth, async (user) => {
   if (!user) {
@@ -212,23 +196,6 @@ onAuthStateChanged(auth, async (user) => {
   telefone.textContent = `📞 ${c.telefone}`;
 
   carregarProdutos(uid);
-  carregarPedidos(uid);
-
-  // Ativar notificações e salvar token
-  try {
-    const permission = await Notification.requestPermission();
-    if (permission === "granted") {
-      const token = await getToken(messaging, { vapidKey: "SUA_VAPID_KEY" }); // substitua pela sua VAPID KEY
-      if(token){
-        await setDoc(doc(db, "comercios", uid), { fcmToken: token }, { merge: true });
-        console.log("Token FCM salvo:", token);
-      }
-    } else {
-      console.warn("Permissão de notificação negada");
-    }
-  } catch(err){
-    console.error("Erro ao ativar notificações:", err);
-  }
 });
 
 async function carregarProdutos(uid){
@@ -242,22 +209,6 @@ async function carregarProdutos(uid){
         <strong>${p.nome}</strong>
         <div class="preco">R$ ${p.valor}</div>
         <div>${p.descricao || ""}</div>
-      </div>
-    `;
-  });
-}
-
-async function carregarPedidos(uid){
-  listaPedidos.innerHTML = "";
-  const pedidosSnap = await getDocs(collection(db, "comercios", uid, "pedidos"));
-
-  pedidosSnap.forEach(docu => {
-    const p = docu.data();
-    listaPedidos.innerHTML += `
-      <div class="pedido">
-        <strong>${p.clienteNome}</strong> pediu <em>${p.produtoNome}</em>
-        <div class="preco">R$ ${p.valor}</div>
-        <div>Status: ${p.status}</div>
       </div>
     `;
   });
@@ -284,8 +235,7 @@ form.addEventListener("submit", async (e) => {
 window.toggleForm = function(){
   form.style.display = form.style.display === "flex" ? "none" : "flex";
 }
+</script>
 
-// Receber notificações em tempo real
-onMessage(messaging, (payload) => {
-  console.log("Mensagem recebida:", payload);
-  alert(`🔔 Notificação: ${payload.notification.title}\n${payload
+</body>
+</html>
