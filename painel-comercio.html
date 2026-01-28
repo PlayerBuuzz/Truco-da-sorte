@@ -302,6 +302,11 @@ function escutarPedidos(uid){
       const pedido = docu.data();
       const pedidoId = docu.id; // ID do documento
 
+      // 🔑 Se o status for "entregue", não renderiza
+      if (pedido.status === "entregue") {
+        return;
+      }
+
       listaPedidos.innerHTML += `
         <div class="produto" style="border:2px solid var(--laranja);cursor:pointer"
              onclick="abrirPedido('${pedidoId}')">
@@ -312,6 +317,15 @@ function escutarPedidos(uid){
         </div>
       `;
     });
+
+    // 🔑 Se não houver pedidos visíveis
+    if (listaPedidos.innerHTML === "") {
+      listaPedidos.innerHTML = `
+        <div style="text-align:center;color:#666;margin-top:20px">
+          ✅ Nenhum pedido pendente
+        </div>
+      `;
+    }
   });
 }
 
