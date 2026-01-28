@@ -259,12 +259,12 @@ body{
 ">
   💬 Suporte
 </div>
-  
-<script type="module">
+  <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
 import { getFirestore, collection, getDocs, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
+/* 🔧 Firebase */
 const firebaseConfig = {
   apiKey: "AIzaSyD6a29L24aFSgVjmC7NFGXpdWW4g1uQsio",
   authDomain: "tocomfome-754e1.firebaseapp.com",
@@ -275,11 +275,13 @@ const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 const auth = getAuth(app);
 
+/* 🔧 Elementos do DOM */
 const lista = document.getElementById("listaProdutos");
 const usuarioEl = document.getElementById("usuario");
 const sidebar = document.getElementById("sidebar");
 const overlay = document.getElementById("overlay");
 const buscaInput = document.getElementById("buscaInput");
+const chatBalao = document.getElementById("chat-balao");
 
 let produtos = [];
 
@@ -375,25 +377,21 @@ window.abrirComercio = (comercioId)=>{
   window.location.href = "perfil-comercio.html";
 }
 
-carregarProdutos();
-  
+/* BALÃO DE CHAT */
+chatBalao.addEventListener("click", ()=>{
+  onAuthStateChanged(auth, (user)=>{
+    if(user){
+      // Usuário logado → vai para chat
+      window.location.href = "chat-suporte.html";
+    }else{
+      // Não logado → vai para login
+      window.location.href = "login-cliente.html";
     }
-    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-    
-    const auth = getAuth();
-    const chatBalao = document.getElementById("chat-balao");
-    
-    chatBalao.addEventListener("click", ()=>{
-      onAuthStateChanged(auth, (user)=>{
-        if(user){
-          // Usuário logado → vai para chat
-          window.location.href = "chat-suporte.html";
-        }else{
-          // Não logado → vai para login
-          window.location.href = "login-cliente.html";
-        }
-      });
-    });
+  });
+});
+
+/* INIT */
+carregarProdutos();
 </script>
 </body>
 </html>
