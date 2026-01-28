@@ -100,6 +100,7 @@ body{
   background:var(--laranja);
   color:#fff;
   font-weight:600;
+  cursor:pointer;
 }
 </style>
 </head>
@@ -187,7 +188,6 @@ function ouvirMensagens(){
       const m = docu.data();
       const div = document.createElement("div");
       div.className = `msg ${m.autor}`;
-
       div.innerHTML = `
         <div class="nome">${m.nome}</div>
         ${m.texto}
@@ -219,14 +219,10 @@ window.enviar = async ()=>{
 window.encerrarChat = async ()=>{
   if(!confirm("Encerrar a conversa?")) return;
 
-  const msgs = await getDocs(
-    collection(db,"chats",chatId,"mensagens")
-  );
-
+  const msgs = await getDocs(collection(db,"chats",chatId,"mensagens"));
   for(const d of msgs.docs){
     await deleteDoc(d.ref);
   }
-
   await deleteDoc(doc(db,"chats",chatId));
   localStorage.removeItem("chatSuporteId");
 
