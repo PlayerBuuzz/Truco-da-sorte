@@ -300,8 +300,11 @@ function escutarPedidos(uid){
     listaPedidos.innerHTML = "";
     snapshot.forEach(docu => {
       const pedido = docu.data();
+      const pedidoId = docu.id; // ID do documento
+
       listaPedidos.innerHTML += `
-        <div class="produto" style="border:2px solid var(--laranja)">
+        <div class="produto" style="border:2px solid var(--laranja);cursor:pointer"
+             onclick="abrirPedido('${pedidoId}')">
           <strong>Pedido: ${pedido.produtoNome}</strong>
           <div>Cliente: ${pedido.clienteNome}</div>
           <div class="preco">R$ ${pedido.valor}</div>
@@ -310,6 +313,12 @@ function escutarPedidos(uid){
       `;
     });
   });
+}
+
+/* Função para abrir pedido */
+window.abrirPedido = (id)=>{
+  localStorage.setItem("pedidoSelecionado", id);
+  window.location.href = "pedido-comercio.html";
 }
 
 /* Notificações em primeiro plano */
