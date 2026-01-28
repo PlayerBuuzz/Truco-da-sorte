@@ -178,14 +178,67 @@ function statusClass(status){
   return status || "aguardando";
 }
 
-/* CARREGAR PEDIDOS */
-async function carregarPedidos(uid){
+/* CARREGAR PEDIDOS EM TEMPO REAL */
+function carregarPedidos(uid){
   lista.innerHTML = "";
 
   const q = query(
     collection(db,"pedidos"),
     where("clienteId","==",uid)
   );
+
+  onSnapshot(q, (snap)=>{
+    lista.innerHTML = "";
+
+    if(snap.empty){
+      lista.innerHTML = `
+        <div class="vazio">
+          😕 Você ainda não fez nenhum pedido
+        </div>
+      `;
+      return;
+    }
+
+    snap.forEach(doc=>{
+      const p = doc.data();
+
+      lista.innerHTML += `
+        <div class="card">
+
+          <div class="card-top">
+            <div>
+              <h4>${p.produtoNome}</h4>
+              <div class="preco">
+                ${Number(p.valor).toLocaleString("pt-BR",{style:"currency",currency:"BRL"})}
+              </div>
+              <div class="local">
+                📍 Pedido em <strong>${p.comercioNome}</strong>
+              </div>
+            </div>
+          </div>
+
+          <div class="timeline">
+            <span class="${ativo(p.status,'novo')}">🕒</span>
+            <span class="${ativo(p.status,'preparando')}">👨‍🍳</span>
+            <span class="${ativo(p.status,'saiu')}">🛵</span>
+            <span class="${ativo(p.status,'entregue')}">✅</span>
+          </div>
+
+          <div class="card-footer">
+            <div class="status ${statusClass(p.status)}">
+              ${p.status || "aguardando"}
+            </div>
+
+            <button class="btn-sec" onclick="repetirPedido('${doc.id}')">
+              🔁 Pedir novamente
+            </button>
+          </div>
+
+        </div>
+      `;
+    });
+  });
+}
 
   const snap = await getDocs(q);
 
