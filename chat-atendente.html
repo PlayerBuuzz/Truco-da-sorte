@@ -157,7 +157,6 @@ const db = getFirestore(app);
 const chatEl = document.getElementById("chat");
 const input = document.getElementById("msg");
 let chatId = null;
-
 /* LOGIN LOCAL */
 window.fazerLogin = () => {
   const user = document.getElementById("loginUser").value.trim();
@@ -185,8 +184,11 @@ async function initChat(){
                   .sort((a,b)=>a.data().posicao - b.data().posicao);
     if(fila.length > 0){
       // promove primeiro da fila
-      await deleteDoc(doc(db,"chats",fila[0].id));
+      const filaDoc = fila[0];
+      const filaData = filaDoc.data();
+      await deleteDoc(doc(db,"chats",filaDoc.id));
       const novoChatRef = await addDoc(collection(db,"chats"), { 
+        uid: filaData.uid, // mantém o cliente
         criadoEm: serverTimestamp(),
         status: "ativo"
       });
@@ -219,7 +221,7 @@ function ouvirMensagens(){
 window.enviar = async ()=>{
   if(!input.value.trim() || !chatId) return;
   await addDoc(collection(db,"chats",chatId,"mensagens"),{
-        texto: input.value,
+    texto: input.value,
     autor: "support",
     nome: "Suporte 👨‍💼",
     criadoEm: serverTimestamp()
@@ -245,9 +247,11 @@ window.encerrarChat = async ()=>{
                 .sort((a,b)=>a.data().posicao - b.data().posicao);
   
   if(fila.length > 0){
-    // Promove o primeiro da fila para ativo
-    await deleteDoc(doc(db,"chats",fila[0].id));
+    const filaDoc = fila[0];
+    const filaData = filaDoc.data();
+    await deleteDoc(doc(db,"chats",filaDoc.id));
     const novoChatRef = await addDoc(collection(db,"chats"), { 
+      uid: filaData.uid, // mantém o cliente
       criadoEm: serverTimestamp(),
       status: "ativo"
     });
@@ -261,3 +265,6 @@ window.encerrarChat = async ()=>{
   }
 };
 </script>
+
+</body>
+</html>
