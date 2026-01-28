@@ -148,7 +148,9 @@ import {
   collection,
   query,
   where,
-  onSnapshot
+  onSnapshot,
+  doc,
+  updateDoc
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 import {
   getAuth,
@@ -178,6 +180,27 @@ function statusClass(status){
   return status || "aguardando";
 }
 
+/* Salvar avaliação */
+window.salvarAvaliacao = async (pedidoId)=>{
+  const pedidoRef = doc(db,"pedidos",pedidoId);
+
+  const pedidoCard = document.getElementById(`pedido-${pedidoId}`);
+  const notaPedido = pedidoCard.querySelector(".notaPedido").value;
+  const notaMotoboy = pedidoCard.querySelector(".notaMotoboy").value;
+  const tempoEntrega = pedidoCard.querySelector(".tempoEntrega").value;
+
+  await updateDoc(pedidoRef,{
+    avaliacao:{
+      pedido: notaPedido,
+      motoboy: notaMotoboy,
+      tempo: tempoEntrega,
+      criadoEm: new Date()
+    }
+  });
+
+  alert("✅ Avaliação enviada com sucesso!");
+}
+
 /* CARREGAR PEDIDOS EM TEMPO REAL */
 function carregarPedidos(uid){
   lista.innerHTML = "";
@@ -199,12 +222,12 @@ function carregarPedidos(uid){
       return;
     }
 
-    snap.forEach(doc=>{
-      const p = doc.data();
+    snap.forEach(docSnap=>{
+      const p = docSnap.data();
+      const id = docSnap.id;
 
       lista.innerHTML += `
-        <div class="card">
-
+        <div class="card" id="pedido-${id}">
           <div class="card-top">
             <div>
               <h4>${p.produtoNome}</h4>
@@ -228,12 +251,29 @@ function carregarPedidos(uid){
             <div class="status ${statusClass(p.status)}">
               ${p.status || "aguardando"}
             </div>
-
-            <button class="btn-sec" onclick="repetirPedido('${doc.id}')">
+            <button class="btn-sec" onclick="repetirPedido('${id}')">
               🔁 Pedir novamente
             </button>
           </div>
 
+          ${p.status === "entregue" && !p.avaliacao ? `
+            <div style="margin-top:12px;padding:10px;border-top:1px solid #eee">
+              <label>⭐ Avaliação do pedido:</label>
+              <input type="number" min="1" max="5" class="notaPedido" placeholder="1-5">
+              <label>🛵 Avaliação do motoboy:</label>
+              <input type="number" min="1" max="5" class="notaMotoboy" placeholder="1-5">
+              <label>⏱ Tempo de entrega (min):</label>
+              <input type="number" class="tempoEntrega" placeholder="Ex: 30">
+              <button class="btn-sec" onclick="salvarAvaliacao('${id}')">Enviar avaliação</button>
+            </div>
+          ` : p.avaliacao ? `
+            <div style="margin-top:12px;padding:10px;border-top:1px solid #eee;color:#555">
+              ✅ Avaliação enviada<br>
+              Pedido: ${p.avaliacao.pedido} ⭐<br>
+              Motoboy: ${p.avaliacao.motoboy} ⭐<br>
+              Tempo: ${p.avaliacao.tempo} min
+            </div>
+          ` : ""}
         </div>
       `;
     });
@@ -254,7 +294,6 @@ onAuthStateChanged(auth,(user)=>{
   carregarPedidos(user.uid);
 });
 </script>
-
-
+  
 </body>
 </html>
