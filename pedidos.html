@@ -53,7 +53,9 @@ body{background:var(--cinza);}
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-import { getFirestore, collection, query, where, onSnapshot, doc, updateDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+import { 
+  getFirestore, collection, query, where, onSnapshot, doc, updateDoc, getDoc 
+} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
 /* FIREBASE */
@@ -94,22 +96,32 @@ window.salvarAvaliacao = async (pedidoId)=>{
 /* CARREGAR PEDIDOS EM TEMPO REAL */
 function carregarPedidos(uid){
   const q = query(collection(db,"pedidos"), where("clienteId","==",uid));
-  onSnapshot(q,(snap)=>{
+  onSnapshot(q, async (snap)=>{
     lista.innerHTML = "";
     if(snap.empty){
       lista.innerHTML = `<div class="vazio">😕 Você ainda não fez nenhum pedido</div>`;
       return;
     }
-    snap.forEach(docSnap=>{
+    for(const docSnap of snap.docs){
       const p = docSnap.data();
       const id = docSnap.id;
+
+      // 🔑 Buscar nome do comércio pelo comercioId
+      let comercioNome = p.comercioNome || "";
+      if(!comercioNome && p.comercioId){
+        const comercioSnap = await getDoc(doc(db,"comercios",p.comercioId));
+        if(comercioSnap.exists()){
+          comercioNome = comercioSnap.data().nome;
+        }
+      }
+
       lista.innerHTML += `
         <div class="card" id="pedido-${id}">
           <div class="card-top">
             <div>
               <h4>${p.produtoNome}</h4>
               <div class="preco">${Number(p.valor).toLocaleString("pt-BR",{style:"currency",currency:"BRL"})}</div>
-              <div class="local">📍 Pedido em <strong>${p.comercioNome}</strong></div>
+              <div class="local">📍 Pedido em <strong>${comercioNome}</strong></div>
             </div>
           </div>
           <div class="timeline">
@@ -141,7 +153,7 @@ function carregarPedidos(uid){
             </div>
           ` : ""}
         </div>`;
-    });
+    }
   });
 }
 
@@ -159,5 +171,6 @@ onAuthStateChanged(auth,(user)=>{
   carregarPedidos(user.uid);
 });
 </script>
+
 </body>
 </html>
