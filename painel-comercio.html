@@ -34,6 +34,9 @@ body{
   max-width:420px;
   border-radius:20px 20px 0 0;
   padding:20px 18px 80px; /* espaço para menu inferior */
+  box-shadow:0 -2px 12px rgba(0,0,0,0.15);
+  overflow-y:auto;
+  max-height:90vh;
 }
 
 .logo{
@@ -134,28 +137,40 @@ textarea{
   display:block;
 }
 
-/* Menu inferior */
+/* Menu inferior estilo app */
 .menu-inferior{
   position:fixed;
   bottom:0;
   left:0;
   width:100%;
   max-width:420px;
-  background:var(--branco);
+  background:#fff;
   border-top:1px solid #ddd;
   display:flex;
   justify-content:space-around;
-  padding:10px 0;
+  padding:8px 0;
 }
 
 .menu-inferior button{
   flex:1;
   border:none;
   background:none;
-  font-size:0.9em;
+  font-size:0.8em;
   font-weight:600;
-  color:var(--laranja);
+  color:#555;
   cursor:pointer;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  gap:4px;
+}
+
+.menu-inferior button.active{
+  color:var(--laranja);
+}
+
+.menu-inferior button i{
+  font-size:1.2em;
 }
 </style>
 </head>
@@ -222,13 +237,12 @@ textarea{
 
 <!-- Menu inferior -->
 <div class="menu-inferior">
-  <button onclick="mostrarAba('abaProdutos')">Produtos</button>
-  <button onclick="mostrarAba('abaPedidos')">Pedidos</button>
-  <button onclick="mostrarAba('abaCupons')">Cupons</button>
-  <button onclick="mostrarAba('abaInfo')">Informações</button>
-  <button onclick="mostrarAba('abaChat')">Chat</button>
+  <button onclick="mostrarAba('abaProdutos')" id="btnProdutos"><i>🍔</i>Produtos</button>
+  <button onclick="mostrarAba('abaPedidos')" id="btnPedidos"><i>📦</i>Pedidos</button>
+  <button onclick="mostrarAba('abaCupons')" id="btnCupons"><i>🎟️</i>Cupons</button>
+  <button onclick="mostrarAba('abaInfo')" id="btnInfo"><i>⚙️</i>Info</button>
+  <button onclick="mostrarAba('abaChat')" id="btnChat"><i>💬</i>Chat</button>
 </div>
-
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
 import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
@@ -268,12 +282,16 @@ const formChat = document.getElementById("formChat");
 window.mostrarAba = function(id){
   document.querySelectorAll('.aba').forEach(el => el.classList.remove('ativa'));
   document.getElementById(id).classList.add('ativa');
+
+  // Atualiza destaque no menu inferior
+  document.querySelectorAll('.menu-inferior button').forEach(btn => btn.classList.remove('active'));
+  const btnId = "btn" + id.replace("aba",""); 
+  document.getElementById(btnId).classList.add('active');
 }
 
 /* Toggle form produto */
 window.toggleForm = function(){
-  formProduto.style.display = formProduto.style.display === "flex" ? "none"
-      : "flex";
+  formProduto.style.display = formProduto.style.display === "flex" ? "none" : "flex";
 }
 
 /* 🔔 REGISTRAR NOTIFICAÇÃO */
@@ -304,29 +322,23 @@ function escutarPedidos(uid){
   const q = query(pedidosRef, where("comercioId", "==", uid));
 
   onSnapshot(q, (snapshot) => {
-    snapshot.docChanges().forEach(change => {
-      if (change.type === "added") {
-        const pedido = change.doc.data();
-        listaPedidos.innerHTML += `
-          <div class="produto" style="border:2px solid var(--laranja)">
-            <strong>🆕 Pedido: ${pedido.produtoNome}</strong>
-            <div>Cliente: ${pedido.clienteNome}</div>
-            <div class="preco">R$ ${pedido.valor}</div>
-            <div>Status: ${pedido.status}</div>
-          </div>
-        `;
-        new Notification("🍔 Novo pedido recebido!", {
-          body: `${pedido.clienteNome} pediu: ${pedido.produtoNome}`,
-          icon: "/icon.png"
-        });
-      }
+    listaPedidos.innerHTML = "";
+    snapshot.forEach(docu => {
+      const pedido = docu.data();
+      listaPedidos.innerHTML += `
+        <div class="produto" style="border:2px solid var(--laranja)">
+          <strong>Pedido: ${pedido.produtoNome}</strong>
+          <div>Cliente: ${pedido.clienteNome}</div>
+          <div class="preco">R$ ${pedido.valor}</div>
+          <div>Status: ${pedido.status}</div>
+        </div>
+      `;
     });
   });
 }
 
 /* 🔔 RECEBER NOTIFICAÇÕES EM PRIMEIRO PLANO */
 onMessage(messaging, (payload) => {
-  console.log("Mensagem recebida em primeiro plano:", payload);
   new Notification(payload.notification.title, {
     body: payload.notification.body,
     icon: "/icon.png"
