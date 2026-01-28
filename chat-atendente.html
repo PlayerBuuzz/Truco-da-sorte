@@ -116,7 +116,7 @@ header strong{
 }
 
 /* BALÕES */
-.message{
+.msg{
   max-width:75%;
   padding:12px 16px;
   border-radius:20px;
@@ -181,7 +181,7 @@ footer button:hover{
 
 /* RESPONSIVO */
 @media(max-width:480px){
-  .message{max-width:90%; font-size:.9em;}
+  .msg{max-width:90%; font-size:.9em;}
   footer input, footer button{font-size:.9em; padding:10px;}
 }
 </style>
@@ -254,15 +254,15 @@ window.fazerLogin = () => {
   }
 }
 
-/* INIT CHAT: pegar o primeiro chat aberto */
+/* INIT CHAT: pegar o chat mais recente aberto */
 function initChat(){
   const q = query(collection(db,"chats"), where("status","==","aberto"));
   onSnapshot(q, async (snap)=>{
     if(snap.docs.length > 0){
-      if(!chatId){
-        chatId = snap.docs[0].id;
-        // marcar como "em atendimento"
-        await updateDoc(doc(db,"chats",chatId),{status:"atendimento"});
+      const chat = snap.docs[snap.docs.length - 1];
+      if(!chatId || chatId !== chat.id){
+        chatId = chat.id;
+        await updateDoc(doc(db,"chats",chatId), {status:"atendimento"});
         ouvirMensagens();
       }
     }
@@ -277,7 +277,7 @@ function ouvirMensagens(){
     snap.forEach(docu=>{
       const m = docu.data();
       const div = document.createElement("div");
-      div.className = `message ${m.autor === "cliente" ? "user" : "support"}`;
+      div.className = `msg ${m.autor === "cliente" ? "user" : "support"}`;
       div.innerHTML = `
         <strong>${m.nome}</strong><br>
         ${m.texto}
