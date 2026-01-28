@@ -2,25 +2,19 @@
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
-<title>Tôcomfome 💬 | Suporte</title>
+<title>💬 Suporte Tôcomfome</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <style>
 :root{
   --laranja:#ff8c1a;
-  --cinza:#f5f5f5;
-  --sombra:rgba(0,0,0,.08);
+  --cinza:#f1f1f1;
+  --texto:#333;
 }
-
-*{
-  margin:0;
-  padding:0;
-  box-sizing:border-box;
-  font-family:'Segoe UI',Arial;
-}
-
 body{
-  background:var(--cinza);
+  margin:0;
+  font-family:'Segoe UI',Arial;
+  background:#f5f5f5;
   display:flex;
   flex-direction:column;
   height:100vh;
@@ -30,63 +24,79 @@ body{
 .header{
   background:#fff;
   padding:14px;
-  text-align:center;
-  box-shadow:0 2px 6px var(--sombra);
-  font-weight:700;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  box-shadow:0 2px 6px rgba(0,0,0,.1);
+}
+.header h3{
   color:var(--laranja);
 }
+.encerrar{
+  font-size:.8em;
+  color:#c00;
+  cursor:pointer;
+}
 
-/* CHAT */
+/* MENSAGENS */
 .chat{
   flex:1;
   padding:14px;
   overflow-y:auto;
+  display:flex;
+  flex-direction:column;
+  gap:10px;
 }
 
-/* MENSAGEM */
 .msg{
   max-width:75%;
   padding:10px 14px;
   border-radius:14px;
-  margin-bottom:10px;
   font-size:.9em;
-  line-height:1.4;
 }
 
 .cliente{
+  align-self:flex-end;
   background:var(--laranja);
   color:#fff;
-  margin-left:auto;
-  border-bottom-right-radius:4px;
 }
 
 .suporte{
-  background:#fff;
+  align-self:flex-start;
+  background:var(--cinza);
   color:#333;
-  border-bottom-left-radius:4px;
-  box-shadow:0 2px 6px var(--sombra);
+}
+
+.nome{
+  font-size:.7em;
+  font-weight:600;
+  margin-bottom:4px;
+}
+
+.data{
+  font-size:.65em;
+  opacity:.7;
+  margin-top:4px;
 }
 
 /* INPUT */
-.input-area{
+.footer{
   background:#fff;
   padding:10px;
   display:flex;
-  gap:10px;
-  box-shadow:0 -2px 6px var(--sombra);
+  gap:8px;
+  box-shadow:0 -2px 6px rgba(0,0,0,.1);
 }
-
-.input-area input{
+.footer input{
   flex:1;
-  padding:12px;
-  border-radius:12px;
+  padding:10px;
+  border-radius:10px;
   border:1px solid #ddd;
 }
-
-.input-area button{
-  padding:12px 18px;
+.footer button{
+  padding:10px 14px;
   border:none;
-  border-radius:12px;
+  border-radius:10px;
   background:var(--laranja);
   color:#fff;
   font-weight:600;
@@ -96,12 +106,15 @@ body{
 
 <body>
 
-<div class="header">💬 Suporte ao Cliente</div>
+<div class="header">
+  <h3>💬 Suporte</h3>
+  <div class="encerrar" onclick="encerrarChat()">Encerrar conversa</div>
+</div>
 
 <div class="chat" id="chat"></div>
 
-<div class="input-area">
-  <input id="mensagem" placeholder="Digite sua mensagem...">
+<div class="footer">
+  <input id="msg" placeholder="Digite sua mensagem...">
   <button onclick="enviar()">Enviar</button>
 </div>
 
@@ -111,13 +124,13 @@ import {
   getFirestore,
   collection,
   addDoc,
-  doc,
-  setDoc,
-  onSnapshot,
+  serverTimestamp,
   query,
   orderBy,
-  serverTimestamp,
-  getDoc
+  onSnapshot,
+  deleteDoc,
+  getDocs,
+  doc
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 import {
   getAuth,
@@ -130,81 +143,97 @@ const firebaseConfig = {
   authDomain: "tocomfome-754e1.firebaseapp.com",
   projectId: "tocomfome-754e1",
 };
-
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 const auth = getAuth(app);
 
-const chatBox = document.getElementById("chat");
-const input = document.getElementById("mensagem");
+const chatEl = document.getElementById("chat");
+const input = document.getElementById("msg");
 
-let chatId = null;
-let clienteNome = "";
+let chatId = localStorage.getItem("chatSuporteId");
+let userAtual = null;
 
 /* LOGIN */
-onAuthStateChanged(auth, async user=>{
+onAuthStateChanged(auth, async (user)=>{
   if(!user){
     location.href = "login-cliente.html";
     return;
   }
+  userAtual = user;
 
-  const snap = await getDoc(doc(db,"clientes",user.uid));
-  clienteNome = snap.exists() ? snap.data().nome : "Cliente";
-
-  iniciarChat(user.uid);
-});
-
-/* CRIAR / ABRIR CHAT */
-async function iniciarChat(clienteId){
-  chatId = clienteId; // 1 chat por cliente (simples e eficiente)
-
-  await setDoc(doc(db,"chats",chatId),{
-    clienteId,
-    clienteNome,
-    status:"aberto",
-    criadoEm: serverTimestamp()
-  },{merge:true});
+  if(!chatId){
+    const chatRef = await addDoc(collection(db,"chats"),{
+      clienteId:user.uid,
+      status:"aberto",
+      criadoEm:serverTimestamp()
+    });
+    chatId = chatRef.id;
+    localStorage.setItem("chatSuporteId", chatId);
+  }
 
   ouvirMensagens();
-}
+});
 
-/* OUVIR MENSAGENS (REAL TIME) */
+/* OUVIR CHAT */
 function ouvirMensagens(){
   const q = query(
     collection(db,"chats",chatId,"mensagens"),
     orderBy("criadoEm")
   );
 
-  onSnapshot(q,snap=>{
-    chatBox.innerHTML = "";
+  onSnapshot(q,(snap)=>{
+    chatEl.innerHTML = "";
     snap.forEach(docu=>{
       const m = docu.data();
-      chatBox.innerHTML += `
-        <div class="msg ${m.autor}">
-          ${m.texto}
+      const div = document.createElement("div");
+      div.className = `msg ${m.autor}`;
+
+      div.innerHTML = `
+        <div class="nome">${m.nome}</div>
+        ${m.texto}
+        <div class="data">
+          ${m.criadoEm?.toDate().toLocaleString("pt-BR")}
         </div>
       `;
+      chatEl.appendChild(div);
     });
-    chatBox.scrollTop = chatBox.scrollHeight;
+    chatEl.scrollTop = chatEl.scrollHeight;
   });
 }
 
 /* ENVIAR */
 window.enviar = async ()=>{
-  const texto = input.value.trim();
-  if(!texto) return;
+  if(!input.value.trim()) return;
 
-  await addDoc(
-    collection(db,"chats",chatId,"mensagens"),
-    {
-      texto,
-      autor:"cliente",
-      criadoEm: serverTimestamp()
-    }
-  );
+  await addDoc(collection(db,"chats",chatId,"mensagens"),{
+    texto:input.value,
+    autor:"cliente",
+    nome:"Você",
+    criadoEm:serverTimestamp()
+  });
 
   input.value = "";
 };
+
+/* ENCERRAR */
+window.encerrarChat = async ()=>{
+  if(!confirm("Encerrar a conversa?")) return;
+
+  const msgs = await getDocs(
+    collection(db,"chats",chatId,"mensagens")
+  );
+
+  for(const d of msgs.docs){
+    await deleteDoc(d.ref);
+  }
+
+  await deleteDoc(doc(db,"chats",chatId));
+  localStorage.removeItem("chatSuporteId");
+
+  alert("Conversa encerrada.");
+  history.back();
+};
 </script>
+
 </body>
 </html>
