@@ -43,6 +43,19 @@ body{
   margin-top:4px;
 }
 
+.top-actions{
+  display:flex;
+  gap:10px;
+  margin-top:10px;
+}
+
+.tag{
+  background:#f1f1f1;
+  padding:6px 10px;
+  border-radius:12px;
+  font-size:.75em;
+}
+
 /* INFO */
 .info{
   background:#fff;
@@ -53,8 +66,31 @@ body{
   font-size:.9em;
 }
 
-.info div{
-  margin-bottom:6px;
+/* CUPOM */
+.cupom{
+  background:#fff7ee;
+  border:1px dashed var(--laranja);
+  margin:14px;
+  padding:14px;
+  border-radius:16px;
+  font-size:.9em;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+}
+
+.cupom strong{
+  color:var(--laranja);
+}
+
+.cupom button{
+  border:none;
+  background:var(--laranja);
+  color:#fff;
+  padding:8px 12px;
+  border-radius:10px;
+  font-size:.8em;
+  cursor:pointer;
 }
 
 /* PRODUTOS */
@@ -91,6 +127,12 @@ body{
   margin:6px 0;
 }
 
+.preco-antigo{
+  text-decoration:line-through;
+  font-size:.8em;
+  color:#999;
+}
+
 .btn{
   width:100%;
   padding:10px;
@@ -117,12 +159,28 @@ body{
 <div class="header">
   <h2 id="nomeComercio">Comércio</h2>
   <p id="categoriaComercio"></p>
+
+  <div class="top-actions">
+    <div class="tag">⚡ Entrega rápida</div>
+    <div class="tag">🔥 Promoções</div>
+    <div class="tag" onclick="favoritar()">❤️ Favoritar</div>
+  </div>
+
   <div class="voltar" onclick="history.back()">← Voltar</div>
 </div>
 
 <div class="info">
   <div id="endereco"></div>
   <div id="telefone"></div>
+</div>
+
+<!-- CUPOM -->
+<div class="cupom" id="cupomBox" style="display:none">
+  <div>
+    🎟️ Cupom disponível: <strong id="cupomNome"></strong><br>
+    <small id="cupomDesc"></small>
+  </div>
+  <button onclick="aplicarCupom()">Usar</button>
 </div>
 
 <div class="lista" id="listaProdutos"></div>
@@ -154,31 +212,20 @@ const enderecoEl = document.getElementById("endereco");
 const telefoneEl = document.getElementById("telefone");
 const lista = document.getElementById("listaProdutos");
 
-/* COMÉRCIO SELECIONADO */
-let comercioSelecionado = null;
+const cupomBox = document.getElementById("cupomBox");
+const cupomNome = document.getElementById("cupomNome");
+const cupomDesc = document.getElementById("cupomDesc");
 
-try{
-  comercioSelecionado = JSON.parse(
-    localStorage.getItem("comercioSelecionado")
-  );
-}catch(e){
-  comercioSelecionado = null;
-}
-
-if(!comercioSelecionado || !comercioSelecionado.comercioId){
-  alert("Comércio inválido.");
-  location.href = "index.html";
-}
+/* ESTADO */
+let comercioSelecionado = JSON.parse(localStorage.getItem("comercioSelecionado"));
+let cupomAtivo = null;
 
 /* CARREGAR COMÉRCIO */
 async function carregarComercio(){
   const ref = doc(db,"comercios",comercioSelecionado.comercioId);
   const snap = await getDoc(ref);
 
-  if(!snap.exists()){
-    alert("Comércio não encontrado.");
-    return;
-  }
+  if(!snap.exists()) return;
 
   const c = snap.data();
 
@@ -187,10 +234,20 @@ async function carregarComercio(){
   enderecoEl.innerText = `📍 ${c.endereco?.rua || ""}, ${c.endereco?.numero || ""} - ${c.endereco?.bairro || ""}`;
   telefoneEl.innerText = `📞 ${c.telefone || ""}`;
 
+  // CUPOM FIXO EXEMPLO
+  cupomAtivo = {
+    nome:"BEMVINDO10",
+    desconto:10
+  };
+
+  cupomNome.innerText = cupomAtivo.nome;
+  cupomDesc.innerText = `Ganhe ${cupomAtivo.desconto}% de desconto`;
+  cupomBox.style.display = "flex";
+
   carregarProdutos();
 }
 
-/* PRODUTOS DO COMÉRCIO */
+/* PRODUTOS */
 async function carregarProdutos(){
   lista.innerHTML = "";
 
@@ -201,27 +258,34 @@ async function carregarProdutos(){
   produtosSnap.forEach(docu=>{
     const p = docu.data();
 
-    const produto = {
-      id: docu.id,
-      comercioId: comercioSelecionado.comercioId,
-      nome: p.nome,
-      valor: p.valor,
-      descricao: p.descricao || "",
-      img: p.img || "https://images.unsplash.com/photo-1550547660-d9450f859349"
-    };
+    let valor = Number(p.valor);
+    let valorComDesconto = cupomAtivo
+      ? valor - (valor * cupomAtivo.desconto / 100)
+      : valor;
 
     lista.innerHTML += `
       <div class="card">
-        <img src="${produto.img}">
+        <img src="${p.img || 'https://images.unsplash.com/photo-1550547660-d9450f859349'}">
         <div class="card-info">
-          <h4>${produto.nome}</h4>
+          <h4>${p.nome}</h4>
+
+          ${cupomAtivo ? `
+            <div class="preco-antigo">
+              ${valor.toLocaleString("pt-BR",{style:"currency",currency:"BRL"})}
+            </div>
+          ` : ""}
+
           <div class="preco">
-            ${Number(produto.valor).toLocaleString("pt-BR",{style:"currency",currency:"BRL"})}
+            ${valorComDesconto.toLocaleString("pt-BR",{style:"currency",currency:"BRL"})}
           </div>
-          <div style="font-size:.85em;color:#666">
-            ${produto.descricao}
-          </div>
-          <button class="btn" onclick='pedir(${JSON.stringify(produto)})'>
+
+          <div style="font-size:.85em;color:#666">${p.descricao || ""}</div>
+
+          <button class="btn" onclick='pedir(${JSON.stringify({
+            ...p,
+            valor: valorComDesconto,
+            comercioId: comercioSelecionado.comercioId
+          })})'>
             Pedir
           </button>
         </div>
@@ -230,13 +294,24 @@ async function carregarProdutos(){
   });
 }
 
+/* CUPOM */
+window.aplicarCupom = ()=>{
+  alert("🎉 Cupom aplicado com sucesso!");
+  carregarProdutos();
+};
+
+/* FAVORITO */
+window.favoritar = ()=>{
+  localStorage.setItem("favorito_"+comercioSelecionado.comercioId,"true");
+  alert("❤️ Comércio favoritado!");
+};
+
 /* PEDIR */
 window.pedir = (produto)=>{
   localStorage.setItem("produtoSelecionado", JSON.stringify(produto));
-  window.location.href = "produto.html";
+  location.href = "produto.html";
 };
 
-/* INIT */
 carregarComercio();
 </script>
 </body>
