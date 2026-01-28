@@ -95,18 +95,8 @@ body{display:flex;flex-direction:column;height:100vh;background:var(--cinza);col
   color:var(--texto);
   border-bottom-left-radius:6px;
 }
-.nome{
-  font-size:.75em;
-  font-weight:600;
-  margin-bottom:4px;
-  opacity:.8;
-}
-.data{
-  font-size:.65em;
-  opacity:.6;
-  margin-top:6px;
-  text-align:right;
-}
+.nome{font-size:.75em;font-weight:600;margin-bottom:4px;opacity:.8;}
+.data{font-size:.65em;opacity:.6;margin-top:6px;text-align:right;}
 
 /* Rodapé */
 .footer{
@@ -163,6 +153,7 @@ body{display:flex;flex-direction:column;height:100vh;background:var(--cinza);col
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
 import { getFirestore, collection, addDoc, serverTimestamp, query, orderBy, onSnapshot, deleteDoc, getDocs, doc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+import { getAuth } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
 /* FIREBASE */
 const firebaseConfig = {
@@ -172,23 +163,44 @@ const firebaseConfig = {
 };
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
+const auth = getAuth(app);
 
 const chatEl = document.getElementById("chat");
 const input = document.getElementById("msg");
 
 let chatId = localStorage.getItem("chatSuporteId");
-
-/* Inicializa chat com fila */
+/* Inicializa chat com fila e verificação de UID */
 async function initChat() {
+  const user = auth.currentUser;
+  if(!user){
+    alert("Você precisa estar logado para iniciar o atendimento.");
+    return;
+  }
+
   const chatsSnap = await getDocs(collection(db,"chats"));
   
-  // Verifica se existe algum chat ativo
+  // Verifica se já existe chat do usuário
+  const existente = chatsSnap.docs.find(d => d.data().uid === user.uid);
+  if(existente){
+    chatId = existente.id;
+    if(existente.data().status === "ativo"){
+      ouvirMensagens();
+    } else {
+      chatEl.innerHTML = `<div class="msg suporte"><div class="nome">Sistema</div>
+        Você já está na fila. Sua posição é ${existente.data().posicao}.
+        <div class="data">${new Date().toLocaleString()}</div></div>`;
+    }
+    localStorage.setItem("chatSuporteId", chatId);
+    return;
+  }
+
+  // Se não existe, cria novo
   const ativo = chatsSnap.docs.find(d => d.data().status === "ativo");
   
   if (ativo) {
-    // Já existe chat ativo, cliente vai para fila
     const filaCount = chatsSnap.docs.filter(d => d.data().status === "fila").length;
     const chatRef = await addDoc(collection(db,"chats"), { 
+      uid: user.uid,
       criadoEm: serverTimestamp(),
       status: "fila",
       posicao: filaCount + 1
@@ -198,8 +210,8 @@ async function initChat() {
       Você está na fila de atendimento. Sua posição é ${filaCount + 1}.
       <div class="data">${new Date().toLocaleString()}</div></div>`;
   } else {
-    // Não existe chat ativo, cria um novo
     const chatRef = await addDoc(collection(db,"chats"), { 
+      uid: user.uid,
       criadoEm: serverTimestamp(),
       status: "ativo"
     });
@@ -241,21 +253,22 @@ window.enviar = async ()=>{
 window.encerrarChat = async ()=>{
   if(!confirm("Tem certeza que deseja encerrar o chat e apagar todas as mensagens?")) return;
 
-  // Apaga mensagens do chat ativo
   const msgs = await getDocs(collection(db,"chats",chatId,"mensagens"));
   for(const d of msgs.docs){
     await deleteDoc(d.ref);
   }
   await deleteDoc(doc(db,"chats",chatId));
 
-  // Verifica se há alguém na fila
   const filaSnap = await getDocs(collection(db,"chats"));
-  const fila = filaSnap.docs.filter(d => d.data().status === "fila").sort((a,b)=>a.data().posicao - b.data().posicao);
+  const fila = filaSnap.docs.filter(d => d.data().status === "fila")
+                .sort((a,b)=>a.data().posicao - b.data().posicao);
   
   if (fila.length > 0) {
-    // Promove o primeiro da fila para ativo
-    await deleteDoc(doc(db,"chats",fila[0].id)); // apaga o doc da fila
+    const filaDoc = fila[0];
+    const filaData = filaDoc.data();
+    await deleteDoc(doc(db,"chats",filaDoc.id));
     const novoChatRef = await addDoc(collection(db,"chats"), { 
+      uid: filaData.uid,
       criadoEm: serverTimestamp(),
       status: "ativo"
     });
@@ -273,5 +286,3 @@ initChat();
 
 </body>
 </html>
-
-    
