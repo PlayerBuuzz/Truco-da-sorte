@@ -261,3 +261,17 @@ window.encerrarChat = async ()=>{
     });
     chatId = novoChatRef.id;
     ouvirMensagens();
+    alert("Novo cliente da fila foi atendido!");
+  } else {
+    localStorage.removeItem("chatSuporteId");
+    chatEl.innerHTML = "";
+    alert("Conversa encerrada!");
+  }
+};
+initChat();
+</script>
+
+</body>
+</html>
+
+    
