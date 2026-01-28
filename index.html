@@ -131,7 +131,7 @@ body{
 .preco{
   color:var(--laranja);
   font-weight:700;
-  margin-bottom:4px;
+  margin-bottom:6px;
 }
 .btn{
   margin-top:8px;
@@ -144,14 +144,21 @@ body{
   font-weight:600;
 }
 
-/* COMERCIO CLICÁVEL */
+/* 🔥 COMÉRCIO SELECIONÁVEL (BALÃO CINZA) */
 .comercio-link{
+  display:inline-block;
+  padding:4px 10px;
+  margin-bottom:4px;
+  border-radius:20px;
+  border:1px solid #ccc;
+  background:#fff;
+  color:#555;
+  font-size:.8em;
   font-weight:600;
-  color:var(--laranja);
   cursor:pointer;
 }
 .comercio-link:hover{
-  text-decoration:underline;
+  background:#f2f2f2;
 }
 
 /* SKELETON */
@@ -239,20 +246,9 @@ body{
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-import {
-  getFirestore,
-  collection,
-  getDocs,
-  doc,
-  getDoc
-} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
-import {
-  getAuth,
-  onAuthStateChanged,
-  signOut
-} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+import { getFirestore, collection, getDocs, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
-/* FIREBASE */
 const firebaseConfig = {
   apiKey: "AIzaSyD6a29L24aFSgVjmC7NFGXpdWW4g1uQsio",
   authDomain: "tocomfome-754e1.firebaseapp.com",
@@ -272,63 +268,30 @@ const buscaInput = document.getElementById("buscaInput");
 let produtos = [];
 
 /* MENU */
-window.toggleMenu = ()=>{
-  sidebar.classList.toggle("active");
-  overlay.classList.toggle("active");
-}
-window.fecharMenu = ()=>{
-  sidebar.classList.remove("active");
-  overlay.classList.remove("active");
-}
+window.toggleMenu = ()=>{ sidebar.classList.toggle("active"); overlay.classList.toggle("active"); }
+window.fecharMenu = ()=>{ sidebar.classList.remove("active"); overlay.classList.remove("active"); }
 
 /* USUÁRIO */
 onAuthStateChanged(auth, async (user)=>{
   if(user){
     const snap = await getDoc(doc(db,"clientes",user.uid));
-    usuarioEl.innerText = snap.exists()
-      ? snap.data().nome.split(" ")[0]
-      : "Usuário";
+    usuarioEl.innerText = snap.exists() ? snap.data().nome.split(" ")[0] : "Usuário";
   }else{
     usuarioEl.innerText = "Visitante";
   }
 });
 
 /* LOGOFF */
-window.logoff = async ()=>{
-  await signOut(auth);
-  window.location.href = "index.html";
-}
+window.logoff = async ()=>{ await signOut(auth); window.location.href = "index.html"; }
 
 /* NAVEGAÇÃO */
-window.irPerfil = ()=>{
-  window.location.href = auth.currentUser
-    ? "perfil.html"
-    : "login-cliente.html";
-}
+window.irPerfil = ()=>{ window.location.href = auth.currentUser ? "perfil.html" : "login-cliente.html"; }
 window.irInicio = ()=> location.href = "index.html";
 window.irBusca = ()=> buscaInput.focus();
 window.irPedidos = ()=> location.href = "pedidos.html";
 
-/* SKELETON */
-function skeleton(){
-  lista.innerHTML = "";
-  for(let i=0;i<4;i++){
-    lista.innerHTML += `
-      <div class="skeleton">
-        <div class="skeleton-img"></div>
-        <div style="flex:1">
-          <div class="skeleton-line large"></div>
-          <div class="skeleton-line medium"></div>
-          <div class="skeleton-line small"></div>
-        </div>
-      </div>
-    `;
-  }
-}
-
 /* PRODUTOS */
 async function carregarProdutos(){
-  skeleton();
   produtos = [];
   lista.innerHTML = "";
 
@@ -354,9 +317,7 @@ async function carregarProdutos(){
         img: p.img || "https://images.unsplash.com/photo-1550547660-d9450f859349",
         comercio: comercio.nome,
         bairro: comercio.endereco?.bairro || "",
-        cidade: comercio.endereco?.cidade || "",
-        maisProcurado: p.maisProcurado || false,
-        desconto: p.desconto || false
+        cidade: comercio.endereco?.cidade || ""
       };
 
       produtos.push(produto);
@@ -372,19 +333,13 @@ function render(p){
       <img src="${p.img}">
       <div class="card-info">
         <h4>${p.nome}</h4>
-        <div class="preco">
-          ${Number(p.valor).toLocaleString("pt-BR",{style:"currency",currency:"BRL"})}
-        </div>
+        <div class="preco">${Number(p.valor).toLocaleString("pt-BR",{style:"currency",currency:"BRL"})}</div>
 
-        <div 
-          class="comercio-link"
-          onclick="abrirComercio('${p.comercioId}')">
+        <div class="comercio-link" onclick="abrirComercio('${p.comercioId}')">
           ${p.comercio}
         </div>
 
-        <div style="font-size:.8em;color:#666">
-          ${p.bairro} • ${p.cidade}
-        </div>
+        <div style="font-size:.8em;color:#666">${p.bairro} • ${p.cidade}</div>
         <button class="btn" onclick="pedir('${p.id}')">Pedir</button>
       </div>
     </div>
@@ -398,46 +353,12 @@ window.pedir = (id)=>{
   window.location.href = "produto.html";
 }
 
-/* ABRIR PERFIL DO COMÉRCIO */
+/* PERFIL COMÉRCIO */
 window.abrirComercio = (comercioId)=>{
-  localStorage.setItem(
-    "comercioSelecionado",
-    JSON.stringify({ comercioId })
-  );
+  localStorage.setItem("comercioSelecionado", JSON.stringify({ comercioId }));
   window.location.href = "perfil-comercio.html";
 }
 
-/* FILTROS */
-window.filtrarBusca = ()=>{
-  const termo = buscaInput.value.toLowerCase();
-  lista.innerHTML = "";
-  produtos
-    .filter(p=>p.nome.toLowerCase().includes(termo))
-    .forEach(render);
-}
-
-window.filtrarCategoria = (cat)=>{
-  lista.innerHTML = "";
-  produtos
-    .filter(p=>p.categoria === cat)
-    .forEach(render);
-}
-
-window.filtrarMaisProcurados = ()=>{
-  lista.innerHTML = "";
-  produtos
-    .filter(p=>p.maisProcurado)
-    .forEach(render);
-}
-
-window.filtrarDescontos = ()=>{
-  lista.innerHTML = "";
-  produtos
-    .filter(p=>p.desconto)
-    .forEach(render);
-}
-
-/* INIT */
 carregarProdutos();
 </script>
 </body>
