@@ -229,7 +229,7 @@ body{
   <div class="usuario" id="usuario">...</div>
 </div>
 
-<div class="endereco">Av. Quatro, 7</div>
+<div class="endereco">Carregando endereço...</div>
 <div style="padding:10px 16px;font-size:.85em;color:#777">
   🔎 Buscando opções perto de você...
 </div>
@@ -243,7 +243,8 @@ body{
   <div onclick="irPedidos()">📦<br>Pedidos</div>
   <div onclick="irPerfil()">👤<br>Perfil</div>
 </div>
-  <!-- BALÃO DE CHAT -->
+
+<!-- BALÃO DE CHAT -->
 <div id="chat-balao" style="
   position:fixed;
   bottom:80px;
@@ -259,7 +260,7 @@ body{
 ">
   💬 Suporte
 </div>
-  <script type="module">
+<script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
 import { getFirestore, collection, getDocs, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
@@ -278,6 +279,7 @@ const auth = getAuth(app);
 /* 🔧 Elementos do DOM */
 const lista = document.getElementById("listaProdutos");
 const usuarioEl = document.getElementById("usuario");
+const enderecoEl = document.querySelector(".endereco");
 const sidebar = document.getElementById("sidebar");
 const overlay = document.getElementById("overlay");
 const buscaInput = document.getElementById("buscaInput");
@@ -289,13 +291,28 @@ let produtos = [];
 window.toggleMenu = ()=>{ sidebar.classList.toggle("active"); overlay.classList.toggle("active"); }
 window.fecharMenu = ()=>{ sidebar.classList.remove("active"); overlay.classList.remove("active"); }
 
-/* USUÁRIO */
+/* USUÁRIO + ENDEREÇO */
 onAuthStateChanged(auth, async (user)=>{
   if(user){
     const snap = await getDoc(doc(db,"clientes",user.uid));
-    usuarioEl.innerText = snap.exists() ? snap.data().nome.split(" ")[0] : "Usuário";
+    if(snap.exists()){
+      const dados = snap.data();
+      usuarioEl.innerText = dados.nome.split(" ")[0];
+      // Atualiza endereço do cliente logado
+      if(dados.rua && dados.numero && dados.bairro && dados.cidade){
+        enderecoEl.textContent = `${dados.rua}, ${dados.numero} - ${dados.bairro}, ${dados.cidade}`;
+      }else if(dados.bairro && dados.cidade){
+        enderecoEl.textContent = `${dados.bairro}, ${dados.cidade}`;
+      }else{
+        enderecoEl.textContent = "Endereço não cadastrado";
+      }
+    }else{
+      usuarioEl.innerText = "Usuário";
+      enderecoEl.textContent = "Endereço não encontrado";
+    }
   }else{
     usuarioEl.innerText = "Visitante";
+    enderecoEl.textContent = "Endereço não disponível";
   }
 });
 
@@ -381,10 +398,8 @@ window.abrirComercio = (comercioId)=>{
 chatBalao.addEventListener("click", ()=>{
   onAuthStateChanged(auth, (user)=>{
     if(user){
-      // Usuário logado → vai para chat
       window.location.href = "chat-cliente.html";
     }else{
-      // Não logado → vai para login
       window.location.href = "login-cliente.html";
     }
   });
