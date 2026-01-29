@@ -10,7 +10,8 @@
   --laranja:#ff8c1a;
   --laranja-escuro:#e67300;
   --branco:#ffffff;
-  --cinza:#f4f4f4;
+  --cinza:#f9f9f9;
+  --cinza-claro:#ececec;
   --texto:#333;
 }
 
@@ -33,55 +34,58 @@ body{
   background:var(--branco);
   width:100%;
   max-width:420px;
-  border-radius:20px 20px 0 0;
-  padding:25px 22px 30px;
+  border-radius:24px 24px 0 0;
+  padding:30px 24px 35px;
   text-align:center;
-  box-shadow:0 -4px 12px rgba(0,0,0,0.15);
+  box-shadow:0 -6px 18px rgba(0,0,0,0.12);
   animation:slideUp 0.6s ease;
 }
 
 @keyframes slideUp{
-  from{transform:translateY(40px);opacity:0;}
+  from{transform:translateY(50px);opacity:0;}
   to{transform:translateY(0);opacity:1;}
 }
 
 .logo img{
-  width:70px;
+  width:80px;
   height:auto;
-  margin-bottom:8px;
+  margin-bottom:10px;
 }
 
 .logo-text{
-  font-size:1.8em;
+  font-size:2em;
   font-weight:700;
   color:var(--laranja);
+  letter-spacing:0.5px;
 }
 
 .slogan{
-  font-size:0.95em;
+  font-size:1em;
   color:#555;
-  margin-top:6px;
+  margin-top:8px;
+  margin-bottom:18px;
 }
 
 .area{
-  margin-top:22px;
-  font-size:0.85em;
+  margin-top:24px;
+  font-size:0.9em;
   font-weight:600;
   color:#666;
   text-transform:uppercase;
-  letter-spacing:0.6px;
+  letter-spacing:0.8px;
 }
 
 .btn{
   width:100%;
-  padding:14px;
-  margin-top:12px;
+  padding:15px;
+  margin-top:14px;
   border:none;
-  border-radius:12px;
+  border-radius:14px;
   font-size:1em;
   font-weight:600;
   cursor:pointer;
-  transition:all 0.25s ease;
+  transition:all 0.3s ease;
+  box-shadow:0 3px 6px rgba(0,0,0,0.08);
 }
 
 .btn-cliente{
@@ -91,6 +95,7 @@ body{
 
 .btn-cliente:hover{
   background:var(--laranja-escuro);
+  box-shadow:0 4px 10px rgba(0,0,0,0.15);
 }
 
 .btn-comercio{
@@ -99,18 +104,20 @@ body{
 }
 
 .btn-comercio:hover{
-  background:#e0e0e0;
+  background:var(--cinza-claro);
+  box-shadow:0 4px 10px rgba(0,0,0,0.1);
 }
 
 .btn-login{
   background:transparent;
   color:var(--laranja);
-  border:1.5px solid var(--laranja);
+  border:1.8px solid var(--laranja);
 }
 
 .btn-login:hover{
   background:var(--laranja);
   color:#fff;
+  box-shadow:0 4px 10px rgba(0,0,0,0.15);
 }
 
 .btn:active{
@@ -123,6 +130,7 @@ body{
   <div class="container">
     <div class="logo">
       <img src="img/logo.png" alt="Logo Tôcomfome">
+      <div class="logo-text">Tôcomfome</div>
     </div>
     <div class="slogan">Deixa que a gente te ajuda a matar sua fome!</div>
 
