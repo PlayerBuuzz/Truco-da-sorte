@@ -83,7 +83,7 @@ body{background:var(--cinza);}
 <body>
 
 <div class="header">
-  <img src="img/pedidos.png" alt="Pedidos"> Meus Pedidos
+  <img src="img/pedidos2.png" alt="Pedidos"> Meus Pedidos
 </div>
 <div class="lista" id="listaPedidos"></div>
 
@@ -153,7 +153,7 @@ function carregarPedidos(uid){
             <div>
               <h4>${p.produtoNome}</h4>
               <div class="preco">${Number(p.valor).toLocaleString("pt-BR",{style:"currency",currency:"BRL"})}</div>
-              <div class="local"><img src="img/local.png" alt="Local"> Pedido em <strong>${comercioNome}</strong></div>
+              <div class="local"><img src="img/endereco.png" alt="Local"> Pedido em <strong>${comercioNome}</strong></div>
             </div>
           </div>
           <div class="timeline">
@@ -180,7 +180,7 @@ function carregarPedidos(uid){
         </div>
       ` : p.avaliacao ? `
         <div class="avaliacao-resumo">
-          <img src="img/check.png" alt="Check"> Avaliação enviada<br>
+          <img src="img/concluido.png" alt="Check"> Avaliação enviada<br>
           Pedido: ${p.avaliacao.pedido} <img src="img/star.png" alt="Estrela"><br>
           Motoboy: ${p.avaliacao.motoboy} <img src="img/star.png" alt="Estrela"><br>
           Tempo: ${p.avaliacao.tempo} min
