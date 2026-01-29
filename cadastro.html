@@ -34,29 +34,42 @@ body{
   width:100%;
   max-width:420px;
   border-radius:20px 20px 0 0;
-  padding:20px 18px 25px;
+  padding:25px 22px 30px;
   text-align:center;
+  box-shadow:0 -4px 12px rgba(0,0,0,0.15);
+  animation:slideUp 0.6s ease;
 }
 
-.logo{
-  font-size:1.9em;
+@keyframes slideUp{
+  from{transform:translateY(40px);opacity:0;}
+  to{transform:translateY(0);opacity:1;}
+}
+
+.logo img{
+  width:70px;
+  height:auto;
+  margin-bottom:8px;
+}
+
+.logo-text{
+  font-size:1.8em;
   font-weight:700;
   color:var(--laranja);
 }
 
 .slogan{
-  font-size:0.9em;
-  color:#666;
+  font-size:0.95em;
+  color:#555;
   margin-top:6px;
 }
 
 .area{
-  margin-top:20px;
+  margin-top:22px;
   font-size:0.85em;
   font-weight:600;
-  color:#777;
+  color:#666;
   text-transform:uppercase;
-  letter-spacing:0.5px;
+  letter-spacing:0.6px;
 }
 
 .btn{
@@ -68,6 +81,7 @@ body{
   font-size:1em;
   font-weight:600;
   cursor:pointer;
+  transition:all 0.25s ease;
 }
 
 .btn-cliente{
@@ -75,15 +89,28 @@ body{
   color:#fff;
 }
 
+.btn-cliente:hover{
+  background:var(--laranja-escuro);
+}
+
 .btn-comercio{
   background:var(--cinza);
   color:var(--texto);
 }
 
+.btn-comercio:hover{
+  background:#e0e0e0;
+}
+
 .btn-login{
   background:transparent;
   color:var(--laranja);
-  border:1px solid var(--laranja);
+  border:1.5px solid var(--laranja);
+}
+
+.btn-login:hover{
+  background:var(--laranja);
+  color:#fff;
 }
 
 .btn:active{
@@ -94,7 +121,10 @@ body{
 
 <body>
   <div class="container">
-    <div class="logo">🍔 Tôcomfome</div>
+    <div class="logo">
+      <img src="logo.png" alt="Logo Tôcomfome">
+      <div class="logo-text">Tôcomfome</div>
+    </div>
     <div class="slogan">Deixa que a gente te ajuda a matar sua fome!</div>
 
     <div class="area">Cadastro</div>
