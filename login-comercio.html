@@ -2,14 +2,15 @@
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
-<title>Tôcomfome 🍔 | Login Comércio</title>
+<title>Tôcomfome | Login Comércio</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <style>
 :root{
   --laranja:#ff8c1a;
+  --laranja-escuro:#e67300;
   --branco:#ffffff;
-  --cinza:#f4f4f4;
+  --cinza:#f9f9f9;
   --texto:#333;
 }
 
@@ -31,55 +32,68 @@ body{
 .container{
   background:var(--branco);
   width:100%;
-  max-width:420px;
-  border-radius:20px 20px 0 0;
-  padding:20px 18px 25px;
+  max-width:440px;
+  border-radius:24px 24px 0 0;
+  padding:32px 26px 36px;
+  box-shadow:0 -6px 18px rgba(0,0,0,0.12);
+  animation:slideUp 0.6s ease;
+}
+
+@keyframes slideUp{
+  from{transform:translateY(50px);opacity:0;}
+  to{transform:translateY(0);opacity:1;}
 }
 
 .logo{
-  font-size:1.7em;
-  font-weight:700;
-  color:var(--laranja);
   text-align:center;
+  margin-bottom:10px;
+}
+
+.logo img{
+  width:120px;
+  height:auto;
 }
 
 .slogan{
-  font-size:0.9em;
-  color:#666;
-  margin-top:6px;
+  font-size:1.1em;
+  color:#555;
   text-align:center;
+  margin-bottom:22px;
+  font-weight:500;
 }
 
 .area{
   margin:18px 0 12px;
-  font-size:0.85em;
+  font-size:0.9em;
   font-weight:600;
-  color:#777;
+  color:#666;
   text-transform:uppercase;
-  letter-spacing:0.5px;
+  letter-spacing:0.8px;
   text-align:center;
 }
 
 form{
   display:flex;
   flex-direction:column;
-  gap:12px;
+  gap:14px;
 }
 
 input{
   width:100%;
   padding:14px;
-  border-radius:12px;
-  border:1px solid #ddd;
+  border-radius:14px;
+  border:1.5px solid #ddd;
   font-size:0.95em;
+  transition:border-color 0.25s ease, box-shadow 0.25s ease;
 }
 
 input:focus{
   outline:none;
   border-color:var(--laranja);
+  box-shadow:0 0 6px rgba(255,140,26,0.4);
 }
 
-/* 👁️ CAMPO DE SENHA COM OLHO */
+/* OLHO DA SENHA COM IMAGEM */
 .senha-box{
   position:relative;
 }
@@ -93,23 +107,39 @@ input:focus{
   right:14px;
   top:50%;
   transform:translateY(-50%);
-  font-size:1.2em;
   cursor:pointer;
-  color:#999;
   user-select:none;
+}
+
+.olho img{
+  width:22px;
+  height:auto;
+  opacity:0.7;
+  transition:opacity 0.2s ease;
+}
+
+.olho img:hover{
+  opacity:1;
 }
 
 button{
   width:100%;
-  padding:14px;
-  margin-top:10px;
+  padding:15px;
+  margin-top:12px;
   border:none;
-  border-radius:12px;
-  font-size:1em;
+  border-radius:14px;
+  font-size:1.05em;
   font-weight:600;
   cursor:pointer;
   background:var(--laranja);
   color:#fff;
+  transition:all 0.3s ease;
+  box-shadow:0 3px 8px rgba(0,0,0,0.12);
+}
+
+button:hover{
+  background:var(--laranja-escuro);
+  box-shadow:0 4px 12px rgba(0,0,0,0.18);
 }
 
 button:active{
@@ -117,7 +147,7 @@ button:active{
 }
 
 .link{
-  margin-top:14px;
+  margin-top:16px;
   text-align:center;
   font-size:0.85em;
 }
@@ -133,7 +163,9 @@ button:active{
 <body>
 
 <div class="container">
-  <div class="logo">🍔 Tôcomfome</div>
+  <div class="logo">
+    <img src="img/logo.png" alt="Logo Tôcomfome">
+  </div>
   <div class="slogan">Login do Comércio</div>
 
   <div class="area">Acesso ao painel</div>
@@ -143,7 +175,9 @@ button:active{
 
     <div class="senha-box">
       <input id="senha" type="password" placeholder="Senha" required>
-      <span class="olho" id="btnOlho">👁️</span>
+      <span class="olho" id="btnOlho">
+        <img id="iconeSenha" src="img/eye.png" alt="Mostrar senha">
+      </span>
     </div>
 
     <button type="submit">Entrar</button>
@@ -173,25 +207,28 @@ const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
 
-/* 👁️ OLHO */
+/* OLHO COM IMAGEM */
 const senhaInput = document.getElementById("senha");
 const btnOlho = document.getElementById("btnOlho");
+const icone = document.getElementById("iconeSenha");
 
 btnOlho.addEventListener("click", () => {
   if (senhaInput.type === "password") {
     senhaInput.type = "text";
-    btnOlho.textContent = "🙈";
+    icone.src = "img/Olho-off.png"; // olho fechado
+    icone.alt = "Ocultar senha";
   } else {
     senhaInput.type = "password";
-    btnOlho.textContent = "👁️";
+    icone.src = "img/Olho.png"; // olho aberto
+    icone.alt = "Mostrar senha";
   }
 });
 
-/* 🔐 LOGIN */
+/* LOGIN */
 document.getElementById("formLogin").addEventListener("submit", async (e) => {
   e.preventDefault();
 
-  const email = document.getElementById("email").value; // ✅ CORRETO
+  const email = document.getElementById("email").value;
   const senha = senhaInput.value;
 
   try {
