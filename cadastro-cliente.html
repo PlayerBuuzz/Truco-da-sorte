@@ -2,15 +2,16 @@
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
-<title>Tôcomfome 🍔 | Cadastro Cliente</title>
+<title>Tôcomfome | Cadastro Cliente</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <style>
 :root{
   --laranja:#ff8c1a;
   --laranja-escuro:#e67300;
-  --branco:#fff;
-  --cinza:#f4f4f4;
+  --branco:#ffffff;
+  --cinza:#f9f9f9;
+  --cinza-claro:#ececec;
   --texto:#333;
 }
 
@@ -32,53 +33,74 @@ body{
 .container{
   background:var(--branco);
   width:100%;
-  max-width:420px;
-  border-radius:20px 20px 0 0;
-  padding:20px;
+  max-width:440px;
+  border-radius:24px 24px 0 0;
+  padding:32px 26px 36px;
+  box-shadow:0 -6px 18px rgba(0,0,0,0.12);
+  animation:slideUp 0.6s ease;
+}
+
+@keyframes slideUp{
+  from{transform:translateY(50px);opacity:0;}
+  to{transform:translateY(0);opacity:1;}
 }
 
 .logo{
   text-align:center;
-  font-size:1.8em;
-  font-weight:700;
-  color:var(--laranja);
+  margin-bottom:10px;
+}
+
+.logo img{
+  width:120px;
+  height:auto;
 }
 
 .sub{
   text-align:center;
-  font-size:0.9em;
-  color:#666;
-  margin-top:5px;
+  font-size:1.1em;
+  color:#555;
+  margin-bottom:22px;
+  font-weight:500;
 }
 
 form{
-  margin-top:20px;
+  display:flex;
+  flex-direction:column;
+  gap:12px;
 }
 
 input{
   width:100%;
-  padding:13px;
-  margin-bottom:12px;
-  border-radius:12px;
-  border:1px solid #ddd;
+  padding:14px;
+  border-radius:14px;
+  border:1.5px solid #ddd;
   font-size:0.95em;
+  transition:border-color 0.25s ease, box-shadow 0.25s ease;
 }
 
 input:focus{
   outline:none;
   border-color:var(--laranja);
+  box-shadow:0 0 6px rgba(255,140,26,0.4);
 }
 
 button{
   width:100%;
-  padding:14px;
+  padding:15px;
   background:var(--laranja);
   border:none;
   border-radius:14px;
   color:#fff;
-  font-size:1em;
+  font-size:1.05em;
   font-weight:600;
   cursor:pointer;
+  transition:all 0.3s ease;
+  box-shadow:0 3px 8px rgba(0,0,0,0.12);
+}
+
+button:hover{
+  background:var(--laranja-escuro);
+  box-shadow:0 4px 12px rgba(0,0,0,0.18);
 }
 
 button:active{
@@ -86,7 +108,7 @@ button:active{
 }
 
 .info{
-  margin-top:12px;
+  margin-top:14px;
   text-align:center;
   font-size:0.85em;
   color:#777;
@@ -97,7 +119,9 @@ button:active{
 <body>
 
 <div class="container">
-  <div class="logo">🍔 Tôcomfome</div>
+  <div class="logo">
+    <img src="img/logo.png" alt="Logo Tôcomfome">
+  </div>
   <div class="sub">Cadastro de Cliente</div>
 
   <form id="formCliente">
