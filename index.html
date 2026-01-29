@@ -65,7 +65,7 @@ body{
 }
 
 /* ENDEREÇO */
-.endereco, .buscando{
+.endereco {
   background:#fff;
   padding:12px 16px;
   display:flex;
@@ -75,6 +75,17 @@ body{
   box-shadow:0 2px 4px var(--sombra);
   color:#777;
   margin-bottom:6px;
+}
+
+.buscando {
+  padding:10px 16px;
+  display:flex;
+  align-items:center;
+  gap:8px;
+  font-size:.85em;
+  color:#777;
+  background:transparent; /* 🔑 sem fundo */
+  box-shadow:none;        /* 🔑 sem sombra */
 }
 .endereco .icon, .buscando .icon{
   width:20px;
