@@ -22,6 +22,21 @@ body{
   background:var(--cinza);
   padding-bottom:70px;
 }
+.menu-inferior .icon {
+  width: 24px;   /* largura do ícone */
+  height: 24px;  /* altura do ícone */
+  display: block;
+  margin: 0 auto 4px; /* centraliza e dá espaço abaixo */
+}
+.menu-inferior div {
+  text-align: center;
+  font-size: .8em;
+  color: #333;
+  cursor: pointer;
+}
+.menu-inferior div:hover {
+  color: var(--laranja);
+}
 
 /* HEADER */
 .header{
@@ -238,10 +253,18 @@ body{
 
 <!-- MENU INFERIOR -->
 <div class="menu-inferior">
-  <div onclick="irInicio()">🏠<br>Início</div>
-  <div onclick="irBusca()">🔍<br>Buscar</div>
-  <div onclick="irPedidos()">📦<br>Pedidos</div>
-  <div onclick="irPerfil()">👤<br>Perfil</div>
+  <div onclick="irInicio()">
+    <img src="img/home.png" alt="Início" class="icon"><br>Início
+  </div>
+  <div onclick="irBusca()">
+    <img src="img/Buscar.png" alt="Buscar" class="icon"><br>Buscar
+  </div>
+  <div onclick="irPedidos()">
+    <img src="img/Pedidos.png" alt="Pedidos" class="icon"><br>Pedidos
+  </div>
+  <div onclick="irPerfil()">
+    <img src="img/Perfil.png" alt="Perfil" class="icon"><br>Perfil
+  </div>
 </div>
 
 <!-- BALÃO DE CHAT -->
