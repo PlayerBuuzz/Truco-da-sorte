@@ -148,6 +148,7 @@ body.dark-theme .header input{
 </head>
 
 <body>
+
 <!-- SIDEBAR -->
 <div class="sidebar" id="sidebar">
   <h3><img src="img/menu.png" alt="Menu"> Menu</h3>
@@ -157,7 +158,6 @@ body.dark-theme .header input{
   <a href="#" onclick="filtrarMaisProcurados();fecharMenu()">Mais Procurados</a>
   <a href="#" onclick="filtrarDescontos();fecharMenu()">Descontos</a>
   <a href="#" onclick="irPerfil();fecharMenu()">Meu Perfil</a>
-  <a href="#" onclick="toggleTema();fecharMenu()">🌙 Alternar Tema</a>
   <a href="#" onclick="logoff()">Sair</a>
 </div>
 
@@ -185,10 +185,39 @@ body.dark-theme .header input{
 
 <!-- MENU INFERIOR -->
 <div class="menu-inferior">
-  <div onclick="irInicio()"><img src="img/home.png" alt="Início" class="icon"><br>Início</div>
-  <div onclick="irBusca()"><img src="img/buscar.png" alt="Buscar" class="icon"><br>Buscar</div>
-  <div onclick="irPedidos()"><img src="img/pedidos.png" alt="Pedidos" class="icon"><br>Pedidos</div>
-  <div onclick="irPerfil()"><img src="img/perfil.png" alt="Perfil" class="icon"><br>Perfil</div>
+  <div onclick="irInicio()">
+    <img src="img/home.png" alt="Início" class="icon"><br>Início
+  </div>
+  <div onclick="irBusca()">
+    <img src="img/buscar.png" alt="Buscar" class="icon"><br>Buscar
+  </div>
+  <div onclick="irPedidos()">
+    <img src="img/pedidos.png" alt="Pedidos" class="icon"><br>Pedidos
+  </div>
+  <div onclick="irPerfil()">
+    <img src="img/perfil.png" alt="Perfil" class="icon"><br>Perfil
+  </div>
+</div>
+
+<!-- BALÃO DE CHAT -->
+<div id="chat-balao" style="
+  position:fixed;
+  bottom:80px;
+  right:20px;
+  background:#ff8c1a;
+  color:#fff;
+  padding:12px 16px;
+  border-radius:50px;
+  font-weight:600;
+  cursor:pointer;
+  box-shadow:0 4px 12px rgba(0,0,0,0.2);
+  z-index:1000;
+  display:flex;
+  align-items:center;
+  gap:8px;
+">
+  <img src="img/Suporte.png" alt="Suporte" style="width:20px;height:20px;">
+  <span>Suporte</span>
 </div>
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
