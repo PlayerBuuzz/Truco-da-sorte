@@ -453,13 +453,6 @@ window.abrirComercio = (comercioId)=>{
   localStorage.setItem("comercioSelecionado", JSON.stringify({ comercioId }));
   window.location.href = "perfil-comercio.html";
 }
-    // aplica tema salvo
-    if(d.tema === "dark"){
-      document.body.classList.add("dark-theme");
-    } else {
-      document.body.classList.remove("dark-theme");
-    }
-
 /* BALÃO DE CHAT */
 chatBalao.addEventListener("click", ()=>{
   onAuthStateChanged(auth, (user)=>{
