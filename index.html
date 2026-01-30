@@ -245,6 +245,29 @@ body.dark-theme{
   background:var(--cinza);
   color:var(--texto);
 }
+body.dark-theme .card{
+  background:#2a2a2a;
+}
+
+body.dark-theme label{
+  color:#ddd;
+}
+
+body.dark-theme input{
+  background:#333;
+  border:1.5px solid #555;
+  color:#fff;
+}
+
+body.dark-theme input:focus{
+  background:#444;
+}
+
+body.dark-theme .btn-tema{
+  background:#333;
+  color:#fff;
+  border:1.5px solid #fff;
+}
 </style>
 </head>
 
@@ -374,6 +397,9 @@ onAuthStateChanged(auth, async (user)=>{
     usuarioEl.innerText = "Visitante";
     enderecoEl.innerText = "Endereço não disponível";
   }
+  if(savedTheme === "dark"){
+  document.body.classList.add("dark-theme");
+}
 });
 
 /* LOGOFF */
