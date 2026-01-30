@@ -237,6 +237,14 @@ body{
   flex:1;
   text-align:center;
 }
+  /* Tema escuro */
+body.dark-theme{
+  --cinza:#1e1e1e;
+  --cinza-claro:#2a2a2a;
+  --texto:#f5f5f5;
+  background:var(--cinza);
+  color:var(--texto);
+}
 </style>
 </head>
 
@@ -445,6 +453,25 @@ window.abrirComercio = (comercioId)=>{
   localStorage.setItem("comercioSelecionado", JSON.stringify({ comercioId }));
   window.location.href = "perfil-comercio.html";
 }
+  onAuthStateChanged(auth, async (user)=>{
+  if(!user){
+    location.href = "login-cliente.html";
+    return;
+  }
+
+  const ref = doc(db,"clientes",user.uid);
+  const snap = await getDoc(ref);
+
+  if(snap.exists()){
+    const d = snap.data();
+
+    // aplica tema salvo
+    if(d.tema === "dark"){
+      document.body.classList.add("dark-theme");
+    } else {
+      document.body.classList.remove("dark-theme");
+    }
+  }
 
 /* BALÃO DE CHAT */
 chatBalao.addEventListener("click", ()=>{
