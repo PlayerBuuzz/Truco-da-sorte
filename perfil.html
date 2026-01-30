@@ -8,9 +8,19 @@
 <style>
 :root{
   --laranja:#ff8c1a;
+  --laranja-escuro:#e67300;
   --cinza:#f4f4f4;
   --cinza-claro:#fafafa;
   --texto:#333;
+}
+
+/* Tema escuro */
+body.dark-theme{
+  --cinza:#1e1e1e;
+  --cinza-claro:#2a2a2a;
+  --texto:#f5f5f5;
+  background:var(--cinza);
+  color:var(--texto);
 }
 
 *{
@@ -55,6 +65,9 @@ body{
   padding:22px;
   box-shadow:0 6px 18px rgba(0,0,0,.1);
 }
+body.dark-theme .card{
+  background:#2a2a2a;
+}
 
 /* PERFIL TOPO */
 .perfil-topo{
@@ -81,6 +94,9 @@ body{
   font-size:.9em;
   color:#777;
 }
+body.dark-theme .perfil-topo span{
+  color:#ccc;
+}
 
 /* FORM */
 label{
@@ -89,6 +105,9 @@ label{
   color:#666;
   margin-bottom:5px;
   font-weight:500;
+}
+body.dark-theme label{
+  color:#ddd;
 }
 
 input{
@@ -101,6 +120,11 @@ input{
   margin-bottom:16px;
   transition:border-color 0.25s ease, box-shadow 0.25s ease;
 }
+body.dark-theme input{
+  background:#333;
+  border:1.5px solid #555;
+  color:#fff;
+}
 
 input:focus{
   outline:none;
@@ -108,9 +132,8 @@ input:focus{
   background:#fff;
   box-shadow:0 0 6px rgba(255,140,26,0.4);
 }
-
-input[disabled]{
-  opacity:.7;
+body.dark-theme input:focus{
+  background:#444;
 }
 
 /* BOTÕES */
@@ -136,22 +159,30 @@ button img{
   color:#fff;
   box-shadow:0 3px 8px rgba(0,0,0,0.12);
 }
-
 .btn-salvar:hover{
   background:var(--laranja-escuro);
-  box-shadow:0 4px 12px rgba(0,0,0,0.18);
 }
 
 .btn-sair{
   background:#444;
   color:#fff;
   margin-top:12px;
-  box-shadow:0 3px 8px rgba(0,0,0,0.12);
 }
-
 .btn-sair:hover{
   background:#222;
-  box-shadow:0 4px 12px rgba(0,0,0,0.18);
+}
+
+/* Botão de tema */
+.btn-tema{
+  background:#fff;
+  color:var(--laranja);
+  border:1.5px solid var(--laranja);
+  margin-top:12px;
+}
+body.dark-theme .btn-tema{
+  background:#333;
+  color:#fff;
+  border:1.5px solid #fff;
 }
 </style>
 </head>
@@ -196,6 +227,9 @@ button img{
     </button>
     <button class="btn-sair" onclick="sair()">
       <img src="img/sair.png" alt="Sair"> Sair da conta
+    </button>
+    <button class="btn-tema" onclick="toggleTema()">
+      🌙 Alternar Tema
     </button>
 
   </div>
