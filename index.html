@@ -475,11 +475,15 @@ chatBalao.addEventListener("click", ()=>{
       window.location.href = "login-cliente.html";
     }
   });
+(function(){
+  const tema = localStorage.getItem("tema");
+  if(tema === "dark"){
+    document.body.classList.add("dark-theme");
+  }
 });
 
 /* INIT */
 carregarProdutos();
-<script src="tema.js"></script>
 </script>
 </body>
 </html>
