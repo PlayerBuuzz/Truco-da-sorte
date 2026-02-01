@@ -231,9 +231,8 @@ import {
   onSnapshot, query, where
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 import { getMessaging, getToken, onMessage } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-messaging.js";
-import { getStorage, ref, uploadBytes, getDownloadURL } 
-  from "https://www.gstatic.com/firebasejs/10.7.1/firebase-storage.js";
 
+// 🔑 Configuração Firebase
 const firebaseConfig = {
   apiKey: "AIzaSyD6a29L24aFSgVjmC7NFGXpdWW4g1uQsio",
   authDomain: "tocomfome-754e1.firebaseapp.com",
@@ -247,8 +246,11 @@ const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
 const messaging = getMessaging(app);
-const storage = getStorage(app);
 
+// 🔑 Client ID do Imgur
+const IMGUR_CLIENT_ID = "PMAK-697f8e943ea21300013a2b16-a8c8bde8eb85e96b14263a3740ddb180d9";
+
+// Elementos DOM
 const nomeComercio = document.getElementById("nomeComercio");
 const endereco = document.getElementById("endereco");
 const telefone = document.getElementById("telefone");
@@ -273,25 +275,24 @@ window.toggleForm = function(){
   formProduto.style.display = formProduto.style.display === "flex" ? "none" : "flex";
 }
 
-/* Registrar token de notificação */
-async function registrarNotificacao(uid){
-  if (!("serviceWorker" in navigator)) return;
+/* Upload para Imgur */
+async function uploadParaImgur(file){
+  const formData = new FormData();
+  formData.append("image", file);
 
-  const sw = await navigator.serviceWorker.register("/firebase-messaging-sw.js");
-
-  const permission = await Notification.requestPermission();
-  if (permission !== "granted") return;
-
-  const token = await getToken(messaging, {
-    vapidKey: "BB3NEQpjWYRNQGpB_Dwo1ICScMI03xYlq_WrJo_nxs5HcKbRrUze3ATLLIW9B0xV3Trm6Fm_NwAMvQeLcJBTgU",
-    serviceWorkerRegistration: sw
+  const res = await fetch("https://api.imgur.com/3/image", {
+    method: "POST",
+    headers: {
+      Authorization: `Client-ID ${IMGUR_CLIENT_ID}`
+    },
+    body: formData
   });
 
-  if (token){
-    await setDoc(
-      doc(db, "comercios", uid, "tokens", token),
-      { criadoEm: serverTimestamp() }
-    );
+  const data = await res.json();
+  if (data.success){
+    return data.data.link;
+  } else {
+    throw new Error("Erro ao enviar imagem para Imgur");
   }
 }
 
@@ -351,7 +352,6 @@ onAuthStateChanged(auth, async (user) => {
   }
 
   const uid = user.uid;
-
   const comercioSnap = await getDoc(doc(db, "comercios", uid));
   if (!comercioSnap.exists()) return;
 
@@ -360,7 +360,6 @@ onAuthStateChanged(auth, async (user) => {
   endereco.textContent = `${c.endereco.rua}, ${c.endereco.numero} - ${c.endereco.bairro}`;
   telefone.textContent = `📞 ${c.telefone}`;
 
-  registrarNotificacao(uid);
   carregarProdutos(uid);
   escutarPedidos(uid);
   carregarCupons(uid);
@@ -392,9 +391,12 @@ formProduto.addEventListener("submit", async (e) => {
   let url = "";
 
   if (file){
-    const storageRef = ref(storage, `comercios/${user.uid}/produtos/${Date.now()}-${file.name}`);
-    await uploadBytes(storageRef, file);
-    url = await getDownloadURL(storageRef);
+    try {
+      url = await uploadParaImgur(file);
+    } catch (err){
+      alert("Falha ao enviar imagem: " + err.message);
+      return;
+    }
   }
 
   await addDoc(collection(db, "comercios", user.uid, "produtos"), {
