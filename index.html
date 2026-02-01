@@ -2,7 +2,7 @@
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
-<title>Tôcomfome 🍔 | Empresas</title>
+<title>Tôcomfome 🍔 | Buscar</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <style>
@@ -12,18 +12,10 @@
   --texto:#333;
   --sombra:rgba(0,0,0,.08);
 }
-
-*{
-  margin:0;
-  padding:0;
-  box-sizing:border-box;
-  font-family:'Segoe UI',Arial;
-}
-
+*{margin:0;padding:0;box-sizing:border-box;font-family:'Segoe UI',Arial}
 body{
   background:var(--cinza);
-  padding-bottom:80px;
-  color:var(--texto);
+  padding-bottom:70px;
 }
 
 /* HEADER */
@@ -34,14 +26,58 @@ body{
   align-items:center;
   gap:10px;
   box-shadow:0 2px 6px var(--sombra);
-  font-weight:700;
 }
+.header input{
+  flex:1;
+  padding:10px;
+  border-radius:12px;
+  border:1px solid #ddd;
+}
+.menu-btn img{width:24px;cursor:pointer}
+.usuario{font-size:.85em;font-weight:600;color:var(--laranja)}
 
-/* LISTA DE EMPRESAS */
-.lista{
-  padding:15px;
+/* ENDEREÇO */
+.endereco,.buscando{
+  background:#fff;
+  padding:12px 16px;
+  display:flex;
+  align-items:center;
+  gap:8px;
+  font-size:.9em;
+  box-shadow:0 2px 4px var(--sombra);
+  color:#777;
 }
-.card{
+.buscando{background:transparent;box-shadow:none}
+
+/* CARROSSEL */
+.carrossel-topo{padding:16px}
+.carrossel-topo h3{margin-bottom:10px}
+.carrossel{
+  display:flex;
+  gap:14px;
+  overflow-x:auto;
+}
+.carrossel::-webkit-scrollbar{display:none}
+
+.card-produto{
+  min-width:160px;
+  background:#fff;
+  border-radius:16px;
+  box-shadow:0 4px 10px var(--sombra);
+  cursor:pointer;
+}
+.card-produto img{
+  width:100%;
+  height:110px;
+  object-fit:cover;
+  border-radius:16px 16px 0 0;
+}
+.card-produto .info{padding:10px}
+.card-produto .nota{color:#ff9800;font-weight:700;font-size:.85em}
+
+/* LISTA COMÉRCIOS */
+.lista{padding:15px}
+.card-comercio{
   background:#fff;
   border-radius:18px;
   padding:14px;
@@ -49,51 +85,16 @@ body{
   display:flex;
   gap:14px;
   box-shadow:0 4px 12px var(--sombra);
+  cursor:pointer;
 }
-.card img{
-  width:100px;
-  height:100px;
+.card-comercio img{
+  width:90px;
+  height:90px;
   border-radius:14px;
   object-fit:cover;
 }
-.card-info{flex:1}
-.card-info h4{
-  font-size:1.05em;
-  margin-bottom:4px;
-}
-.card-info p{
-  font-size:.9em;
-  color:#666;
-  margin-bottom:8px;
-}
-.btn{
-  margin-top:8px;
-  width:100%;
-  padding:10px;
-  border:none;
-  border-radius:12px;
-  background:var(--laranja);
-  color:#fff;
-  font-weight:600;
-  cursor:pointer;
-}
-.btn:hover{opacity:.9}
-
-/* RODAPÉ TOP LANCHES */
-footer{
-  background:#fff;
-  padding:16px;
-  box-shadow:0 -2px 8px var(--sombra);
-}
-footer h3{
-  margin-bottom:10px;
-  color:var(--texto);
-}
-.top-lanches div{
-  margin:6px 0;
-  font-size:.9em;
-  color:#444;
-}
+.card-comercio h4{margin-bottom:4px}
+.avaliacao{color:#ff9800;font-weight:700;font-size:.85em}
 
 /* MENU INFERIOR */
 .menu-inferior{
@@ -106,133 +107,131 @@ footer h3{
   justify-content:space-around;
   padding:10px 0;
   box-shadow:0 -2px 8px var(--sombra);
-  font-size:.85em;
 }
-.menu-inferior div{
-  flex:1;
-  text-align:center;
-  cursor:pointer;
-}
-.menu-inferior .icon{
-  width:24px;
-  height:24px;
-  display:block;
-  margin:0 auto 4px;
-}
-.menu-inferior div:hover{color:var(--laranja)}
+.menu-inferior img{width:24px}
+.menu-inferior div{text-align:center;font-size:.8em}
 </style>
 </head>
 
 <body>
 
-<div class="header">🏪 Empresas Parceiras</div>
+<div class="header">
+  <div class="menu-btn"><img src="img/Menu.png"></div>
+  <input placeholder="Buscar empresas...">
+  <div class="usuario" id="usuario">...</div>
+</div>
 
+<div class="endereco">
+  <span id="endereco">Carregando endereço...</span>
+</div>
+
+<div class="buscando">
+  <span>Buscando opções perto de você...</span>
+</div>
+
+<!-- CARROSSEL -->
+<div class="carrossel-topo">
+  <h3>🔥 Produtos mais bem avaliados</h3>
+  <div class="carrossel" id="carrosselAvaliados"></div>
+</div>
+
+<!-- LISTA -->
 <div class="lista" id="listaProdutos"></div>
 
-<!-- MENU INFERIOR -->
 <div class="menu-inferior">
-  <div onclick="irInicio()">
-    <img src="img/home.png" alt="Início" class="icon"><br>Início
-  </div>
-  <div onclick="irBusca()">
-    <img src="img/buscar.png" alt="Buscar" class="icon"><br>Buscar
-  </div>
-  <div onclick="irPedidos()">
-    <img src="img/pedidos.png" alt="Pedidos" class="icon"><br>Pedidos
-  </div>
-  <div onclick="irPerfil()">
-    <img src="img/perfil.png" alt="Perfil" class="icon"><br>Perfil
-  </div>
+  <div><img src="img/home.png"><br>Início</div>
+  <div><img src="img/buscar.png"><br>Buscar</div>
+  <div><img src="img/pedidos.png"><br>Pedidos</div>
+  <div><img src="img/perfil.png"><br>Perfil</div>
 </div>
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-import { 
-  getFirestore, 
-  collection, 
-  getDocs, 
-  query, 
-  orderBy, 
-  limit 
-} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
-import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+import { getFirestore, collection, getDocs, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
-/* 🔧 Firebase */
 const firebaseConfig = {
   apiKey: "AIzaSyD6a29L24aFSgVjmC7NFGXpdWW4g1uQsio",
   authDomain: "tocomfome-754e1.firebaseapp.com",
   projectId: "tocomfome-754e1",
 };
+
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 const auth = getAuth(app);
 
-/* DOM */
 const lista = document.getElementById("listaProdutos");
+const carrossel = document.getElementById("carrosselAvaliados");
+const usuarioEl = document.getElementById("usuario");
+const enderecoEl = document.getElementById("endereco");
 
-/* LOGIN */
+/* USUÁRIO */
 onAuthStateChanged(auth, async (user)=>{
   if(user){
-    carregarEmpresas();
-    carregarTopLanches();
-  }else{
-    carregarEmpresas();
-    carregarTopLanches();
+    const snap = await getDoc(doc(db,"clientes",user.uid));
+    if(snap.exists()){
+      usuarioEl.innerText = snap.data().nome.split(" ")[0];
+      enderecoEl.innerText = snap.data().bairro + " • " + snap.data().cidade;
+    }
   }
 });
 
-/* 🏪 Carregar empresas */
-async function carregarEmpresas(){
-  lista.innerHTML = "";
+/* CARROSSEL AVALIADOS */
+async function carregarAvaliados(){
   const snap = await getDocs(collection(db,"comercios"));
 
-  snap.forEach(doc=>{
-    const c = doc.data();
-    if(!c.ativo) return;
+  for(const c of snap.docs){
+    const prodSnap = await getDocs(collection(db,"comercios",c.id,"produtos"));
+
+    prodSnap.forEach(p=>{
+      const d = p.data();
+      if(d.avaliacao >= 4.5){
+        carrossel.innerHTML += `
+          <div class="card-produto" onclick="abrirComercio('${c.id}')">
+            <img src="${d.img}">
+            <div class="info">
+              <h4>${d.nome}</h4>
+              <div class="nota">⭐ ${d.avaliacao}</div>
+            </div>
+          </div>
+        `;
+      }
+    });
+  }
+}
+
+/* COMÉRCIOS */
+async function carregarComercios(){
+  const snap = await getDocs(collection(db,"comercios"));
+  lista.innerHTML = "";
+
+  snap.forEach(c=>{
+    const d = c.data();
+    if(!d.ativo) return;
 
     lista.innerHTML += `
-      <div class="card">
-        <img src="${c.logo || 'img/empresa.png'}" alt="Logo">
-        <div class="card-info">
-          <h4>${c.nome}</h4>
-          <p>${c.endereco?.bairro || ''} • ${c.endereco?.cidade || ''}</p>
-          <button class="btn" onclick="abrirComercio('${doc.id}')">Ver Cardápio</button>
+      <div class="card-comercio" onclick="abrirComercio('${c.id}')">
+        <img src="${d.logo || 'https://images.unsplash.com/photo-1550547660-d9450f859349'}">
+        <div>
+          <h4>${d.nome}</h4>
+          <div class="avaliacao">⭐ ${d.avaliacao || "4.5"}</div>
+          <div style="font-size:.8em;color:#666">
+            ${d.endereco?.bairro || ""} • ${d.endereco?.cidade || ""}
+          </div>
         </div>
       </div>
     `;
   });
 }
 
-/* 🍔 Lanches mais bem avaliados */
-async function carregarTopLanches(){
-  const rodape = document.createElement("footer");
-  rodape.innerHTML = "<h3>🍔 Lanches mais bem avaliados</h3><div class='top-lanches'></div>";
-  const listaTop = rodape.querySelector(".top-lanches");
-
-  const q = query(collection(db,"lanches"), orderBy("avaliacao","desc"), limit(3));
-  const snap = await getDocs(q);
-
-  snap.forEach(doc=>{
-    const l = doc.data();
-    listaTop.innerHTML += `
-      <div>
-        <strong>${l.nome}</strong> ⭐ ${l.avaliacao.toFixed(1)}
-      </div>
-    `;
-  });
-
-  document.body.appendChild(rodape);
-}
-
-/* Navegação simples */
+/* PERFIL */
 window.abrirComercio = (id)=>{
-  localStorage.setItem("comercioSelecionado", JSON.stringify({ id }));
-  window.location.href = "perfil-comercio.html";
-}
-window.irInicio = ()=> location.href="index.html";
-window.irBusca = ()=> alert("🔍 Função de busca em desenvolvimento");
-window.irPedidos = ()=> location.href="pedidos.html";
-window.irPerfil = ()=> location.href="perfil.html";
-window.logoff = async ()=>{ await signOut(auth); location.href="index.html"; }
+  localStorage.setItem("comercioSelecionado", id);
+  location.href = "perfil-comercio.html";
+};
+
+carregarAvaliados();
+carregarComercios();
 </script>
+
 </body>
 </html>
