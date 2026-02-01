@@ -468,6 +468,7 @@ window.abrirComercio = (comercioId)=>{
 }
 
 /* BALÃO DE CHAT */
+<script type="module">
 chatBalao.addEventListener("click", ()=>{
   onAuthStateChanged(auth, (user)=>{
     window.location.href = user ? "chat-cliente.html" : "login-cliente.html";
@@ -476,8 +477,6 @@ chatBalao.addEventListener("click", ()=>{
 
 /* INIT */
 carregarProdutos();
-  });
-<script type="module" src="js/tema.js"></script>
 </script>
 </body>
 </html>
