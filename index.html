@@ -12,30 +12,18 @@
   --texto:#333;
   --sombra:rgba(0,0,0,.08);
 }
+
 *{
   margin:0;
   padding:0;
   box-sizing:border-box;
   font-family:'Segoe UI',Arial;
 }
+
 body{
   background:var(--cinza);
-  padding-bottom:70px;
-}
-.menu-inferior .icon {
-  width: 24px;
-  height: 24px;
-  display: block;
-  margin: 0 auto 4px;
-}
-.menu-inferior div {
-  text-align: center;
-  font-size: .8em;
-  color: #333;
-  cursor: pointer;
-}
-.menu-inferior div:hover {
-  color: var(--laranja);
+  padding-bottom:80px;
+  color:var(--texto);
 }
 
 /* HEADER */
@@ -46,101 +34,10 @@ body{
   align-items:center;
   gap:10px;
   box-shadow:0 2px 6px var(--sombra);
-}
-.menu-btn img{
-  width:24px;
-  height:24px;
-  cursor:pointer;
-}
-.header input{
-  flex:1;
-  padding:10px;
-  border-radius:12px;
-  border:1px solid #ddd;
-}
-.usuario{
-  font-size:.85em;
-  font-weight:600;
-  color:var(--laranja);
+  font-weight:700;
 }
 
-/* ENDEREÇO */
-.endereco {
-  background:#fff;
-  padding:12px 16px;
-  display:flex;
-  align-items:center;
-  gap:8px;
-  font-size:.9em;
-  box-shadow:0 2px 4px var(--sombra);
-  color:#777;
-  margin-bottom:6px;
-}
-
-.buscando {
-  padding:10px 16px;
-  display:flex;
-  align-items:center;
-  gap:8px;
-  font-size:.85em;
-  color:#777;
-  background:transparent; /* 🔑 sem fundo */
-  box-shadow:none;        /* 🔑 sem sombra */
-}
-.endereco .icon, .buscando .icon{
-  width:20px;
-  height:20px;
-}
-
-/* SIDEBAR */
-.sidebar{
-  position:fixed;
-  top:0;
-  left:-260px;
-  width:260px;
-  height:100%;
-  background:#fff;
-  box-shadow:2px 0 10px rgba(0,0,0,.2);
-  padding:20px;
-  transition:.3s;
-  z-index:10;
-}
-.sidebar.active{left:0}
-.sidebar h3{
-  color:var(--laranja);
-  margin-bottom:12px;
-  display:flex;
-  align-items:center;
-  gap:6px;
-}
-.sidebar h3 img{
-  width:20px;
-  height:20px;
-}
-.sidebar a{
-  display:block;
-  padding:10px 0;
-  color:var(--texto);
-  text-decoration:none;
-  border-bottom:1px solid #eee;
-}
-
-/* OVERLAY */
-.overlay{
-  position:fixed;
-  inset:0;
-  background:rgba(0,0,0,.45);
-  opacity:0;
-  pointer-events:none;
-  transition:.3s;
-  z-index:9;
-}
-.overlay.active{
-  opacity:1;
-  pointer-events:auto;
-}
-
-/* LISTA */
+/* LISTA DE EMPRESAS */
 .lista{
   padding:15px;
 }
@@ -164,10 +61,10 @@ body{
   font-size:1.05em;
   margin-bottom:4px;
 }
-.preco{
-  color:var(--laranja);
-  font-weight:700;
-  margin-bottom:6px;
+.card-info p{
+  font-size:.9em;
+  color:#666;
+  margin-bottom:8px;
 }
 .btn{
   margin-top:8px;
@@ -178,47 +75,25 @@ body{
   background:var(--laranja);
   color:#fff;
   font-weight:600;
-}
-
-/* COMÉRCIO SELECIONÁVEL */
-.comercio-link{
-  display:inline-block;
-  padding:4px 10px;
-  margin-bottom:4px;
-  border-radius:20px;
-  border:1px solid #ccc;
-  background:#fff;
-  color:#555;
-  font-size:.8em;
-  font-weight:600;
   cursor:pointer;
 }
-.comercio-link:hover{background:#f2f2f2}
+.btn:hover{opacity:.9}
 
-/* SKELETON */
-.skeleton{
+/* RODAPÉ TOP LANCHES */
+footer{
   background:#fff;
-  border-radius:18px;
-  padding:14px;
-  margin-bottom:16px;
-  display:flex;
-  gap:14px;
+  padding:16px;
+  box-shadow:0 -2px 8px var(--sombra);
 }
-.skeleton-img{
-  width:100px;
-  height:100px;
-  border-radius:14px;
-  background:#eee;
-}
-.skeleton-line{
-  height:14px;
-  background:#eee;
-  border-radius:8px;
+footer h3{
   margin-bottom:10px;
+  color:var(--texto);
 }
-.large{width:80%}
-.medium{width:60%}
-.small{width:40%}
+.top-lanches div{
+  margin:6px 0;
+  font-size:.9em;
+  color:#444;
+}
 
 /* MENU INFERIOR */
 .menu-inferior{
@@ -236,14 +111,15 @@ body{
 .menu-inferior div{
   flex:1;
   text-align:center;
+  cursor:pointer;
 }
-  /* Tema escuro */
-body.dark-theme{
-  --cinza:#1e1e1e;
-  --cinza-claro:#2a2a2a;
-  --texto:#f5f5f5;
-  background:var(--cinza);
-  color:var(--texto);
+.menu-inferior .icon{
+  width:24px;
+  height:24px;
+  display:block;
+  margin:0 auto 4px;
+}
+.menu-inferior div:hover{color:var(--laranja)}
 }
 </style>
 </head>
@@ -322,7 +198,14 @@ body.dark-theme{
 </div>
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-import { getFirestore, collection, getDocs, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+import { 
+  getFirestore, 
+  collection, 
+  getDocs, 
+  query, 
+  orderBy, 
+  limit 
+} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
 /* 🔧 Firebase */
@@ -331,154 +214,76 @@ const firebaseConfig = {
   authDomain: "tocomfome-754e1.firebaseapp.com",
   projectId: "tocomfome-754e1",
 };
-
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 const auth = getAuth(app);
 
-/* 🔧 Elementos do DOM */
+/* DOM */
 const lista = document.getElementById("listaProdutos");
 const usuarioEl = document.getElementById("usuario");
 const enderecoEl = document.querySelector(".endereco span");
-const sidebar = document.getElementById("sidebar");
-const overlay = document.getElementById("overlay");
-const buscaInput = document.getElementById("buscaInput");
-const chatBalao = document.getElementById("chat-balao");
 
-let produtos = [];
-
-/* MENU */
-window.toggleMenu = ()=>{ sidebar.classList.toggle("active"); overlay.classList.toggle("active"); }
-window.fecharMenu = ()=>{ sidebar.classList.remove("active"); overlay.classList.remove("active"); }
-
-/* USUÁRIO + ENDEREÇO */
+/* LOGIN */
 onAuthStateChanged(auth, async (user)=>{
   if(user){
-    const snap = await getDoc(doc(db,"clientes",user.uid));
-    if(snap.exists()){
-      const dados = snap.data();
-      usuarioEl.innerText = dados.nome.split(" ")[0];
-      if(dados.rua && dados.numero && dados.bairro && dados.cidade){
-        enderecoEl.innerText = `${dados.rua}, ${dados.numero} - ${dados.bairro}, ${dados.cidade}`;
-      }else if(dados.bairro && dados.cidade){
-        enderecoEl.innerText = `${dados.bairro}, ${dados.cidade}`;
-      }else{
-        enderecoEl.innerText = "Endereço não cadastrado";
-      }
-    }else{
-      usuarioEl.innerText = "Usuário";
-      enderecoEl.innerText = "Endereço não encontrado";
-    }
+    usuarioEl.innerText = user.email;
+    carregarEmpresas();
+    carregarTopLanches();
   }else{
     usuarioEl.innerText = "Visitante";
     enderecoEl.innerText = "Endereço não disponível";
   }
 });
 
-/* LOGOFF */
-window.logoff = async ()=>{ await signOut(auth); window.location.href = "index.html"; }
-
-/* NAVEGAÇÃO */
-window.irPerfil = ()=>{ window.location.href = auth.currentUser ? "perfil.html" : "login-cliente.html"; }
-window.irInicio = ()=> location.href = "index.html";
-window.irBusca = ()=> buscaInput.focus();
-window.irPedidos = ()=> location.href = "pedidos.html";
-
-/* PRODUTOS */
-async function carregarProdutos(){
-  produtos = [];
+/* 🏪 Carregar empresas */
+async function carregarEmpresas(){
   lista.innerHTML = "";
+  const snap = await getDocs(collection(db,"comercios"));
 
-  const comerciosSnap = await getDocs(collection(db,"comercios"));
+  snap.forEach(doc=>{
+    const c = doc.data();
+    if(!c.ativo) return;
 
-  for(const comercioDoc of comerciosSnap.docs){
-    const comercio = comercioDoc.data();
-
-    if (!comercio.ativo) continue;
-
-    const produtosSnap = await getDocs(
-      collection(db,"comercios",comercioDoc.id,"produtos")
-    );
-
-    produtosSnap.forEach(prodDoc=>{
-      const p = prodDoc.data();
-
-      const produto = {
-        id: prodDoc.id,
-        comercioId: comercioDoc.id,
-        nome: p.nome,
-        valor: p.valor,
-        descricao: p.descricao || "",
-        categoria: p.categoria || "",
-        img: p.img || "https://images.unsplash.com/photo-1550547660-d9450f859349",
-        comercio: comercio.nome,
-        bairro: comercio.endereco?.bairro || "",
-        cidade: comercio.endereco?.cidade || ""
-      };
-
-      produtos.push(produto);
-      render(produto);
-    });
-  }
-}
-
-/* RENDER */
-function render(p){
-  lista.innerHTML += `
-    <div class="card">
-      <img src="${p.img}">
-      <div class="card-info">
-        <h4>${p.nome}</h4>
-        <div class="preco">${Number(p.valor).toLocaleString("pt-BR",{style:"currency",currency:"BRL"})}</div>
-        <div class="comercio-link" onclick="abrirComercio('${p.comercioId}')">${p.comercio}</div>
-        <div style="font-size:.8em;color:#666">${p.bairro} • ${p.cidade}</div>
-        <button class="btn" onclick="pedir('${p.id}')">Pedir</button>
+    lista.innerHTML += `
+      <div class="card">
+        <img src="${c.logo || 'img/empresa.png'}" alt="Logo">
+        <div class="card-info">
+          <h4>${c.nome}</h4>
+          <p>${c.endereco?.bairro || ''} • ${c.endereco?.cidade || ''}</p>
+          <button class="btn" onclick="abrirComercio('${doc.id}')">Ver Cardápio</button>
+        </div>
       </div>
-    </div>
-  `;
+    `;
+  });
 }
 
-/* BUSCA */
-buscaInput.addEventListener("input", ()=>{
-  const termo = buscaInput.value.toLowerCase();
-  lista.innerHTML = "";
+/* 🍔 Lanches mais bem avaliados */
+async function carregarTopLanches(){
+  const rodape = document.createElement("footer");
+  rodape.innerHTML = "<h3>🍔 Lanches mais bem avaliados</h3><div class='top-lanches'></div>";
+  const listaTop = rodape.querySelector(".top-lanches");
 
-  const filtrados = produtos.filter(p=>
-    p.nome.toLowerCase().includes(termo) ||
-    p.descricao.toLowerCase().includes(termo) ||
-    p.categoria.toLowerCase().includes(termo) ||
-    p.comercio.toLowerCase().includes(termo)
-  );
+  const q = query(collection(db,"lanches"), orderBy("avaliacao","desc"), limit(3));
+  const snap = await getDocs(q);
 
-  filtrados.forEach(render);
-});
+  snap.forEach(doc=>{
+    const l = doc.data();
+    listaTop.innerHTML += `
+      <div>
+        <strong>${l.nome}</strong> ⭐ ${l.avaliacao.toFixed(1)}
+      </div>
+    `;
+  });
 
-/* PEDIR */
-window.pedir = (id)=>{
-  const prod = produtos.find(p=>p.id===id);
-  localStorage.setItem("produtoSelecionado", JSON.stringify(prod));
-  window.location.href = "produto.html";
+  document.body.appendChild(rodape);
 }
 
-/* PERFIL COMÉRCIO */
-window.abrirComercio = (comercioId)=>{
-  localStorage.setItem("comercioSelecionado", JSON.stringify({ comercioId }));
+/* Navegação simples */
+window.abrirComercio = (id)=>{
+  localStorage.setItem("comercioSelecionado", JSON.stringify({ id }));
   window.location.href = "perfil-comercio.html";
 }
-
-/* BALÃO DE CHAT */
-chatBalao.addEventListener("click", ()=>{
-  onAuthStateChanged(auth, (user)=>{
-    if(user){
-      window.location.href = "chat-cliente.html";
-    }else{
-      window.location.href = "login-cliente.html";
-    }
-  });
-});
-
-/* INIT */
-carregarProdutos();
+window.logoff = async ()=>{ await signOut(auth); location.href="index.html"; }
 </script>
 </body>
 </html>
