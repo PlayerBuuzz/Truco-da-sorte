@@ -282,6 +282,15 @@ body.dark-theme{
   <span>Buscando opções perto de você...</span>
 </div>
 
+<div style="padding:15px">
+  <h3 style="margin-bottom:10px">🔥 Mais pedidos</h3>
+  <div id="carrosselProdutos" style="
+    display:flex;
+    gap:12px;
+    overflow-x:auto;
+    padding-bottom:10px;
+  "></div>
+</div>
 <div class="lista" id="listaProdutos"></div>
 
 <!-- MENU INFERIOR -->
@@ -338,11 +347,12 @@ const auth = getAuth(app);
 
 /* ELEMENTOS */
 const lista = document.getElementById("listaProdutos");
+const carrossel = document.getElementById("carrosselProdutos");
+const buscaInput = document.getElementById("buscaInput");
 const usuarioEl = document.getElementById("usuario");
 const enderecoEl = document.querySelector(".endereco span");
-const buscaInput = document.getElementById("buscaInput");
 
-let produtos = [];
+let comercios = [];
 
 /* USUÁRIO */
 onAuthStateChanged(auth, async (user)=>{
@@ -364,112 +374,119 @@ window.logoff = async ()=>{
   location.href = "index.html";
 }
 
-/* CARREGAR PRODUTOS */
-async function carregarProdutos(){
-  produtos = [];
+/* 🔥 CARREGAR LOJAS */
+async function carregarComercios(){
   lista.innerHTML = "";
+  carrossel.innerHTML = "";
+  comercios = [];
 
-  const comerciosSnap = await getDocs(collection(db,"comercios"));
+  const snap = await getDocs(collection(db,"comercios"));
 
-  for(const cDoc of comerciosSnap.docs){
-    const comercio = cDoc.data();
-    if(!comercio.ativo) continue;
+  for(const docSnap of snap.docs){
+    const c = docSnap.data();
+    if(!c.ativo) continue;
 
-    const nota = comercio.avaliacaoMedia || 0;
+    const comercio = {
+      id: docSnap.id,
+      nome: c.nome,
+      avaliacao: c.avaliacaoMedia || 0,
+      bairro: c.endereco?.bairro || "",
+      cidade: c.endereco?.cidade || "",
+      img: c.img || "https://images.unsplash.com/photo-1528605248644-14dd04022da1"
+    };
 
-    const produtosSnap = await getDocs(
-      collection(db,"comercios",cDoc.id,"produtos")
+    comercios.push(comercio);
+    renderComercio(comercio);
+
+    /* 🔥 PRODUTOS EM DESTAQUE (CARROSSEL) */
+    const prodSnap = await getDocs(
+      collection(db,"comercios",docSnap.id,"produtos")
     );
 
-    produtosSnap.forEach(pDoc=>{
+    prodSnap.forEach(pDoc=>{
       const p = pDoc.data();
-
-      produtos.push({
-        id: pDoc.id,
-        comercioId: cDoc.id,
-        nome: p.nome,
-        valor: p.valor,
-        descricao: p.descricao || "",
-        categoria: p.categoria || "",
-        img: p.img || "https://images.unsplash.com/photo-1550547660-d9450f859349",
-        comercio: comercio.nome,
-        bairro: comercio.endereco?.bairro || "",
-        cidade: comercio.endereco?.cidade || "",
-        avaliacao: nota
-      });
+      if(p.destaque){
+        renderProdutoDestaque({
+          ...p,
+          comercioId: docSnap.id,
+          comercioNome: c.nome
+        });
+      }
     });
   }
 
-  ordenarEExibir(produtos);
+  // Ordena lojas por nota
+  comercios.sort((a,b)=>b.avaliacao - a.avaliacao);
 }
 
-/* ORDENAR POR MELHOR AVALIAÇÃO */
-function ordenarEExibir(listaProdutos){
-  lista.innerHTML = "";
-
-  listaProdutos
-    .sort((a,b)=> b.avaliacao - a.avaliacao)
-    .forEach(render);
-}
-
-/* RENDER */
-function render(p){
+/* 🏪 RENDER LOJA */
+function renderComercio(c){
   lista.innerHTML += `
-    <div class="card">
-      <img src="${p.img}">
+    <div class="card" onclick="abrirComercio('${c.id}')">
+      <img src="${c.img}">
       <div class="card-info">
-        <h4>${p.nome}</h4>
-        <div class="preco">${Number(p.valor).toLocaleString("pt-BR",{style:"currency",currency:"BRL"})}</div>
-
-        <div class="comercio-link" onclick="abrirComercio('${p.comercioId}','${p.comercio}',${p.avaliacao})">
-          ${p.comercio} ⭐ ${p.avaliacao.toFixed(1)}
+        <h4>${c.nome}</h4>
+        <div style="color:#ff8c1a;font-weight:600">
+          ⭐ ${c.avaliacao.toFixed(1)}
         </div>
-
-        <div style="font-size:.8em;color:#666">${p.bairro} • ${p.cidade}</div>
-        <button class="btn" onclick="pedir('${p.id}')">Pedir</button>
+        <div style="font-size:.85em;color:#666">
+          ${c.bairro} • ${c.cidade}
+        </div>
       </div>
     </div>
   `;
 }
 
-/* BUSCA REAL */
+/* 🍔 RENDER PRODUTO DESTAQUE */
+function renderProdutoDestaque(p){
+  carrossel.innerHTML += `
+    <div style="
+      min-width:140px;
+      background:#fff;
+      border-radius:16px;
+      box-shadow:0 4px 10px rgba(0,0,0,.1);
+      padding:10px;
+      cursor:pointer
+    " onclick="abrirComercio('${p.comercioId}')">
+      <img src="${p.img}" style="
+        width:100%;
+        height:90px;
+        object-fit:cover;
+        border-radius:12px
+      ">
+      <div style="font-size:.85em;font-weight:600;margin-top:6px">
+        ${p.nome}
+      </div>
+      <div style="font-size:.75em;color:#666">
+        ${p.comercioNome}
+      </div>
+    </div>
+  `;
+}
+
+/* 🔎 BUSCA (FILTRA LOJAS) */
 buscaInput.addEventListener("input", ()=>{
-  const termo = buscaInput.value.toLowerCase().trim();
+  const termo = buscaInput.value.toLowerCase();
+  lista.innerHTML = "";
 
-  if(!termo){
-    ordenarEExibir(produtos);
-    return;
-  }
-
-  const filtrados = produtos.filter(p =>
-    p.nome.toLowerCase().includes(termo) ||
-    p.descricao.toLowerCase().includes(termo) ||
-    p.categoria.toLowerCase().includes(termo) ||
-    p.comercio.toLowerCase().includes(termo)
-  );
-
-  ordenarEExibir(filtrados);
+  comercios
+    .filter(c =>
+      c.nome.toLowerCase().includes(termo) ||
+      c.bairro.toLowerCase().includes(termo) ||
+      c.cidade.toLowerCase().includes(termo)
+    )
+    .forEach(renderComercio);
 });
 
-/* PEDIR */
-window.pedir = (id)=>{
-  const prod = produtos.find(p=>p.id===id);
-  localStorage.setItem("produtoSelecionado", JSON.stringify(prod));
-  location.href = "produto.html";
-}
-
-/* PERFIL DO COMÉRCIO */
-window.abrirComercio = (id,nome,avaliacao)=>{
-  localStorage.setItem("comercioSelecionado", JSON.stringify({
-    comercioId:id,
-    nome,
-    avaliacao
-  }));
+/* PERFIL COMÉRCIO */
+window.abrirComercio = (id)=>{
+  localStorage.setItem("comercioSelecionado", JSON.stringify({ comercioId:id }));
   location.href = "perfil-comercio.html";
-}
+};
 
 /* INIT */
-carregarProdutos();
+carregarComercios();
 </script>
+
 </body>
 </html>
