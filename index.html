@@ -2,7 +2,7 @@
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
-<title>Tôcomfome 🍔 | Buscar</title>
+<title>Tôcomfome 🍔 | Empresas</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <style>
@@ -120,43 +120,12 @@ footer h3{
   margin:0 auto 4px;
 }
 .menu-inferior div:hover{color:var(--laranja)}
-}
 </style>
 </head>
 
 <body>
 
-<!-- SIDEBAR -->
-<div class="sidebar" id="sidebar">
-  <h3><img src="img/menu.png" alt="Menu"> Menu</h3>
-  <a href="#" onclick="filtrarCategoria('Hambúrguer');fecharMenu()">Hambúrguer</a>
-  <a href="#" onclick="filtrarCategoria('Pizza');fecharMenu()">Pizza</a>
-  <a href="#" onclick="filtrarCategoria('Pastel');fecharMenu()">Pastel</a>
-  <a href="#" onclick="filtrarMaisProcurados();fecharMenu()">Mais Procurados</a>
-  <a href="#" onclick="filtrarDescontos();fecharMenu()">Descontos</a>
-  <a href="#" onclick="irPerfil();fecharMenu()">Meu Perfil</a>
-  <a href="#" onclick="logoff()">Sair</a>
-</div>
-
-<div class="overlay" id="overlay" onclick="fecharMenu()"></div>
-
-<!-- HEADER -->
-<div class="header">
-  <div class="menu-btn" onclick="toggleMenu()">
-    <img src="img/Menu.png" alt="Menu">
-  </div>
-  <input id="buscaInput" placeholder="Buscar comida..." oninput="filtrarBusca()">
-  <div class="usuario" id="usuario">...</div>
-</div>
-
-<div class="endereco">
-  <img src="img/endereco.png" alt="Endereço" class="icon">
-  <span>Carregando endereço...</span>
-</div>
-<div class="buscando">
-  <img src="img/Buscar.png" alt="Buscar" class="icon">
-  <span>Buscando opções perto de você...</span>
-</div>
+<div class="header">🏪 Empresas Parceiras</div>
 
 <div class="lista" id="listaProdutos"></div>
 
@@ -174,27 +143,6 @@ footer h3{
   <div onclick="irPerfil()">
     <img src="img/perfil.png" alt="Perfil" class="icon"><br>Perfil
   </div>
-</div>
-
-<!-- BALÃO DE CHAT -->
-<div id="chat-balao" style="
-  position:fixed;
-  bottom:80px;
-  right:20px;
-  background:#ff8c1a;
-  color:#fff;
-  padding:12px 16px;
-  border-radius:50px;
-  font-weight:600;
-  cursor:pointer;
-  box-shadow:0 4px 12px rgba(0,0,0,0.2);
-  z-index:1000;
-  display:flex;
-  align-items:center;
-  gap:8px;
-">
-  <img src="img/Suporte.png" alt="Suporte" style="width:20px;height:20px;">
-  <span>Suporte</span>
 </div>
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
@@ -220,18 +168,15 @@ const auth = getAuth(app);
 
 /* DOM */
 const lista = document.getElementById("listaProdutos");
-const usuarioEl = document.getElementById("usuario");
-const enderecoEl = document.querySelector(".endereco span");
 
 /* LOGIN */
 onAuthStateChanged(auth, async (user)=>{
   if(user){
-    usuarioEl.innerText = user.email;
     carregarEmpresas();
     carregarTopLanches();
   }else{
-    usuarioEl.innerText = "Visitante";
-    enderecoEl.innerText = "Endereço não disponível";
+    carregarEmpresas();
+    carregarTopLanches();
   }
 });
 
@@ -283,6 +228,10 @@ window.abrirComercio = (id)=>{
   localStorage.setItem("comercioSelecionado", JSON.stringify({ id }));
   window.location.href = "perfil-comercio.html";
 }
+window.irInicio = ()=> location.href="index.html";
+window.irBusca = ()=> alert("🔍 Função de busca em desenvolvimento");
+window.irPedidos = ()=> location.href="pedidos.html";
+window.irPerfil = ()=> location.href="perfil.html";
 window.logoff = async ()=>{ await signOut(auth); location.href="index.html"; }
 </script>
 </body>
