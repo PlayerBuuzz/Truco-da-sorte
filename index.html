@@ -376,7 +376,10 @@ onAuthStateChanged(auth, async (user)=>{
 });
 
 /* LOGOFF */
-window.logoff = async ()=>{ await signOut(auth); window.location.href = "index.html"; }
+window.logoff = async ()=>{ 
+  await signOut(auth); 
+  window.location.href = "index.html"; 
+}
 
 /* NAVEGAÇÃO */
 window.irPerfil = ()=>{ window.location.href = auth.currentUser ? "perfil.html" : "login-cliente.html"; }
@@ -393,7 +396,6 @@ async function carregarProdutos(){
 
   for(const comercioDoc of comerciosSnap.docs){
     const comercio = comercioDoc.data();
-
     if (!comercio.ativo) continue;
 
     const produtosSnap = await getDocs(
@@ -442,15 +444,14 @@ function render(p){
 buscaInput.addEventListener("input", ()=>{
   const termo = buscaInput.value.toLowerCase();
   lista.innerHTML = "";
-
-  const filtrados = produtos.filter(p=>
-    p.nome.toLowerCase().includes(termo) ||
-    p.descricao.toLowerCase().includes(termo) ||
-    p.categoria.toLowerCase().includes(termo) ||
-    p.comercio.toLowerCase().includes(termo)
-  );
-
-  filtrados.forEach(render);
+  produtos
+    .filter(p =>
+      p.nome.toLowerCase().includes(termo) ||
+      p.descricao.toLowerCase().includes(termo) ||
+      p.categoria.toLowerCase().includes(termo) ||
+      p.comercio.toLowerCase().includes(termo)
+    )
+    .forEach(render);
 });
 
 /* PEDIR */
@@ -469,17 +470,8 @@ window.abrirComercio = (comercioId)=>{
 /* BALÃO DE CHAT */
 chatBalao.addEventListener("click", ()=>{
   onAuthStateChanged(auth, (user)=>{
-    if(user){
-      window.location.href = "chat-cliente.html";
-    }else{
-      window.location.href = "login-cliente.html";
-    }
+    window.location.href = user ? "chat-cliente.html" : "login-cliente.html";
   });
-(function(){
-  const tema = localStorage.getItem("tema");
-  if(tema === "dark"){
-    document.body.classList.add("dark-theme");
-  }
 });
 
 /* INIT */
