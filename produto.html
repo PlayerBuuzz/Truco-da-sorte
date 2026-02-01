@@ -12,16 +12,9 @@
   --texto:#333;
 }
 
-*{
-  box-sizing:border-box;
-  font-family:'Segoe UI', Arial;
-}
+*{box-sizing:border-box;font-family:'Segoe UI', Arial;}
 
-body{
-  background:var(--cinza);
-  margin:0;
-  padding:0;
-}
+body{background:var(--cinza);margin:0;padding:0}
 
 header{
   background:#fff;
@@ -31,9 +24,7 @@ header{
   box-shadow:0 2px 6px rgba(0,0,0,.08);
 }
 
-.container{
-  padding:20px;
-}
+.container{padding:20px}
 
 .card{
   background:#fff;
@@ -42,22 +33,36 @@ header{
   box-shadow:0 6px 16px rgba(0,0,0,.08);
 }
 
-h2{
-  margin:0 0 10px;
-  color:var(--texto);
+h2{margin:0 0 10px;color:var(--texto)}
+
+.preco{color:var(--laranja);font-size:1.5em;font-weight:800;margin:10px 0}
+
+.descricao{color:#555;margin-bottom:20px}
+
+.produto-img{
+  width:100%;
+  border-radius:14px;
+  margin-bottom:15px;
 }
 
-.preco{
-  color:var(--laranja);
-  font-size:1.5em;
-  font-weight:800;
-  margin:10px 0;
+.detalhes{
+  list-style:none;
+  padding:0;
+  margin:0 0 20px;
+}
+.detalhes li{margin:6px 0;color:#555}
+
+.avaliacao{
+  margin:15px 0;
+  font-size:1.1em;
+  color:#ffbb33;
 }
 
-.descricao{
-  color:#555;
-  margin-bottom:20px;
+.comentarios{
+  margin-top:20px;
 }
+.comentarios h3{margin-bottom:10px;color:var(--texto)}
+.comentarios p{margin:6px 0;color:#444;font-size:.95em}
 
 .btn{
   width:100%;
@@ -70,17 +75,11 @@ h2{
   font-weight:700;
   cursor:pointer;
   transition:.2s;
+  margin-top:10px;
 }
+.btn:hover{opacity:.9}
 
-.btn:hover{
-  opacity:.9;
-}
-
-.loading{
-  text-align:center;
-  margin-top:40px;
-  font-weight:600;
-}
+.loading{text-align:center;margin-top:40px;font-weight:600}
 </style>
 </head>
 
@@ -90,15 +89,32 @@ h2{
 
 <div class="container">
 
-  <div class="loading" id="loading">
-    Carregando produto...
-  </div>
+  <div class="loading" id="loading">Carregando produto...</div>
 
   <div class="card" id="conteudo" style="display:none">
+    <img id="fotoProduto" class="produto-img" alt="Foto do produto">
     <h2 id="nome"></h2>
     <div class="preco" id="preco"></div>
     <p class="descricao" id="descricao"></p>
-    <button class="btn" onclick="finalizarPedido()">Finalizar Pedido</button>
+
+    <ul class="detalhes">
+      <li>🍟 Porção individual</li>
+      <li>⏱️ Preparo: 15 min</li>
+      <li>🥩 Ingredientes: carne, queijo, molho especial</li>
+    </ul>
+
+    <div class="avaliacao" id="avaliacao">
+      ⭐⭐⭐⭐☆ (4.2)
+    </div>
+
+    <button class="btn" onclick="finalizarPedido()">✅ Finalizar Pedido</button>
+    <button class="btn" onclick="adicionarCarrinho()">🛒 Adicionar ao Carrinho</button>
+
+    <div class="comentarios">
+      <h3>Comentários de clientes</h3>
+      <p><strong>Ana:</strong> Muito saboroso, recomendo!</p>
+      <p><strong>João:</strong> Chegou quentinho e rápido 😋</p>
+    </div>
   </div>
 
 </div>
@@ -154,9 +170,7 @@ onAuthStateChanged(auth, async (user)=>{
 function carregarProduto(){
   try{
     produto = JSON.parse(localStorage.getItem("produtoSelecionado"));
-  }catch{
-    produto = null;
-  }
+  }catch{produto = null;}
 
   if(!produto || !produto.nome || !produto.valor || !produto.comercioId){
     alert("Produto não encontrado.");
@@ -169,8 +183,8 @@ function carregarProduto(){
 
   document.getElementById("nome").innerText = produto.nome;
   document.getElementById("preco").innerText = "R$ " + Number(produto.valor).toFixed(2);
-  document.getElementById("descricao").innerText =
-    produto.descricao || "Produto delicioso preparado com carinho 😋";
+  document.getElementById("descricao").innerText = produto.descricao || "Produto delicioso preparado com carinho 😋";
+  document.getElementById("fotoProduto").src = produto.foto || "img/produto.png";
 }
 
 /* ✅ FINALIZAR */
@@ -193,6 +207,14 @@ window.finalizarPedido = async ()=>{
 
   alert("✅ Pedido enviado com sucesso!");
   window.location.href = "index.html";
+};
+
+/* 🛒 Carrinho */
+window.adicionarCarrinho = ()=>{
+  let carrinho = JSON.parse(localStorage.getItem("carrinho")) || [];
+  carrinho.push(produto);
+  localStorage.setItem("carrinho", JSON.stringify(carrinho));
+  alert("🛒 Produto adicionado ao carrinho!");
 };
 </script>
 
