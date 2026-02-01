@@ -224,6 +224,14 @@ const auth = getAuth(app);
 const db = getFirestore(app);
 const storage = getStorage(app);
 const messaging = getMessaging(app);
+const nomeProduto = document.getElementById("nomeProduto");
+const valorProduto = document.getElementById("valorProduto");
+const descricaoProduto = document.getElementById("descricaoProduto");
+const fotoProduto = document.getElementById("fotoProduto");
+
+const codigoCupom = document.getElementById("codigoCupom");
+const descontoCupom = document.getElementById("descontoCupom");
+
 
 window.mostrarAba = (id)=>{
   document.querySelectorAll('.aba').forEach(a=>a.classList.remove('ativa'));
