@@ -149,6 +149,7 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebas
 import { getFirestore, collection, getDocs, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
+/* 🔥 Firebase */
 const firebaseConfig = {
   apiKey: "AIzaSyD6a29L24aFSgVjmC7NFGXpdWW4g1uQsio",
   authDomain: "tocomfome-754e1.firebaseapp.com",
@@ -159,76 +160,130 @@ const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 const auth = getAuth(app);
 
+/* ELEMENTOS */
 const lista = document.getElementById("listaProdutos");
 const carrossel = document.getElementById("carrosselAvaliados");
 const usuarioEl = document.getElementById("usuario");
 const enderecoEl = document.getElementById("endereco");
+const buscaInput = document.getElementById("buscaInput");
+
+let comerciosCache = [];
 
 /* USUÁRIO */
 onAuthStateChanged(auth, async (user)=>{
   if(user){
     const snap = await getDoc(doc(db,"clientes",user.uid));
     if(snap.exists()){
-      usuarioEl.innerText = snap.data().nome.split(" ")[0];
-      enderecoEl.innerText = snap.data().bairro + " • " + snap.data().cidade;
+      const d = snap.data();
+      usuarioEl.innerText = d.nome.split(" ")[0];
+      enderecoEl.innerText = `${d.bairro || ""} • ${d.cidade || ""}`;
     }
   }
 });
 
-/* CARROSSEL AVALIADOS */
+/* 🔥 CARROSSEL — PRODUTOS DE LOJAS BEM AVALIADAS */
 async function carregarAvaliados(){
+  carrossel.innerHTML = "";
+
   const snap = await getDocs(collection(db,"comercios"));
 
   for(const c of snap.docs){
-    const prodSnap = await getDocs(collection(db,"comercios",c.id,"produtos"));
+    const comercio = c.data();
+    if(!comercio.ativo || !comercio.avaliacao || comercio.avaliacao < 4.5) continue;
+
+    const prodSnap = await getDocs(
+      collection(db,"comercios",c.id,"produtos")
+    );
 
     prodSnap.forEach(p=>{
-      const d = p.data();
-      if(d.avaliacao >= 4.5){
-        carrossel.innerHTML += `
-          <div class="card-produto" onclick="abrirComercio('${c.id}')">
-            <img src="${d.img}">
-            <div class="info">
-              <h4>${d.nome}</h4>
-              <div class="nota">⭐ ${d.avaliacao}</div>
-            </div>
+      const prod = p.data();
+
+      carrossel.innerHTML += `
+        <div class="card-produto" onclick="abrirComercio('${c.id}')">
+          <img src="${prod.img || 'https://images.unsplash.com/photo-1550547660-d9450f859349'}">
+          <div class="info">
+            <h4>${prod.nome}</h4>
+            <div class="nota">⭐ ${comercio.avaliacao}</div>
           </div>
-        `;
-      }
+        </div>
+      `;
     });
   }
 }
 
-/* COMÉRCIOS */
+/* 🏪 COMÉRCIOS */
 async function carregarComercios(){
-  const snap = await getDocs(collection(db,"comercios"));
   lista.innerHTML = "";
+  comerciosCache = [];
 
-  snap.forEach(c=>{
-    const d = c.data();
-    if(!d.ativo) return;
+  const snap = await getDocs(collection(db,"comercios"));
 
-    lista.innerHTML += `
-      <div class="card-comercio" onclick="abrirComercio('${c.id}')">
-        <img src="${d.logo || 'https://images.unsplash.com/photo-1550547660-d9450f859349'}">
-        <div>
-          <h4>${d.nome}</h4>
-          <div class="avaliacao">⭐ ${d.avaliacao || "4.5"}</div>
-          <div style="font-size:.8em;color:#666">
-            ${d.endereco?.bairro || ""} • ${d.endereco?.cidade || ""}
-          </div>
-        </div>
-      </div>
-    `;
+  snap.forEach(docSnap=>{
+    const c = docSnap.data();
+    if(!c.ativo) return;
+
+    const comercio = {
+      id: docSnap.id,
+      nome: c.nome,
+      avaliacao: c.avaliacao || 0,
+      endereco: c.endereco || {},
+      logo: c.logo || "",
+    };
+
+    comerciosCache.push(comercio);
+    renderComercio(comercio);
   });
 }
 
-/* PERFIL */
-window.abrirComercio = (id)=>{
-  localStorage.setItem("comercioSelecionado", id);
-  location.href = "perfil-comercio.html";
+/* RENDER COMÉRCIO */
+function renderComercio(c){
+  lista.innerHTML += `
+    <div class="card-comercio" onclick="abrirComercio('${c.id}')">
+      <img src="${c.logo || 'https://images.unsplash.com/photo-1550547660-d9450f859349'}">
+      <div>
+        <h4>${c.nome}</h4>
+        <div class="avaliacao">⭐ ${c.avaliacao}</div>
+        <div style="font-size:.8em;color:#666">
+          ${c.endereco?.bairro || ""} • ${c.endereco?.cidade || ""}
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+/* 🔍 BUSCA */
+buscaInput.addEventListener("input", ()=>{
+  const termo = buscaInput.value.toLowerCase();
+  lista.innerHTML = "";
+
+  comerciosCache
+    .filter(c =>
+      c.nome.toLowerCase().includes(termo) ||
+      c.endereco?.bairro?.toLowerCase().includes(termo) ||
+      c.endereco?.cidade?.toLowerCase().includes(termo)
+    )
+    .forEach(renderComercio);
+});
+
+/* 🔗 PERFIL COMÉRCIO (COMPATÍVEL) */
+window.abrirComercio = (comercioId)=>{
+  const comercio = comerciosCache.find(c=>c.id===comercioId);
+
+  localStorage.setItem(
+    "comercioSelecionado",
+    JSON.stringify({
+      comercioId,
+      nome: comercio?.nome,
+      avaliacao: comercio?.avaliacao,
+      endereco: comercio?.endereco,
+      logo: comercio?.logo
+    })
+  );
+
+  window.location.href = "perfil-comercio.html";
 };
 
+/* INIT */
 carregarAvaliados();
 carregarComercios();
 </script>
