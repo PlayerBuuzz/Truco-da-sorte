@@ -113,6 +113,31 @@ button:active{
   font-size:0.85em;
   color:#777;
 }
+
+/* 🔑 Termos de Uso estilizados */
+.termos{
+  display:flex;
+  align-items:flex-start;
+  gap:8px;
+  font-size:.85em;
+  color:#555;
+  background:var(--cinza-claro);
+  padding:10px 12px;
+  border-radius:12px;
+  border:1px solid #ddd;
+}
+.termos input[type="checkbox"]{
+  margin-top:2px;
+  accent-color:var(--laranja);
+}
+.termos a{
+  color:var(--laranja);
+  font-weight:600;
+  text-decoration:none;
+}
+.termos a:hover{
+  text-decoration:underline;
+}
 </style>
 </head>
 
@@ -134,12 +159,14 @@ button:active{
     <input type="password" id="senha" placeholder="Senha" required>
 
     <!-- 🔑 Termos de uso -->
-    <div style="font-size:.85em;color:#555;margin:6px 0;">
+    <div class="termos">
       <input type="checkbox" id="aceiteTermos" required>
-      Eu li e aceito os 
-      <a href="#" onclick="alert('Termos de Uso: Este é um texto genérico. Ao usar o Tôcomfome você concorda em fornecer dados corretos e respeitar as regras da plataforma.')">
-        Termos de Uso
-      </a>.
+      <label for="aceiteTermos">
+        Eu li e aceito os 
+        <a href="#" onclick="alert('Termos de Uso: Este é um texto genérico. Ao usar o Tôcomfome você concorda em fornecer dados corretos e respeitar as regras da plataforma.')">
+          Termos de Uso
+        </a>.
+      </label>
     </div>
 
     <button type="submit">Criar Conta</button>
