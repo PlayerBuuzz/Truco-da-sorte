@@ -479,14 +479,20 @@ if (buscaInput) {
 }
 
 /* =========================
-   FILTRO MENU LATERAL
+   FILTRO MENU LATERAL (CORRIGIDO)
+   👉 agora filtra por ID ex: "hamburgueria"
 ========================= */
-window.filtrarTipoComercio = (tipo) => {
+window.filtrarTipoComercio = (tipoId) => {
   lista.innerHTML = "";
 
-  const filtrados = comercios.filter(c =>
-    normalizar(c.tipo) === normalizar(tipo)
-  );
+  const tipoNormalizado = normalizar(tipoId);
+
+  const filtrados = comercios.filter(c => {
+    if (Array.isArray(c.tipo)) {
+      return c.tipo.map(normalizar).includes(tipoNormalizado);
+    }
+    return normalizar(c.tipo).includes(tipoNormalizado);
+  });
 
   if (!filtrados.length) {
     lista.innerHTML =
@@ -526,5 +532,6 @@ if (chatBalao) {
 ========================= */
 carregarComercios();
 </script>
+
 </body>
 </html>
