@@ -253,10 +253,11 @@ body.dark-theme{
 <!-- SIDEBAR -->
 <div class="sidebar" id="sidebar">
   <h3><img src="img/menu.png" alt="Menu"> Menu</h3>
-  <a href="#" onclick="filtrarCategoria('Hambúrguer');fecharMenu()">Hambúrguearia</a>
-  <a href="#" onclick="filtrarCategoria('Pizza');fecharMenu()">Pizzaria</a>
-  <a href="#" onclick="filtrarCategoria('Pastel');fecharMenu()">Pastelaria</a>
-  <a href="#" onclick="filtrarMaisProcurados();fecharMenu()">Açai/Sorveteria</a>
+  <a href="#" onclick="filtrarTipoComercio('Hamburgueria');fecharMenu()">Hamburgueria</a>
+  <a href="#" onclick="filtrarTipoComercio('Pizzaria');fecharMenu()">Pizzaria</a>
+  <a href="#" onclick="filtrarTipoComercio('Pastelaria');fecharMenu()">Pastelaria</a>
+  <a href="#" onclick="filtrarTipoComercio('Açai/Sorveteria');fecharMenu()">Açai / Sorveteria</a>
+  <a href="#" onclick="filtrarTipoComercio('Lanchonete');fecharMenu()">Lanchonete</a>
   <a href="#" onclick="filtrarDescontos();fecharMenu()">Descontos</a>
   <a href="#" onclick="irPerfil();fecharMenu()">Meu Perfil</a>
   <a href="#" onclick="logoff()">Sair</a>
@@ -358,16 +359,9 @@ onAuthStateChanged(auth, async (user)=>{
     if(snap.exists()){
       const dados = snap.data();
       usuarioEl.innerText = dados.nome.split(" ")[0];
-      if(dados.rua && dados.numero && dados.bairro && dados.cidade){
-        enderecoEl.innerText = `${dados.rua}, ${dados.numero} - ${dados.bairro}, ${dados.cidade}`;
-      }else if(dados.bairro && dados.cidade){
-        enderecoEl.innerText = `${dados.bairro}, ${dados.cidade}`;
-      }else{
-        enderecoEl.innerText = "Endereço não cadastrado";
-      }
-    }else{
-      usuarioEl.innerText = "Usuário";
-      enderecoEl.innerText = "Endereço não encontrado";
+      enderecoEl.innerText = dados.endereco
+        ? `${dados.endereco.bairro}, ${dados.endereco.cidade}`
+        : "Endereço não cadastrado";
     }
   }else{
     usuarioEl.innerText = "Visitante";
@@ -376,10 +370,13 @@ onAuthStateChanged(auth, async (user)=>{
 });
 
 /* LOGOFF */
-window.logoff = async ()=>{ await signOut(auth); window.location.href = "index.html"; }
+window.logoff = async ()=>{
+  await signOut(auth);
+  window.location.href = "index.html";
+}
 
 /* NAVEGAÇÃO */
-window.irPerfil = ()=>{ window.location.href = auth.currentUser ? "perfil.html" : "login-cliente.html"; }
+window.irPerfil = ()=> window.location.href = auth.currentUser ? "perfil.html" : "login-cliente.html";
 window.irInicio = ()=> location.href = "home.html";
 window.irBusca = ()=> buscaInput.focus();
 window.irPedidos = ()=> location.href = "pedidos.html";
@@ -393,7 +390,6 @@ async function carregarProdutos(){
 
   for(const comercioDoc of comerciosSnap.docs){
     const comercio = comercioDoc.data();
-
     if (!comercio.ativo) continue;
 
     const produtosSnap = await getDocs(
@@ -403,19 +399,19 @@ async function carregarProdutos(){
     produtosSnap.forEach(prodDoc=>{
       const p = prodDoc.data();
 
-    const produto = {
-      id: prodDoc.id,
-      comercioId: comercioDoc.id,
-      nome: p.nome,
-      valor: p.valor,
-      descricao: p.descricao || "",
-      categoria: p.categoria || "",
-      img: p.imagemUrl || "https://images.unsplash.com/photo-1550547660-d9450f859349",
-      comercio: comercio.nome,
-      tipoComercio: comercio.tipo || "",
-      bairro: comercio.endereco?.bairro || "",
-      cidade: comercio.endereco?.cidade || ""
-    };
+      const produto = {
+        id: prodDoc.id,
+        comercioId: comercioDoc.id,
+        nome: p.nome,
+        valor: p.valor,
+        descricao: p.descricao || "",
+        categoria: p.categoria || "",
+        img: p.imagemUrl || "https://images.unsplash.com/photo-1550547660-d9450f859349",
+        comercio: comercio.nome,
+        tipoComercio: comercio.tipoComercio || "",
+        bairro: comercio.endereco?.bairro || "",
+        cidade: comercio.endereco?.cidade || ""
+      };
 
       produtos.push(produto);
       render(produto);
@@ -439,19 +435,38 @@ function render(p){
   `;
 }
 
+/* NORMALIZA TEXTO */
+const normalizar = txt =>
+  txt.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+
+/* FILTRO POR TIPO DE COMÉRCIO */
+window.filtrarTipoComercio = (tipo)=>{
+  lista.innerHTML = "";
+
+  const filtrados = produtos.filter(p =>
+    normalizar(p.tipoComercio) === normalizar(tipo)
+  );
+
+  if(!filtrados.length){
+    lista.innerHTML = "<p style='padding:20px;color:#777'>Nenhum comércio encontrado.</p>";
+    return;
+  }
+
+  filtrados.forEach(render);
+}
+
 /* BUSCA */
 buscaInput.addEventListener("input", ()=>{
   const termo = buscaInput.value.toLowerCase();
   lista.innerHTML = "";
 
-  const filtrados = produtos.filter(p=>
-    p.nome.toLowerCase().includes(termo) ||
-    p.descricao.toLowerCase().includes(termo) ||
-    p.categoria.toLowerCase().includes(termo) ||
-    p.comercio.toLowerCase().includes(termo)
-  );
-
-  filtrados.forEach(render);
+  produtos
+    .filter(p =>
+      p.nome.toLowerCase().includes(termo) ||
+      p.descricao.toLowerCase().includes(termo) ||
+      p.comercio.toLowerCase().includes(termo)
+    )
+    .forEach(render);
 });
 
 /* PEDIR */
@@ -466,30 +481,10 @@ window.abrirComercio = (comercioId)=>{
   localStorage.setItem("comercioSelecionado", JSON.stringify({ comercioId }));
   window.location.href = "perfil-comercio.html";
 }
-/* FILTRO POR TIPO DE COMÉRCIO */
-window.filtrarTipoComercio = (tipo)=>{
-  lista.innerHTML = "";
 
-  const filtrados = produtos.filter(p =>
-    p.tipoComercio.toLowerCase() === tipo.toLowerCase()
-  );
-
-  if(filtrados.length === 0){
-    lista.innerHTML = "<p style='padding:20px;color:#777'>Nenhum comércio encontrado.</p>";
-    return;
-  }
-
-  filtrados.forEach(render);
-}
-/* BALÃO DE CHAT */
+/* CHAT */
 chatBalao.addEventListener("click", ()=>{
-  onAuthStateChanged(auth, (user)=>{
-    if(user){
-      window.location.href = "chat-cliente.html";
-    }else{
-      window.location.href = "login-cliente.html";
-    }
-  });
+  window.location.href = auth.currentUser ? "chat-cliente.html" : "login-cliente.html";
 });
 
 /* INIT */
