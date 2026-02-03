@@ -16,7 +16,6 @@
   --header:#ffffff;
 }
 
-/* 🌙 TEMA ESCURO */
 html.dark-theme{
   --cinza:#1e1e1e;
   --cinza-claro:#2a2a2a;
@@ -161,7 +160,6 @@ h2{margin:0 0 10px;color:var(--texto)}
   </div>
 
 </div>
-
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
 import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
@@ -173,6 +171,8 @@ import {
   collection, 
   serverTimestamp 
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+import { getMessaging, getToken } 
+from "https://www.gstatic.com/firebasejs/10.7.1/firebase-messaging.js";
 
 /* 🔥 FIREBASE */
 const firebaseConfig = {
@@ -187,9 +187,35 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
+const messaging = getMessaging(app);
 
 let produto = null;
 let clienteNome = "";
+
+/* Registrar Service Worker */
+if ("serviceWorker" in navigator) {
+  navigator.serviceWorker.register("/firebase-messaging-sw.js")
+    .then(reg => console.log("Service Worker registrado"))
+    .catch(err => console.error("Erro ao registrar SW:", err));
+}
+
+/* Ativar Notificações */
+async function ativarNotificacoes(){
+  try{
+    const token = await getToken(messaging, {
+      vapidKey: "BB3N1EQpjWRYNQGpB_Dwo1ICsCMI03xYIqLWrJo_nxs5HcKbRrUze3ATLlIW9BoX3Trm6Fm_NwAMvQeLcJBTgU"
+    });
+    if(token){
+      console.log("🔔 Token de notificação:", token);
+      alert("Notificações ativadas com sucesso!");
+      // Aqui você pode salvar o token no Firestore para enviar notificações depois
+    }else{
+      alert("Não foi possível ativar notificações.");
+    }
+  }catch(err){
+    console.error("Erro ao ativar notificações:", err);
+  }
+}
 
 /* 🔐 LOGIN */
 onAuthStateChanged(auth, async (user)=>{
@@ -254,18 +280,4 @@ window.finalizarPedido = async ()=>{
 
   localStorage.removeItem("produtoSelecionado");
 
-  alert("✅ Pedido enviado com sucesso!");
-  window.location.href = "index.html";
-};
-
-/* 🛒 Carrinho */
-window.adicionarCarrinho = ()=>{
-  let carrinho = JSON.parse(localStorage.getItem("carrinho")) || [];
-  carrinho.push(produto);
-  localStorage.setItem("carrinho", JSON.stringify(carrinho));
-  alert("🛒 Produto adicionado ao carrinho!");
-};
-</script>
-
-</body>
-</html>
+  await ativ
