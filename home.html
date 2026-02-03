@@ -380,7 +380,7 @@ window.logoff = async ()=>{ await signOut(auth); window.location.href = "index.h
 
 /* NAVEGAÇÃO */
 window.irPerfil = ()=>{ window.location.href = auth.currentUser ? "perfil.html" : "login-cliente.html"; }
-window.irInicio = ()=> location.href = "index.html";
+window.irInicio = ()=> location.href = "home.html";
 window.irBusca = ()=> buscaInput.focus();
 window.irPedidos = ()=> location.href = "pedidos.html";
 
