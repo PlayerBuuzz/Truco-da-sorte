@@ -388,7 +388,6 @@ window.irPedidos = ()=> location.href = "pedidos.html";
 async function carregarProdutos(){
   produtos = [];
   lista.innerHTML = "";
-  tipoComercio: comercio.tipo || ""
 
   const comerciosSnap = await getDocs(collection(db,"comercios"));
 
