@@ -331,7 +331,6 @@ const enderecoEl = document.querySelector(".endereco span");
 const sidebar = document.getElementById("sidebar");
 const overlay = document.getElementById("overlay");
 const buscaInput = document.getElementById("buscaInput");
-const tipoSelect = document.getElementById("tipoSelect");
 
 /* 🔧 ESTADO */
 let comercios = [];
@@ -356,29 +355,18 @@ const normalizar = (txt = "") =>
   txt.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
 
 /* =========================
-   USUÁRIO / ENDEREÇO / TEMA
+   USUÁRIO / ENDEREÇO
 ========================= */
 onAuthStateChanged(auth, async (user) => {
   if (user) {
     const snap = await getDoc(doc(db, "clientes", user.uid));
     if (snap.exists()) {
       const dados = snap.data();
-
-      usuarioEl.innerText = dados.nome
-        ? dados.nome.split(" ")[0]
-        : "Usuário";
-
+      usuarioEl.innerText = dados.nome?.split(" ")[0] || "Usuário";
       enderecoEl.innerText = dados.endereco
         ? `${dados.endereco.bairro}, ${dados.endereco.cidade}`
         : "Endereço não cadastrado";
-
-      if (dados.tema === "dark") {
-        document.body.classList.add("dark-theme");
-      }
     }
-  } else {
-    usuarioEl.innerText = "Visitante";
-    enderecoEl.innerText = "Endereço não disponível";
   }
 });
 
@@ -391,18 +379,6 @@ window.logoff = async () => {
 };
 
 /* =========================
-   NAVEGAÇÃO
-========================= */
-window.irInicio = () => window.location.href = "home.html";
-window.irPedidos = () => window.location.href = "pedidos.html";
-window.irPerfil = () =>
-  window.location.href = auth.currentUser
-    ? "perfil.html"
-    : "login-cliente.html";
-
-window.irBusca = () => buscaInput?.focus();
-
-/* =========================
    CARREGAR COMÉRCIOS
 ========================= */
 async function carregarComercios() {
@@ -411,128 +387,89 @@ async function carregarComercios() {
 
   const snap = await getDocs(collection(db, "comercios"));
 
-  if (snap.empty) {
-    lista.innerHTML =
-      "<p style='padding:20px;color:#777'>Nenhum comércio encontrado.</p>";
-    return;
-  }
-
   snap.forEach(docSnap => {
     const c = docSnap.data();
     if (!c.ativo) return;
 
-    const comercio = {
+    comercios.push({
       id: docSnap.id,
       nome: c.nome || "",
       tipo: c.tipoComercio || "",
       bairro: c.endereco?.bairro || "",
       cidade: c.endereco?.cidade || "",
       img: c.logoUrl || "https://images.unsplash.com/photo-1552566626-52f8b828add9"
-    };
-
-    comercios.push(comercio);
-    renderComercio(comercio);
+    });
   });
+
+  renderLista(comercios);
 }
 
 /* =========================
-   RENDER COMÉRCIO
+   RENDER LISTA
 ========================= */
-function renderComercio(c) {
-  lista.innerHTML += `
-    <div class="card-comercio">
-      <img src="${c.img}">
-      <div style="flex:1">
-        <h4>${c.nome}</h4>
-        <div class="tipo">${c.tipo}</div>
-        <div class="local">${c.bairro} • ${c.cidade}</div>
-        <button class="btn" onclick="abrirComercio('${c.id}')">
-          Ver cardápio
-        </button>
-      </div>
-    </div>
-  `;
-}
-
-/* =========================
-   BUSCA POR TEXTO
-========================= */
-if (buscaInput) {
-  buscaInput.addEventListener("input", () => {
-    aplicarFiltros();
-  });
-}
-
-/* =========================
-   SELECT TIPO DE COMÉRCIO (AGORA FUNCIONA)
-========================= */
-if (tipoSelect) {
-  tipoSelect.addEventListener("change", () => {
-    aplicarFiltros();
-  });
-}
-
-/* =========================
-   FILTRO MENU LATERAL
-========================= */
-window.filtrarTipoComercio = (tipoMenu) => {
-  if (tipoSelect) tipoSelect.value = tipoMenu;
-  aplicarFiltros();
-  fecharMenu();
-};
-
-/* =========================
-   FUNÇÃO CENTRAL DE FILTRO
-========================= */
-function aplicarFiltros() {
-  const termo = normalizar(buscaInput?.value || "");
-  const tipoSelecionado = normalizar(tipoSelect?.value || "");
-
+function renderLista(listaComercios) {
   lista.innerHTML = "";
 
-  const filtrados = comercios.filter(c => {
-    const matchTexto =
-      normalizar(c.nome).includes(termo) ||
-      normalizar(c.bairro).includes(termo) ||
-      normalizar(c.cidade).includes(termo);
-
-    const matchTipo =
-      !tipoSelecionado || normalizar(c.tipo) === tipoSelecionado;
-
-    return matchTexto && matchTipo;
-  });
-
-  if (!filtrados.length) {
+  if (!listaComercios.length) {
     lista.innerHTML =
       "<p style='padding:20px;color:#777'>Nenhum comércio encontrado.</p>";
     return;
   }
 
-  filtrados.forEach(renderComercio);
+  listaComercios.forEach(c => {
+    lista.innerHTML += `
+      <div class="card-comercio">
+        <img src="${c.img}">
+        <div style="flex:1">
+          <h4>${c.nome}</h4>
+          <div class="tipo">${c.tipo}</div>
+          <div class="local">${c.bairro} • ${c.cidade}</div>
+          <button class="btn" onclick="abrirComercio('${c.id}')">
+            Ver cardápio
+          </button>
+        </div>
+      </div>
+    `;
+  });
 }
+
+/* =========================
+   BUSCA
+========================= */
+buscaInput?.addEventListener("input", () => {
+  const termo = normalizar(buscaInput.value);
+
+  const filtrados = comercios.filter(c =>
+    normalizar(c.nome).includes(termo) ||
+    normalizar(c.tipo).includes(termo) ||
+    normalizar(c.bairro).includes(termo) ||
+    normalizar(c.cidade).includes(termo)
+  );
+
+  renderLista(filtrados);
+});
+
+/* =========================
+   FILTRO MENU LATERAL ✅ CORRIGIDO
+========================= */
+window.filtrarTipoComercio = (tipoMenu) => {
+  const tipo = normalizar(tipoMenu);
+
+  const filtrados = comercios.filter(c =>
+    normalizar(c.tipo).includes(tipo)
+  );
+
+  renderLista(filtrados);
+  fecharMenu();
+};
 
 /* =========================
    ABRIR COMÉRCIO
 ========================= */
 window.abrirComercio = (comercioId) => {
-  localStorage.setItem(
-    "comercioSelecionado",
-    JSON.stringify({ comercioId })
-  );
+  localStorage.setItem("comercioSelecionado", comercioId);
   window.location.href = "perfil-comercio.html";
 };
-
-/* =========================
-   CHAT
-========================= */
-const chatBalao = document.getElementById("chat-balao");
-if (chatBalao) {
-  chatBalao.addEventListener("click", () => {
-    window.location.href = auth.currentUser
-      ? "chat-cliente.html"
-      : "login-cliente.html";
-  });
-}
 
 /* =========================
    INIT
