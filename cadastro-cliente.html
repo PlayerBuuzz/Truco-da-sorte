@@ -114,21 +114,29 @@ button:active{
   color:#777;
 }
 
-/* 🔑 Termos de Uso estilizados */
+/* 🔒 Termos de Uso - Mobile */
 .termos{
   display:flex;
   align-items:flex-start;
-  gap:8px;
+  gap:10px;
   font-size:.85em;
   color:#555;
   background:var(--cinza-claro);
-  padding:10px 12px;
-  border-radius:12px;
+  padding:12px 14px;
+  border-radius:14px;
   border:1px solid #ddd;
+  line-height:1.4;
 }
 .termos input[type="checkbox"]{
-  margin-top:2px;
+  margin-top:3px;
   accent-color:var(--laranja);
+  flex-shrink:0;
+}
+.termos label{
+  display:flex;
+  gap:10px;
+  align-items:flex-start;
+  flex:1;
 }
 .termos a{
   color:var(--laranja);
@@ -158,14 +166,16 @@ button:active{
     <input type="email" id="email" placeholder="Email" required>
     <input type="password" id="senha" placeholder="Senha" required>
 
-    <!-- 🔑 Termos de uso -->
+    <!-- 🔒 Termos de uso estilizados -->
     <div class="termos">
-      <input type="checkbox" id="aceiteTermos" required>
       <label for="aceiteTermos">
-        Eu li e aceito os 
-        <a href="#" onclick="alert('Termos de Uso: Este é um texto genérico. Ao usar o Tôcomfome você concorda em fornecer dados corretos e respeitar as regras da plataforma.')">
-          Termos de Uso
-        </a>.
+        <input type="checkbox" id="aceiteTermos" required>
+        <span>
+          Eu li e aceito os 
+          <a href="#" onclick="alert('Termos de Uso: Este é um texto genérico. Ao usar o Tôcomfome você concorda em fornecer dados corretos e respeitar as regras da plataforma.')">
+            Termos de Uso
+          </a>.
+        </span>
       </label>
     </div>
 
@@ -173,7 +183,7 @@ button:active{
   </form>
 
   <div class="info">
-    Seus dados são usados apenas para pedidos 🍔
+    Seus dados são usados apenas para pedidos 🔒
   </div>
 </div>
 
