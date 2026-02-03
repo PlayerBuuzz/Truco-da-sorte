@@ -11,7 +11,7 @@
   --laranja-escuro:#e67300;
   --branco:#ffffff;
   --cinza:#f9f9f9;
-  --cinza-claro:#ececec;
+  --cinza-claro:#f1f1f1;
   --texto:#333;
 }
 
@@ -94,8 +94,8 @@ button{
   font-size:1.05em;
   font-weight:600;
   cursor:pointer;
+  transition:all 0.3s ease;
   box-shadow:0 3px 8px rgba(0,0,0,0.12);
-  transition:background 0.3s ease, box-shadow 0.3s ease, transform 0.2s ease;
 }
 
 button:hover{
@@ -114,28 +114,26 @@ button:active{
   color:#777;
 }
 
-/* 🔒 Termos de Uso - Mobile */
+/* 🔒 Termos de Uso - Mobile bonito */
 .termos{
+  background:var(--cinza-claro);
+  border:1px solid #ddd;
+  border-radius:16px;
+  padding:14px;
+  font-size:.85em;
+  color:#444;
   display:flex;
   align-items:flex-start;
   gap:10px;
-  font-size:.85em;
-  color:#555;
-  background:var(--cinza-claro);
-  padding:12px 14px;
-  border-radius:14px;
-  border:1px solid #ddd;
-  line-height:1.4;
+  line-height:1.5;
+  margin-top:6px;
 }
 .termos input[type="checkbox"]{
   margin-top:3px;
   accent-color:var(--laranja);
   flex-shrink:0;
 }
-.termos label{
-  display:flex;
-  gap:10px;
-  align-items:flex-start;
+.termos span{
   flex:1;
 }
 .termos a{
@@ -168,15 +166,13 @@ button:active{
 
     <!-- 🔒 Termos de uso estilizados -->
     <div class="termos">
-      <label for="aceiteTermos">
-        <input type="checkbox" id="aceiteTermos" required>
-        <span>
-          Eu li e aceito os 
-          <a href="#" onclick="alert('Termos de Uso: Este é um texto genérico. Ao usar o Tôcomfome você concorda em fornecer dados corretos e respeitar as regras da plataforma.')">
-            Termos de Uso
-          </a>.
-        </span>
-      </label>
+      <input type="checkbox" id="aceiteTermos" required>
+      <span>
+        Eu li e aceito os 
+        <a href="#" onclick="alert('Termos de Uso: Este é um texto genérico. Ao usar o Tôcomfome você concorda em fornecer dados corretos e respeitar as regras da plataforma.')">
+          Termos de Uso
+        </a>.
+      </span>
     </div>
 
     <button type="submit">Criar Conta</button>
