@@ -93,6 +93,31 @@ input:focus, select:focus{
   box-shadow:0 0 6px rgba(255,140,26,0.4);
 }
 
+.termos{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  font-size:0.9em;
+  color:#555;
+}
+
+.termos input[type="checkbox"]{
+  accent-color:var(--laranja);
+  width:18px;
+  height:18px;
+  cursor:pointer;
+}
+
+.termos a{
+  color:var(--laranja);
+  text-decoration:none;
+  font-weight:600;
+}
+
+.termos a:hover{
+  text-decoration:underline;
+}
+
 button{
   width:100%;
   padding:15px;
@@ -149,6 +174,13 @@ button:active{
     <input id="bairro" type="text" placeholder="Bairro">
     <input type="text" value="Colina - SP" disabled>
 
+    <div class="termos">
+      <input type="checkbox" id="aceiteTermos" required>
+      <label for="aceiteTermos">
+        Li e aceito os <a href="termos.html" target="_blank">Termos de Uso</a>
+      </label>
+    </div>
+
     <button type="submit">Cadastrar comércio</button>
   </form>
 </div>
@@ -177,6 +209,12 @@ const form = document.getElementById("formComercio");
 form.addEventListener("submit", async (e) => {
   e.preventDefault();
 
+  const aceiteTermos = document.getElementById("aceiteTermos").checked;
+  if(!aceiteTermos){
+    alert("Você precisa aceitar os Termos de Uso para continuar.");
+    return;
+  }
+
   const nome = document.getElementById("nome").value;
   const email = document.getElementById("email").value;
   const senha = document.getElementById("senha").value;
@@ -194,7 +232,8 @@ form.addEventListener("submit", async (e) => {
     await setDoc(doc(db, "users", uid), {
       tipo: "comercio",
       email,
-      criadoEm: serverTimestamp()
+      criadoEm: serverTimestamp(),
+      aceitouTermos: true
     });
 
     await setDoc(doc(db, "comercios", uid), {
@@ -209,7 +248,8 @@ form.addEventListener("submit", async (e) => {
         cidade: "Colina - SP"
       },
       ativo: true,
-      criadoEm: serverTimestamp()
+      criadoEm: serverTimestamp(),
+      aceitouTermos: true
     });
 
     alert("✅ Comércio cadastrado com sucesso!");
