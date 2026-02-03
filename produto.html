@@ -215,14 +215,15 @@ async function ativarNotificacoes(){
     if(token){
       console.log("🔔 Token de notificação:", token);
       alert("Notificações ativadas com sucesso!");
-      // Aqui você pode salvar o token no Firestore para enviar notificações depois
-    }else{
-      alert("Não foi possível ativar notificações.");
     }
   }catch(err){
     console.error("Erro ao ativar notificações:", err);
   }
 }
+
+// Torna a função acessível ao botão
+window.ativarNotificacoes = ativarNotificacoes;
+
 
 /* 🔐 LOGIN */
 onAuthStateChanged(auth, async (user)=>{
