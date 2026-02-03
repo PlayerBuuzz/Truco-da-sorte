@@ -150,7 +150,7 @@ h2{margin:0 0 10px;color:var(--texto)}
     </div>
 
     <button class="btn" onclick="finalizarPedido()">✅ Finalizar Pedido</button>
-    <button class="btn" onclick="adicionarCarrinho()">🛒 Adicionar ao Carrinho</button>
+    <button class="btn" onclick="ativarNotificacoes()">🔔 Ativar Notificações</button>
 
     <div class="comentarios">
       <h3>Comentários de clientes</h3>
@@ -216,6 +216,8 @@ async function ativarNotificacoes(){
       console.log("🔔 Token de notificação:", token);
       alert("Notificações ativadas com sucesso!");
       // Aqui você pode salvar o token no Firestore para enviar notificações depois
+    }else{
+      alert("Não foi possível ativar notificações.");
     }
   }catch(err){
     console.error("Erro ao ativar notificações:", err);
@@ -290,14 +292,6 @@ window.finalizarPedido = async ()=>{
 
   alert("✅ Pedido enviado com sucesso!");
   window.location.href = "index.html";
-};
-
-/* 🛒 Carrinho */
-window.adicionarCarrinho = ()=>{
-  let carrinho = JSON.parse(localStorage.getItem("carrinho")) || [];
-  carrinho.push(produto);
-  localStorage.setItem("carrinho", JSON.stringify(carrinho));
-  alert("🛒 Produto adicionado ao carrinho!");
 };
 </script>
 
