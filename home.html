@@ -251,7 +251,7 @@ body.dark-theme .sidebar a{
   <div class="menu-btn" onclick="toggleMenu()">
     <img src="img/menu.png">
   </div>
-  <input placeholder="Buscar restaurantes...">
+  <input id="buscaInput" placeholder="Buscar restaurantes...">
   <div class="usuario">...</div>
 </div>
 
@@ -330,6 +330,10 @@ const usuarioEl = document.querySelector(".usuario");
 const enderecoEl = document.querySelector(".endereco span");
 const sidebar = document.getElementById("sidebar");
 const overlay = document.getElementById("overlay");
+const buscaInput = document.getElementById("buscaInput");
+
+/* 🔧 ESTADO */
+let comercios = [];
 
 /* =========================
    MENU LATERAL
@@ -343,6 +347,12 @@ window.fecharMenu = () => {
   sidebar.classList.remove("active");
   overlay.classList.remove("active");
 };
+
+/* =========================
+   NORMALIZAR TEXTO
+========================= */
+const normalizar = (txt = "") =>
+  txt.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
 
 /* =========================
    USUÁRIO / ENDEREÇO / TEMA
@@ -380,32 +390,23 @@ window.logoff = async () => {
 };
 
 /* =========================
-   NAVEGAÇÃO (barra inferior)
+   NAVEGAÇÃO
 ========================= */
-window.irInicio = () => {
-  window.location.href = "home.html";
-};
-
-window.irPedidos = () => {
-  window.location.href = "pedidos.html";
-};
-
-window.irPerfil = () => {
+window.irInicio = () => window.location.href = "home.html";
+window.irPedidos = () => window.location.href = "pedidos.html";
+window.irPerfil = () =>
   window.location.href = auth.currentUser
     ? "perfil.html"
     : "login-cliente.html";
-};
 
-window.irBusca = () => {
-  const input = document.querySelector(".header input");
-  if (input) input.focus();
-};
+window.irBusca = () => buscaInput?.focus();
 
 /* =========================
    CARREGAR COMÉRCIOS
 ========================= */
 async function carregarComercios() {
   lista.innerHTML = "";
+  comercios = [];
 
   const snap = await getDocs(collection(db, "comercios"));
 
@@ -419,14 +420,17 @@ async function carregarComercios() {
     const c = docSnap.data();
     if (!c.ativo) return;
 
-    renderComercio({
+    const comercio = {
       id: docSnap.id,
-      nome: c.nome,
+      nome: c.nome || "",
       tipo: c.tipoComercio || "",
       bairro: c.endereco?.bairro || "",
       cidade: c.endereco?.cidade || "",
       img: c.logoUrl || "https://images.unsplash.com/photo-1552566626-52f8b828add9"
-    });
+    };
+
+    comercios.push(comercio);
+    renderComercio(comercio);
   });
 }
 
@@ -450,7 +454,52 @@ function renderComercio(c) {
 }
 
 /* =========================
-   ABRIR PERFIL DO COMÉRCIO
+   BUSCA POR COMÉRCIOS
+========================= */
+if (buscaInput) {
+  buscaInput.addEventListener("input", () => {
+    const termo = normalizar(buscaInput.value);
+    lista.innerHTML = "";
+
+    const filtrados = comercios.filter(c =>
+      normalizar(c.nome).includes(termo) ||
+      normalizar(c.tipo).includes(termo) ||
+      normalizar(c.bairro).includes(termo) ||
+      normalizar(c.cidade).includes(termo)
+    );
+
+    if (!filtrados.length) {
+      lista.innerHTML =
+        "<p style='padding:20px;color:#777'>Nenhum comércio encontrado.</p>";
+      return;
+    }
+
+    filtrados.forEach(renderComercio);
+  });
+}
+
+/* =========================
+   FILTRO MENU LATERAL
+========================= */
+window.filtrarTipoComercio = (tipo) => {
+  lista.innerHTML = "";
+
+  const filtrados = comercios.filter(c =>
+    normalizar(c.tipo) === normalizar(tipo)
+  );
+
+  if (!filtrados.length) {
+    lista.innerHTML =
+      "<p style='padding:20px;color:#777'>Nenhum comércio encontrado.</p>";
+    return;
+  }
+
+  filtrados.forEach(renderComercio);
+  fecharMenu();
+};
+
+/* =========================
+   ABRIR COMÉRCIO
 ========================= */
 window.abrirComercio = (comercioId) => {
   localStorage.setItem(
