@@ -351,7 +351,7 @@ let produtos = [];
 window.toggleMenu = ()=>{ sidebar.classList.toggle("active"); overlay.classList.toggle("active"); }
 window.fecharMenu = ()=>{ sidebar.classList.remove("active"); overlay.classList.remove("active"); }
 
-/* USUÁRIO + ENDEREÇO */
+/* USUÁRIO + ENDEREÇO + TEMA */
 onAuthStateChanged(auth, async (user)=>{
   if(user){
     const snap = await getDoc(doc(db,"clientes",user.uid));
@@ -361,6 +361,13 @@ onAuthStateChanged(auth, async (user)=>{
       enderecoEl.innerText = dados.endereco
         ? `${dados.endereco.bairro}, ${dados.endereco.cidade}`
         : "Endereço não cadastrado";
+
+      // 🔑 aplica tema salvo no perfil
+      if(dados.tema === "dark"){
+        document.body.classList.add("dark-theme");
+      }else{
+        document.body.classList.remove("dark-theme");
+      }
     }
   }else{
     usuarioEl.innerText = "Visitante";
