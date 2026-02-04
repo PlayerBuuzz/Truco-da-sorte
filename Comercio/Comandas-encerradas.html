@@ -127,7 +127,7 @@ function carregarPedidos(uid){
 /* Auth */
 onAuthStateChanged(auth,user=>{
   if(!user){
-    location.href="login-comercio.html";
+    location.href="Comercio/login-comercio.html";
     return;
   }
   carregarPedidos(user.uid);
