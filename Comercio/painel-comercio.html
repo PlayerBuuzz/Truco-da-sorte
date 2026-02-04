@@ -329,7 +329,7 @@ formCupom.addEventListener("submit",async e=>{
 
 /* Auth */
 onAuthStateChanged(auth,async user=>{
-  if(!user) location.href="login-comercio.html";
+  if(!user) location.href="Comercio/login-comercio.html";
 
   const snap=await getDoc(doc(db,"comercios",user.uid));
   const c=snap.data();
