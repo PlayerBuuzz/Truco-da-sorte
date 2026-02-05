@@ -9,8 +9,9 @@
 :root{
   --laranja:#ff8c1a;
   --branco:#fff;
-  --cinza:#f4f4f4;
+  --cinza:#f5f5f5;
   --texto:#333;
+  --sombra:rgba(0,0,0,.08);
 }
 
 *{
@@ -21,113 +22,102 @@
 }
 
 body{
-  background:var(--laranja);
+  background:var(--cinza);
   min-height:100vh;
   display:flex;
   justify-content:center;
-  align-items:flex-end;
+  align-items:center;
 }
 
-.container{
+/* CARD PRINCIPAL */
+.painel{
   background:var(--branco);
   width:100%;
   max-width:420px;
-  border-radius:20px 20px 0 0;
-  padding:24px 18px 90px;
-  box-shadow:0 -2px 12px rgba(0,0,0,.15);
+  border-radius:20px;
+  padding:26px 20px;
+  box-shadow:0 8px 24px var(--sombra);
 }
 
+/* HEADER */
 .logo{
+  text-align:center;
   font-size:1.6em;
   font-weight:700;
   color:var(--laranja);
-  text-align:center;
 }
 
 .sub{
+  text-align:center;
   font-size:.9em;
   color:#777;
-  text-align:center;
-  margin-top:6px;
+  margin-top:4px;
 }
 
-/* AÇÕES */
-.acoes{
-  margin-top:24px;
-  display:flex;
-  flex-direction:column;
+/* MENU */
+.menu{
+  margin-top:26px;
+  display:grid;
+  grid-template-columns:1fr 1fr;
   gap:14px;
 }
 
-.btn{
-  padding:16px;
-  border:none;
-  border-radius:14px;
-  font-size:1em;
-  font-weight:600;
-  cursor:pointer;
-  background:var(--laranja);
-  color:#fff;
-}
-
-/* MENU INFERIOR */
-.menu-inferior{
-  position:fixed;
-  bottom:0;
-  left:0;
-  width:100%;
-  max-width:420px;
+.card{
   background:#fff;
-  border-top:1px solid #ddd;
-  display:flex;
+  border:1px solid #eee;
+  border-radius:16px;
+  padding:20px 14px;
+  text-align:center;
+  cursor:pointer;
+  transition:.2s;
 }
 
-.menu-inferior button{
-  flex:1;
-  background:none;
-  border:none;
-  padding:10px 0;
+.card:hover{
+  transform:translateY(-2px);
+  box-shadow:0 6px 18px var(--sombra);
+}
+
+.card span{
+  font-size:1.6em;
+  display:block;
+}
+
+.card p{
+  margin-top:6px;
+  font-size:.9em;
   font-weight:600;
   color:var(--texto);
-  cursor:pointer;
-}
-
-.menu-inferior button.active{
-  color:var(--laranja);
 }
 </style>
 </head>
 
 <body>
 
-<div class="container">
+<div class="painel">
   <div class="logo">🍔 Tôcomfome</div>
   <div class="sub">Painel do Comércio</div>
 
-  <div class="acoes">
-    <button class="btn" onclick="irPara('comandas.html')">
-      📦 Comandas Ativas
-    </button>
+  <div class="menu">
+    <div class="card" onclick="irPara('comandas.html')">
+      <span>📦</span>
+      <p>Comandas Ativas</p>
+    </div>
 
-    <button class="btn" onclick="irPara('comandas-encerradas.html')">
-      ✅ Comandas Encerradas
-    </button>
+    <div class="card" onclick="irPara('comandas-encerradas.html')">
+      <span>✅</span>
+      <p>Encerradas</p>
+    </div>
 
-    <button class="btn" onclick="irPara('cupons.html')">
-      🎟️ Cupons
-    </button>
+    <div class="card" onclick="irPara('cupons.html')">
+      <span>🎟️</span>
+      <p>Cupons</p>
+    </div>
 
-    <button class="btn" onclick="irPara('editarperfil-comercio.html')">
-      ⚙️ Editar Perfil
-    </button>
+    <div class="card" onclick="irPara('editarperfil-comercio.html')">
+      <span>⚙️</span>
+      <p>Perfil</p>
+    </div>
   </div>
-</div>
-
-<div class="menu-inferior">
-  <button class="active">🏠 Painel</button>
-  <button onclick="irPara('comandas.html')">📦</button>
-  <button onclick="irPara('cupons.html')">🎟️</button>
-  <button onclick="irPara('editarperfil-comercio.html')">⚙️</button>
 </div>
 
 <script>
