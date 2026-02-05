@@ -268,7 +268,7 @@ function carregarProduto(){
 
   if(!produto || !produto.nome || !produto.valor || !produto.comercioId){
     alert("Produto não encontrado.");
-    window.location.href = "index.html";
+    window.location.href = "/index.html/";
     return;
   }
 
@@ -302,7 +302,7 @@ window.finalizarPedido = async ()=>{
   await ativarNotificacoes();
 
   alert("✅ Pedido enviado com sucesso!");
-  window.location.href = "index.html";
+  window.location.href = "/index.html/";
 };
 
 /* 🔔 Foreground notifications */
