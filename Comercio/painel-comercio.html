@@ -2,16 +2,18 @@
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
-<title>Tôcomfome 🍔 | Painel do Comércio</title>
+<title>Tôcomfome | Painel do Comércio</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <style>
 :root{
   --laranja:#ff8c1a;
-  --laranja-claro:#fff1e2;
-  --branco:#fff;
-  --cinza:#f6f6f6;
-  --texto:#333;
+  --laranja-hover:#ff7a00;
+  --branco:#ffffff;
+  --cinza:#f4f5f7;
+  --card:#ffffff;
+  --texto:#2e2e2e;
+  --subtexto:#777;
 }
 
 *{
@@ -34,58 +36,64 @@ body{
   background:var(--branco);
   width:100%;
   max-width:420px;
-  border-radius:22px;
+  border-radius:20px;
   overflow:hidden;
-  box-shadow:0 10px 26px rgba(0,0,0,.12);
+  box-shadow:0 12px 30px rgba(0,0,0,.12);
 }
 
 /* HEADER */
 .header{
-  background:var(--laranja);
-  padding:28px 16px; /* levemente maior */
+  background:linear-gradient(135deg, var(--laranja), var(--laranja-hover));
+  padding:32px 20px;
   text-align:center;
 }
 
 .header h1{
   color:#fff;
-  font-size:1.5em;
+  font-size:1.4em;
+  font-weight:700;
+  letter-spacing:.3px;
 }
 
 .header p{
-  color:#ffe5c7;
-  font-size:.9em;
-  margin-top:4px;
+  color:#ffe6cc;
+  font-size:.85em;
+  margin-top:6px;
 }
 
 /* MENU */
 .menu{
-  padding:22px 18px;
-  margin-top:26px; /* 👈 DESCE O MENU */
+  padding:26px 22px 30px;
+  margin-top:18px;
   display:grid;
   grid-template-columns:1fr 1fr;
-  gap:16px;
+  gap:18px;
 }
 
 .card{
-  background:var(--laranja-claro);
-  border-radius:18px;
-  padding:22px 14px;
+  background:var(--card);
+  border-radius:16px;
+  padding:26px 16px;
   text-align:center;
   cursor:pointer;
-  transition:.2s;
+  transition:.25s ease;
+  box-shadow:0 6px 14px rgba(0,0,0,.08);
 }
 
 .card:hover{
-  transform:scale(1.03);
+  transform:translateY(-4px);
+  box-shadow:0 10px 22px rgba(0,0,0,.12);
 }
 
 .card span{
-  font-size:1.8em;
+  font-size:1.6em;
   display:block;
+  color:var(--laranja);
 }
 
 .card p{
-  margin-top:8px;
+  margin-top:10px;
+  font-size:.95em;
   font-weight:600;
   color:var(--texto);
 }
@@ -96,7 +104,7 @@ body{
 
 <div class="painel">
   <div class="header">
-    <h1>🍔 Tôcomfome</h1>
+    <h1>Tôcomfome</h1>
     <p>Painel do Comércio</p>
   </div>
 
@@ -107,7 +115,7 @@ body{
     </div>
 
     <div class="card" onclick="irPara('comandas-encerradas.html')">
-      <span>✅</span>
+      <span>✔️</span>
       <p>Encerradas</p>
     </div>
 
@@ -122,12 +130,12 @@ body{
     </div>
 
     <div class="card" onclick="irPara('adicionar-produto.html')">
-      <span>➕</span>
+      <span>＋</span>
       <p>Adicionar Produto</p>
     </div>
 
     <div class="card" onclick="irPara('alterar-perfil.html')">
-      <span>✏️</span>
+      <span>✎</span>
       <p>Alterar Perfil</p>
     </div>
   </div>
