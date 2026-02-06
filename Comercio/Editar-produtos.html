@@ -2,7 +2,7 @@
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
-<title>Tôcomfome | Editar Produto</title>
+<title>Tôcomfome | Meus Produtos</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <style>
@@ -25,126 +25,103 @@
 body{
   background:var(--cinza);
   min-height:100vh;
-  display:flex;
-  justify-content:center;
-  align-items:center;
-}
-
-/* CONTAINER */
-.container{
-  background:var(--branco);
-  width:100%;
-  max-width:420px;
-  border-radius:20px;
-  box-shadow:0 12px 30px rgba(0,0,0,.12);
-  overflow:hidden;
 }
 
 /* HEADER */
-.header{
-  background:linear-gradient(135deg, var(--laranja), var(--laranja-hover));
-  padding:24px 20px;
-  text-align:center;
+
+.topo{
+  background:linear-gradient(135deg,var(--laranja),var(--laranja-hover));
+  padding:18px;
   color:#fff;
+  text-align:center;
 }
 
-.header h1{
-  font-size:1.3em;
-  font-weight:700;
+.topo h1{
+  font-size:1.2em;
 }
 
-.header p{
-  font-size:.85em;
-  opacity:.9;
-  margin-top:4px;
+
+/* LISTA */
+
+.lista{
+  max-width:600px;
+  margin:20px auto;
+  padding:10px;
 }
 
-/* FORM */
-.form{
-  padding:22px;
+.card{
+  background:#fff;
+  border-radius:14px;
+  box-shadow:0 4px 12px rgba(0,0,0,.08);
   display:flex;
-  flex-direction:column;
-  gap:14px;
+  gap:12px;
+  padding:12px;
+  margin-bottom:12px;
+  align-items:center;
 }
 
-label{
-  font-size:.8em;
-  font-weight:600;
-  color:var(--sub);
-  text-transform:uppercase;
+.card img{
+  width:70px;
+  height:70px;
+  border-radius:10px;
+  object-fit:cover;
 }
 
-input, textarea{
-  padding:14px;
-  border-radius:12px;
-  border:1px solid #ddd;
+.info{
+  flex:1;
+}
+
+.info h3{
   font-size:.95em;
+  margin-bottom:4px;
 }
 
-textarea{
-  resize:none;
-  min-height:80px;
+.info p{
+  font-size:.8em;
+  color:#666;
 }
 
-.preview{
-  display:none;
-  margin-top:10px;
-}
-
-.preview img{
-  width:100%;
-  border-radius:14px;
-}
-
-button{
-  margin-top:10px;
-  padding:14px;
-  border:none;
-  border-radius:14px;
-  font-size:1em;
+.info span{
   font-weight:600;
-  cursor:pointer;
+  color:var(--laranja);
+  font-size:.9em;
+}
+
+.acoes button{
   background:var(--laranja);
   color:#fff;
-  transition:.2s;
+  border:none;
+  border-radius:10px;
+  padding:8px 12px;
+  font-size:.8em;
+  cursor:pointer;
 }
 
-button:hover{
+.acoes button:hover{
   background:var(--laranja-hover);
+}
+
+.vazio{
+  text-align:center;
+  margin-top:40px;
+  color:#777;
+  font-size:.9em;
 }
 </style>
 </head>
 
 <body>
 
-<div class="container">
-  <div class="header">
-    <h1 id="titulo">Cadastrar Produto</h1>
-    <p id="subtitulo">Adicione um novo item</p>
-  </div>
-
-  <form class="form" id="formProduto">
-
-    <label>Nome do produto</label>
-    <input id="nomeProduto" required>
-
-    <label>Preço</label>
-    <input id="valorProduto" type="number" step="0.01" required>
-
-    <label>Descrição</label>
-    <textarea id="descricaoProduto"></textarea>
-
-    <label>Imagem do produto</label>
-    <input id="imagemProduto" type="file" accept="image/*">
-
-    <div class="preview" id="preview">
-      <img id="previewImg">
-    </div>
-
-    <button type="submit" id="btnSalvar">Salvar Produto</button>
-
-  </form>
+<div class="topo">
+  <h1>Meus Produtos</h1>
 </div>
+
+<div class="lista" id="listaProdutos"></div>
+
+<p class="vazio" id="msgVazio" style="display:none;">
+  Nenhum produto cadastrado ainda.
+</p>
+
 
 <script type="module">
 
@@ -154,12 +131,11 @@ import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/
 import {
   getFirestore,
   collection,
-  addDoc,
-  doc,
-  getDoc,
-  updateDoc,
-  serverTimestamp
+  getDocs,
+  query,
+  orderBy
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
 
 /* Firebase */
 
@@ -175,168 +151,75 @@ const auth = getAuth(app);
 const db = getFirestore(app);
 
 
-/* Cloudinary */
-
-const CLOUD_NAME = "daqyssjdj";
-const UPLOAD_PRESET = "TOCOMFOME";
-
-async function uploadCloudinary(file){
-
-  const fd = new FormData();
-
-  fd.append("file", file);
-  fd.append("upload_preset", UPLOAD_PRESET);
-
-  const res = await fetch(
-    `https://api.cloudinary.com/v1_1/${CLOUD_NAME}/image/upload`,
-    { method:"POST", body:fd }
-  );
-
-  const data = await res.json();
-
-  return data.secure_url;
-}
-
-
-/* URL PARAM */
-
-const params = new URLSearchParams(location.search);
-const produtoId = params.get("id");
-
-let usuarioAtual = null;
-let imagemAtual = null;
-
-
-/* Preview */
-
-imagemProduto.addEventListener("change", e=>{
-
-  const file = e.target.files[0];
-
-  if(!file) return;
-
-  preview.style.display="block";
-  previewImg.src = URL.createObjectURL(file);
-
-});
-
-
 /* Auth */
 
-onAuthStateChanged(auth, async user=>{
+onAuthStateChanged(auth, user=>{
 
   if(!user){
     location.href="login-comercio.html";
     return;
   }
 
-  usuarioAtual = user;
-
-  if(produtoId){
-    carregarProduto();
-  }
+  carregarProdutos(user.uid);
 
 });
 
 
-/* Carregar Produto */
+/* Carregar produtos */
 
-async function carregarProduto(){
+async function carregarProdutos(uid){
 
-  titulo.innerText = "Editar Produto";
-  subtitulo.innerText = "Atualize as informações";
-  btnSalvar.innerText = "Atualizar Produto";
+  const ref = collection(db,"comercios",uid,"produtos");
 
-  const ref = doc(
-    db,
-    "comercios",
-    usuarioAtual.uid,
-    "produtos",
-    produtoId
-  );
+  const q = query(ref, orderBy("criadoEm","desc"));
 
-  const snap = await getDoc(ref);
+  const snap = await getDocs(q);
 
-  if(!snap.exists()){
-    alert("Produto não encontrado!");
+
+  if(snap.empty){
+    msgVazio.style.display="block";
     return;
   }
 
-  const p = snap.data();
 
-  nomeProduto.value = p.nome;
-  valorProduto.value = p.valor;
-  descricaoProduto.value = p.descricao || "";
-  imagemAtual = p.imagemUrl;
+  snap.forEach(docu=>{
 
-  if(imagemAtual){
-    preview.style.display="block";
-    previewImg.src = imagemAtual;
-  }
+    const p = docu.data();
+
+    const div = document.createElement("div");
+
+    div.className="card";
+
+    div.innerHTML = `
+      <img src="${p.imagemUrl}">
+      
+      <div class="info">
+        <h3>${p.nome}</h3>
+        <p>${p.descricao || ""}</p>
+        <span>R$ ${Number(p.valor).toFixed(2)}</span>
+      </div>
+
+      <div class="acoes">
+        <button onclick="editar('${docu.id}')">
+          Editar
+        </button>
+      </div>
+    `;
+
+    listaProdutos.appendChild(div);
+
+  });
 
 }
 
 
-/* Submit */
+/* Editar */
 
-formProduto.addEventListener("submit", async e=>{
+window.editar = function(id){
 
-  e.preventDefault();
+  location.href = `editar-produtos.html?id=${id}`;
 
-  const user = usuarioAtual;
-
-  let imagemFinal = imagemAtual;
-
-
-  if(imagemProduto.files.length){
-    imagemFinal = await uploadCloudinary(imagemProduto.files[0]);
-  }
-
-
-  if(produtoId){
-
-    /* EDITAR */
-
-    const ref = doc(
-      db,
-      "comercios",
-      user.uid,
-      "produtos",
-      produtoId
-    );
-
-    await updateDoc(ref,{
-      nome: nomeProduto.value,
-      valor: valorProduto.value,
-      descricao: descricaoProduto.value,
-      imagemUrl: imagemFinal,
-      atualizadoEm: serverTimestamp()
-    });
-
-    alert("Produto atualizado com sucesso!");
-
-  }else{
-
-    /* NOVO */
-
-    await addDoc(
-      collection(db,"comercios",user.uid,"produtos"),
-      {
-        nome: nomeProduto.value,
-        valor: valorProduto.value,
-        descricao: descricaoProduto.value,
-        imagemUrl: imagemFinal,
-        criadoEm: serverTimestamp()
-      }
-    );
-
-    alert("Produto cadastrado com sucesso!");
-  }
-
-
-  location.href="painel.html";
-
-});
+}
 
 </script>
 
