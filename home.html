@@ -438,7 +438,7 @@ async function carregarComercios() {
       tipo: c.tipoComercio || "",
       bairro: c.endereco?.bairro || "",
       cidade: c.endereco?.cidade || "",
-      img: c.logoUrl || "https://images.unsplash.com/photo-1552566626-52f8b828add9"
+      img: c.fotoPerfil || c.logoUrl || "https://images.unsplash.com/photo-1552566626-52f8b828add9"
     };
 
     comercios.push(comercio);
