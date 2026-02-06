@@ -108,31 +108,17 @@ body{
 <body>
 
 <div class="header">📦 Comandas</div>
-
 <div class="lista" id="listaPedidos"></div>
 
 <script type="module">
 
-// 🔥 Firebase
+/* Firebase */
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
 import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-import {
-  getFirestore,
-  collection,
-  query,
-  where,
-  onSnapshot,
-  doc,
-  updateDoc,
-  setDoc
-} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
-import {
-  getMessaging,
-  getToken,
-  onMessage
-} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-messaging.js";
+import { getFirestore, collection, query, where, onSnapshot, doc, updateDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+import { getMessaging, getToken, onMessage } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-messaging.js";
 
-// 🔹 Config do Firebase
+/* Config Firebase */
 const firebaseConfig = {
   apiKey: "AIzaSyD6a29L24aFSgVjmC7NFGXpdWW4g1uQsio",
   authDomain: "tocomfome-754e1.firebaseapp.com",
@@ -147,51 +133,46 @@ const auth = getAuth(app);
 const db = getFirestore(app);
 const messaging = getMessaging(app);
 
-// 🔹 DOM
+/* DOM */
 const lista = document.getElementById("listaPedidos");
 
-// 🔹 Registrar Service Worker
+/* Registrar Service Worker */
 if ("serviceWorker" in navigator) {
   navigator.serviceWorker.register("/firebase-messaging-sw.js")
-    .then(() => console.log("✅ Service Worker registrado"))
+    .then(() => console.log("✅ Service Worker OK"))
     .catch(e => console.error("❌ SW erro:", e));
 }
 
-// 🔹 Registrar token FCM para notificações push
+/* Registrar Token FCM do Comércio */
 async function registrarToken(uid){
   try{
-    const permission = await Notification.requestPermission();
-    if(permission !== "granted"){
-      alert("❌ Permita notificações para receber novos pedidos!");
+    const perm = await Notification.requestPermission();
+    if(perm !== "granted"){
+      alert("⚠️ Permita notificações para receber novos pedidos!");
       return;
     }
 
     const registration = await navigator.serviceWorker.ready;
-
     const token = await getToken(messaging, {
-      vapidKey: "SUA_VAPID_KEY_AQUI", // ⚠️ Substitua pela sua chave VAPID do Firebase
+      vapidKey: "COLOQUE_SUA_VAPID_KEY_AQUI",
       serviceWorkerRegistration: registration
     });
 
-    if(!token){
-      console.log("Sem token FCM");
-      return;
-    }
+    if(!token) return console.log("Sem token FCM");
 
-    // Salvar token no Firestore
-    await setDoc(doc(db,"tokens",uid), {
-      token,
+    await setDoc(doc(db,"tokens",uid),{
+      token: token,
       atualizadoEm: Date.now()
     });
 
-    console.log("🔥 Token FCM registrado:", token);
+    console.log("🔥 Token registrado:", token);
 
   }catch(err){
-    console.error("Erro ao registrar token:", err);
+    console.error("❌ Erro token:", err);
   }
 }
 
-// 🔹 Atualizar status do pedido
+/* Atualizar status */
 window.mudarStatus = async (id,status)=>{
   let msg = "";
   if(status==="preparando") msg="👨‍🍳 Marcar como preparando?";
@@ -199,29 +180,25 @@ window.mudarStatus = async (id,status)=>{
   if(status==="entregue") msg="✅ Pedido entregue?";
   if(!confirm(msg)) return;
 
-  await updateDoc(doc(db,"pedidos",id), { status });
+  await updateDoc(doc(db,"pedidos",id),{ status });
   alert("Status atualizado");
 };
 
-// 🔹 Carregar pedidos do comércio
+/* Carregar pedidos do comércio */
 function carregarPedidos(uid){
   const q = query(collection(db,"pedidos"), where("comercioId","==",uid));
-
-  onSnapshot(q, snap => {
+  onSnapshot(q, snap=>{
     lista.innerHTML = "";
-
     if(snap.empty){
       lista.innerHTML = `<div class="vazio">📭 Nenhum pedido</div>`;
       return;
     }
 
     let ativos = 0;
-
     snap.forEach(d=>{
       const p = d.data();
       if(p.status==="entregue") return;
       ativos++;
-
       lista.innerHTML += `
         <div class="card">
           <h4>${p.produtoNome}</h4>
@@ -243,30 +220,29 @@ function carregarPedidos(uid){
   });
 }
 
-// 🔹 Auth
-onAuthStateChanged(auth, user=>{
-  if(!user){
-    location.href="Comercio/login-comercio.html";
-    return;
-  }
-
-  // Registrar token FCM
-  registrarToken(user.uid);
-
-  // Carregar pedidos
-  carregarPedidos(user.uid);
-});
-
-// 🔹 Receber notificações em foreground
+/* Foreground notifications */
 onMessage(messaging, payload=>{
-  console.log("📩 Mensagem recebida:", payload);
+  console.log("🔔 Notificação recebida:", payload);
   new Notification(payload.notification.title, {
     body: payload.notification.body,
     icon: "/img/logo.png"
   });
 });
 
-</script>
+/* Auth */
+onAuthStateChanged(auth, user=>{
+  if(!user){
+    location.href="Comercio/login-comercio.html";
+    return;
+  }
 
+  // Ativa notificações
+  registrarToken(user.uid);
+
+  // Carrega pedidos
+  carregarPedidos(user.uid);
+});
+
+</script>
 </body>
 </html>
