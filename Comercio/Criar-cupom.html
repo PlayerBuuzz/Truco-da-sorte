@@ -41,7 +41,20 @@ body{
 h2{
   text-align:center;
   color:var(--laranja);
-  margin-bottom:20px;
+  margin-bottom:15px;
+}
+
+/* Criar */
+.criar{
+  width:100%;
+  border:none;
+  background:var(--laranja);
+  color:#fff;
+  padding:12px;
+  border-radius:12px;
+  font-weight:600;
+  margin-bottom:18px;
+  cursor:pointer;
 }
 
 /* Lista */
@@ -113,10 +126,10 @@ h2{
   text-align:center;
   color:#777;
   font-size:.9em;
-  padding:30px 10px;
+  padding:20px 10px;
 }
 
-/* Botão */
+/* Voltar */
 .voltar{
   margin-top:20px;
   text-align:center;
@@ -132,6 +145,11 @@ h2{
 <div class="box">
 
   <h2>🎟️ Meus Cupons</h2>
+
+  <!-- BOTÃO CRIAR -->
+  <button class="criar" onclick="criarCupom()">
+    ➕ Criar Novo Cupom
+  </button>
 
   <div id="lista" class="lista"></div>
 
@@ -152,7 +170,9 @@ import {
   orderBy,
   doc,
   deleteDoc,
-  updateDoc
+  updateDoc,
+  addDoc,
+  serverTimestamp
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
 
@@ -174,6 +194,51 @@ if(!comercio || !comercio.comercioId){
   alert("Comércio não identificado.");
   location.href = "/comercio/painel.html";
 }
+
+
+/* CRIAR CUPOM */
+window.criarCupom = async ()=>{
+
+  const nome = prompt("Nome do cupom (ex: PROMO10):");
+  if(!nome) return;
+
+  const desconto = prompt("Desconto (%):");
+  if(!desconto) return;
+
+  const validade = prompt("Validade (AAAA-MM-DD):");
+  if(!validade) return;
+
+  const ativo = confirm("Deseja ativar agora?");
+
+  try{
+
+    await addDoc(
+      collection(
+        db,
+        "comercios",
+        comercio.comercioId,
+        "cupons"
+      ),
+      {
+        nome: nome.toUpperCase(),
+        desconto: Number(desconto),
+        validade: validade,
+        ativo: ativo,
+        criadoEm: serverTimestamp()
+      }
+    );
+
+    alert("🎉 Cupom criado!");
+    carregarCupons();
+
+  }catch(e){
+
+    alert("Erro ao criar.");
+    console.error(e);
+
+  }
+
+};
 
 
 /* CARREGAR CUPONS */
@@ -219,31 +284,37 @@ async function carregarCupons(){
 
       div.innerHTML = `
         <h3>${c.nome}</h3>
+
         <p>💰 Desconto: ${c.desconto}%</p>
+
         <p>📅 Validade: ${formatarData(c.validade)}</p>
+
         <p>Status: ${status}</p>
 
         <div class="acoes">
+
           <button class="btn-editar"
             onclick="editarCupom('${id}',
               '${c.nome}',
               ${c.desconto},
               '${c.validade}',
               ${c.ativo})">
+
             ✏️ Editar
           </button>
 
           <button class="btn-excluir"
             onclick="excluirCupom('${id}')">
+
             🗑️ Excluir
           </button>
+
         </div>
       `;
 
       lista.appendChild(div);
 
     });
-
 
   }catch(e){
 
@@ -293,27 +364,16 @@ window.excluirCupom = async (id)=>{
 /* EDITAR */
 window.editarCupom = async (id,nome,desconto,validade,ativo)=>{
 
-  const novoNome =
-    prompt("Nome do cupom:", nome);
-
+  const novoNome = prompt("Nome:", nome);
   if(!novoNome) return;
 
-
-  const novoDesconto =
-    prompt("Desconto (%):", desconto);
-
+  const novoDesconto = prompt("Desconto (%):", desconto);
   if(!novoDesconto) return;
 
-
-  const novaValidade =
-    prompt("Validade (AAAA-MM-DD):", validade);
-
+  const novaValidade = prompt("Validade (AAAA-MM-DD):", validade);
   if(!novaValidade) return;
 
-
-  const novoStatus =
-    confirm("Deseja deixar ATIVO?\nOK = Sim | Cancelar = Não");
-
+  const novoStatus = confirm("Deseja deixar ATIVO?\nOK = Sim | Cancelar = Não");
 
   try{
 
@@ -351,13 +411,12 @@ function formatarData(data){
 
   if(!data) return "-";
 
-  return new Date(data)
-    .toLocaleDateString("pt-BR");
+  return new Date(data).toLocaleDateString("pt-BR");
 
 }
 
 
-/* INICIAR */
+/* START */
 carregarCupons();
 
 </script>
