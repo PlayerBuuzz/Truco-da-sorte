@@ -28,31 +28,32 @@ body{
 /* HEADER */
 .header{
   background:#fff;
-  padding:16px;
-  box-shadow:0 2px 6px var(--sombra);
+  padding:18px;
+  box-shadow:0 2px 8px var(--sombra);
 }
 
 .header h2{
   color:var(--laranja);
-  font-size:1.4em;
+  font-size:1.5em;
 }
 
 .header p{
   font-size:.9em;
-  color:#666;
+  color:#777;
   margin-top:4px;
 }
 
 .top-actions{
   display:flex;
   gap:10px;
-  margin-top:10px;
+  margin-top:12px;
+  flex-wrap:wrap;
 }
 
 .tag{
   background:#f1f1f1;
-  padding:6px 10px;
-  border-radius:12px;
+  padding:6px 12px;
+  border-radius:14px;
   font-size:.75em;
 }
 
@@ -60,37 +61,57 @@ body{
 .info{
   background:#fff;
   margin:14px;
-  padding:14px;
-  border-radius:16px;
-  box-shadow:0 4px 10px var(--sombra);
+  padding:16px;
+  border-radius:18px;
+  box-shadow:0 4px 12px var(--sombra);
   font-size:.9em;
+  line-height:1.6;
 }
 
 /* CUPOM */
 .cupom{
-  background:#fff7ee;
+  background:linear-gradient(135deg,#fff4e6,#fff);
   border:1px dashed var(--laranja);
   margin:14px;
-  padding:14px;
-  border-radius:16px;
+  padding:16px;
+  border-radius:18px;
   font-size:.9em;
   display:flex;
   justify-content:space-between;
   align-items:center;
+  gap:12px;
+  box-shadow:0 4px 10px var(--sombra);
 }
 
 .cupom strong{
   color:var(--laranja);
+  font-size:1.1em;
+}
+
+.cupom small{
+  color:#666;
 }
 
 .cupom button{
   border:none;
   background:var(--laranja);
   color:#fff;
-  padding:8px 12px;
-  border-radius:10px;
+  padding:10px 14px;
+  border-radius:12px;
   font-size:.8em;
   cursor:pointer;
+  font-weight:600;
+}
+
+.sem-cupom{
+  background:#fff;
+  margin:14px;
+  padding:14px;
+  border-radius:16px;
+  font-size:.85em;
+  color:#777;
+  text-align:center;
+  box-shadow:0 2px 8px var(--sombra);
 }
 
 /* PRODUTOS */
@@ -100,25 +121,25 @@ body{
 
 .card{
   background:#fff;
-  border-radius:18px;
+  border-radius:20px;
   padding:14px;
-  margin-bottom:16px;
+  margin-bottom:18px;
   display:flex;
   gap:14px;
-  box-shadow:0 4px 12px var(--sombra);
+  box-shadow:0 4px 14px var(--sombra);
 }
 
 .card img{
   width:90px;
   height:90px;
-  border-radius:14px;
+  border-radius:16px;
   object-fit:cover;
 }
 
 .card-info{flex:1}
 
 .card-info h4{
-  font-size:1.05em;
+  font-size:1.1em;
 }
 
 .preco{
@@ -135,9 +156,9 @@ body{
 
 .btn{
   width:100%;
-  padding:10px;
+  padding:11px;
   border:none;
-  border-radius:12px;
+  border-radius:14px;
   background:var(--laranja);
   color:#fff;
   font-weight:600;
@@ -146,7 +167,7 @@ body{
 
 /* VOLTAR */
 .voltar{
-  margin-top:8px;
+  margin-top:10px;
   font-size:.85em;
   color:#666;
   cursor:pointer;
@@ -156,6 +177,7 @@ body{
 
 <body>
 
+<!-- HEADER -->
 <div class="header">
   <h2 id="nomeComercio">Comércio</h2>
   <p id="categoriaComercio"></p>
@@ -169,26 +191,26 @@ body{
   <div class="voltar" onclick="history.back()">← Voltar</div>
 </div>
 
+<!-- INFO -->
 <div class="info">
   <div id="endereco"></div>
   <div id="telefone"></div>
 </div>
 
 <!-- CUPOM -->
-<div class="cupom" id="cupomBox" style="display:none">
-  <div>
-    🎟️ Cupom disponível: <strong id="cupomNome"></strong><br>
-    <small id="cupomDesc"></small>
-  </div>
-  <button onclick="aplicarCupom()">Usar</button>
-</div>
+<div id="areaCupom"></div>
 
+<!-- PRODUTOS -->
 <div class="lista" id="listaProdutos"></div>
+
 <!-- AVALIAÇÕES -->
 <div class="lista" id="listaAvaliacoes"></div>
 
+
 <script type="module">
+
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+
 import {
   getFirestore,
   doc,
@@ -199,33 +221,43 @@ import {
   where
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
+
 /* FIREBASE */
 const firebaseConfig = {
   apiKey: "AIzaSyD6a29L24aFSgVjmC7NFGXpdWW4g1uQsio",
   authDomain: "tocomfome-754e1.firebaseapp.com",
   projectId: "tocomfome-754e1",
 };
+
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
+
 
 /* ELEMENTOS */
 const nomeEl = document.getElementById("nomeComercio");
 const categoriaEl = document.getElementById("categoriaComercio");
 const enderecoEl = document.getElementById("endereco");
 const telefoneEl = document.getElementById("telefone");
+
 const lista = document.getElementById("listaProdutos");
 const listaAvaliacoes = document.getElementById("listaAvaliacoes");
 
-const cupomBox = document.getElementById("cupomBox");
-const cupomNome = document.getElementById("cupomNome");
-const cupomDesc = document.getElementById("cupomDesc");
+const areaCupom = document.getElementById("areaCupom");
+
 
 /* ESTADO */
 let comercioSelecionado = JSON.parse(localStorage.getItem("comercioSelecionado"));
 let cupomAtivo = null;
 
+
 /* CARREGAR COMÉRCIO */
 async function carregarComercio(){
+
+  if(!comercioSelecionado){
+    alert("Comércio não encontrado.");
+    return;
+  }
+
   const ref = doc(db,"comercios",comercioSelecionado.comercioId);
   const snap = await getDoc(ref);
 
@@ -235,80 +267,230 @@ async function carregarComercio(){
 
   nomeEl.innerText = c.nome;
   categoriaEl.innerText = c.categoria || "";
-  enderecoEl.innerText = `📍 ${c.endereco?.rua || ""}, ${c.endereco?.numero || ""} - ${c.endereco?.bairro || ""}`;
+  enderecoEl.innerText =
+    `📍 ${c.endereco?.rua || ""}, ${c.endereco?.numero || ""} - ${c.endereco?.bairro || ""}`;
+
   telefoneEl.innerText = `📞 ${c.telefone || ""}`;
 
-  // CUPOM FIXO EXEMPLO
-  cupomAtivo = { nome:"BEMVINDO10", desconto:10 };
-  cupomNome.innerText = cupomAtivo.nome;
-  cupomDesc.innerText = `Ganhe ${cupomAtivo.desconto}% de desconto`;
-  cupomBox.style.display = "flex";
-
+  await carregarCupom();
   carregarProdutos();
   carregarAvaliacoes();
 }
 
+
+/* CUPONS */
+async function carregarCupom(){
+
+  const hoje = new Date().toISOString().split("T")[0];
+
+  const cuponsSnap = await getDocs(
+    collection(db,"comercios",comercioSelecionado.comercioId,"cupons")
+  );
+
+  let cuponsValidos = [];
+
+  cuponsSnap.forEach(docu=>{
+
+    const c = docu.data();
+
+    if(c.ativo && c.validade >= hoje){
+      cuponsValidos.push(c);
+    }
+
+  });
+
+  /* Sem cupom */
+  if(cuponsValidos.length === 0){
+
+    areaCupom.innerHTML = `
+      <div class="sem-cupom">
+        😕 Este comércio não possui cupons ativos no momento.
+      </div>
+    `;
+
+    return;
+  }
+
+  /* Usa o primeiro cupom válido */
+  cupomAtivo = cuponsValidos[0];
+
+  areaCupom.innerHTML = `
+    <div class="cupom">
+      <div>
+        🎟️ Use o cupom <strong>${cupomAtivo.nome}</strong><br>
+        <small>Ganhe ${cupomAtivo.desconto}% de desconto</small>
+      </div>
+
+      <button onclick="aplicarCupom()">Aplicar</button>
+    </div>
+  `;
+
+}
+
+
 /* PRODUTOS */
 async function carregarProdutos(){
+
   lista.innerHTML = "";
-  const produtosSnap = await getDocs(collection(db,"comercios",comercioSelecionado.comercioId,"produtos"));
+
+  const produtosSnap = await getDocs(
+    collection(db,"comercios",comercioSelecionado.comercioId,"produtos")
+  );
+
   produtosSnap.forEach(docu=>{
+
     const p = docu.data();
+
     let valor = Number(p.valor);
-    let valorComDesconto = cupomAtivo ? valor - (valor * cupomAtivo.desconto / 100) : valor;
+
+    let valorComDesconto = cupomAtivo
+      ? valor - (valor * cupomAtivo.desconto / 100)
+      : valor;
 
     lista.innerHTML += `
       <div class="card">
+
         <img src="${p.img || 'https://images.unsplash.com/photo-1550547660-d9450f859349'}">
+
         <div class="card-info">
+
           <h4>${p.nome}</h4>
-          ${cupomAtivo ? `<div class="preco-antigo">${valor.toLocaleString("pt-BR",{style:"currency",currency:"BRL"})}</div>` : ""}
-          <div class="preco">${valorComDesconto.toLocaleString("pt-BR",{style:"currency",currency:"BRL"})}</div>
-          <div style="font-size:.85em;color:#666">${p.descricao || ""}</div>
-          <button class="btn" onclick='pedir(${JSON.stringify({...p,valor:valorComDesconto,comercioId:comercioSelecionado.comercioId})})'>Pedir</button>
+
+          ${
+            cupomAtivo
+            ? `<div class="preco-antigo">
+                ${valor.toLocaleString("pt-BR",{style:"currency",currency:"BRL"})}
+               </div>`
+            : ""
+          }
+
+          <div class="preco">
+            ${valorComDesconto.toLocaleString("pt-BR",{style:"currency",currency:"BRL"})}
+          </div>
+
+          <div style="font-size:.85em;color:#666">
+            ${p.descricao || ""}
+          </div>
+
+          <button class="btn"
+            onclick='pedir(${JSON.stringify({
+              ...p,
+              valor:valorComDesconto,
+              comercioId:comercioSelecionado.comercioId
+            })})'>
+            Pedir
+          </button>
+
         </div>
       </div>
     `;
+
   });
+
 }
+
 
 /* AVALIAÇÕES */
 async function carregarAvaliacoes(){
+
   listaAvaliacoes.innerHTML = "<h3>📝 Avaliações</h3>";
-  const q = query(collection(db,"pedidos"), where("comercioId","==",comercioSelecionado.comercioId));
+
+  const q = query(
+    collection(db,"pedidos"),
+    where("comercioId","==",comercioSelecionado.comercioId)
+  );
+
   const pedidosSnap = await getDocs(q);
 
   pedidosSnap.forEach(docu=>{
+
     const p = docu.data();
+
     if(p.avaliacao){
+
       listaAvaliacoes.innerHTML += `
         <div class="card">
+
           <div class="card-info">
+
             <h4>${p.clienteNome || "Cliente"}</h4>
-            <div style="color:#555;font-size:.9em">🍔 Pedido: ${p.produtoNome}</div>
-            <div style="margin-top:6px">⭐ Avaliação do lanche: ${p.avaliacao.pedido}</div>
-            <div style="font-size:.85em;color:#666">🛵 Motoboy: ${p.avaliacao.motoboy} | ⏱ Tempo: ${p.avaliacao.tempo} min</div>
+
+            <div style="color:#555;font-size:.9em">
+              🍔 Pedido: ${p.produtoNome}
+            </div>
+
+            <div style="margin-top:6px">
+              ⭐ Pedido: ${p.avaliacao.pedido}
+            </div>
+
+            <div style="font-size:.85em;color:#666">
+              🛵 Motoboy: ${p.avaliacao.motoboy}
+              | ⏱ ${p.avaliacao.tempo} min
+            </div>
+
           </div>
         </div>
       `;
     }
+
   });
 
+
   if(listaAvaliacoes.innerHTML === "<h3>📝 Avaliações</h3>"){
-    listaAvaliacoes.innerHTML += `<div style="color:#666;margin-top:10px">Ainda não há avaliações.</div>`;
+
+    listaAvaliacoes.innerHTML += `
+      <div style="color:#777;margin-top:10px">
+        Ainda não há avaliações.
+      </div>
+    `;
+
   }
+
 }
 
+
 /* CUPOM */
-window.aplicarCupom = ()=>{ alert("🎉 Cupom aplicado com sucesso!"); carregarProdutos(); };
+window.aplicarCupom = ()=>{
+
+  if(!cupomAtivo){
+    alert("Nenhum cupom disponível.");
+    return;
+  }
+
+  alert(`🎉 Cupom ${cupomAtivo.nome} aplicado!`);
+
+  carregarProdutos();
+};
+
 
 /* FAVORITO */
-window.favoritar = ()=>{ localStorage.setItem("favorito_"+comercioSelecionado.comercioId,"true"); alert("❤️ Comércio favoritado!"); };
+window.favoritar = ()=>{
+
+  localStorage.setItem(
+    "favorito_"+comercioSelecionado.comercioId,
+    "true"
+  );
+
+  alert("❤️ Comércio favoritado!");
+};
+
 
 /* PEDIR */
-window.pedir = (produto)=>{ localStorage.setItem("produtoSelecionado", JSON.stringify(produto)); location.href = "produto.html"; };
+window.pedir = (produto)=>{
 
+  localStorage.setItem(
+    "produtoSelecionado",
+    JSON.stringify(produto)
+  );
+
+  location.href = "produto.html";
+};
+
+
+/* INICIAR */
 carregarComercio();
+
 </script>
+
 </body>
 </html>
