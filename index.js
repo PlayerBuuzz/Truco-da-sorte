@@ -4,145 +4,47 @@ const nodemailer = require("nodemailer");
 
 admin.initializeApp();
 
-/* =========================
-   EMAIL CONFIG
-========================= */
-
+// Configuração do transporte SMTP (exemplo com Gmail)
 const transporter = nodemailer.createTransport({
   service: "gmail",
   auth: {
     user: "SEU_EMAIL@gmail.com",
-    pass: "SUA_SENHA_DE_APP"
+    pass: "SUA_SENHA_DE_APP" // precisa ser senha de app, não a senha normal
   }
 });
 
-
-/* =========================
-   FUNÇÃO PRINCIPAL
-========================= */
-
-exports.notificarNovoPedido = functions.firestore
+exports.enviarEmailPedido = functions.firestore
   .document("pedidos/{pedidoId}")
-  .onCreate(async (snap) => {
-
+  .onCreate(async (snap, context) => {
     const pedido = snap.data();
 
-    if (!pedido || !pedido.comercioId) return;
-
-    const comercioId = pedido.comercioId;
-
-
-    /* =========================
-       BUSCAR COMÉRCIO
-    ========================= */
-
-    const comercioRef = admin
-      .firestore()
+    // Buscar e-mail do comércio
+    const comercioSnap = await admin.firestore()
       .collection("comercios")
-      .doc(comercioId);
-
-    const comercioSnap = await comercioRef.get();
-
-    if (!comercioSnap.exists) return;
-
-    const comercio = comercioSnap.data();
-
-
-    /* =========================
-       ENVIAR EMAIL
-    ========================= */
-
-    if (comercio.email) {
-
-      const mailOptions = {
-        from: "SEU_EMAIL@gmail.com",
-        to: comercio.email,
-        subject: "🍔 Novo pedido recebido!",
-        text: `
-Novo pedido no Tô Com Fome!
-
-Cliente: ${pedido.clienteNome || "-"}
-Produto: ${pedido.produtoNome}
-Valor: R$ ${pedido.valor}
-
-Entre no painel para visualizar.
-        `
-      };
-
-      try {
-        await transporter.sendMail(mailOptions);
-        console.log("✅ Email enviado");
-      } catch (err) {
-        console.error("❌ Erro email:", err);
-      }
-
-    }
-
-
-    /* =========================
-       BUSCAR TOKEN PUSH
-    ========================= */
-
-    const tokenSnap = await admin
-      .firestore()
-      .collection("tokens")
-      .doc(comercioId)
+      .doc(pedido.comercioId)
       .get();
 
-    if (!tokenSnap.exists) {
-      console.log("❌ Token não encontrado");
+    if (!comercioSnap.exists) return;
+    const comercio = comercioSnap.data();
+    const emailComercio = comercio.email;
+
+    if (!emailComercio) {
+      console.log("Comércio sem e-mail cadastrado");
       return;
     }
 
-    const token = tokenSnap.data().token;
-
-
-    /* =========================
-       ENVIAR PUSH
-    ========================= */
-
-    const payload = {
-
-      notification: {
-        title: "🍔 Novo Pedido!",
-        body: `Pedido de ${pedido.clienteNome || "Cliente"}`
-      },
-
-      data: {
-        pedidoId: snap.id,
-        tipo: "novo_pedido"
-      },
-
-      android: {
-        priority: "high",
-        notification: {
-          sound: "default",
-          channelId: "pedidos"
-        }
-      },
-
-      apns: {
-        payload: {
-          aps: {
-            sound: "default"
-          }
-        }
-      }
-
+    // Montar mensagem
+    const mailOptions = {
+      from: "SEU_EMAIL@gmail.com",
+      to: emailComercio,
+      subject: "🍔 Novo pedido recebido!",
+      text: `Cliente: ${pedido.clienteNome}\nProduto: ${pedido.produtoNome}\nValor: R$ ${pedido.valor}`
     };
 
     try {
-
-      const res = await admin.messaging().sendToDevice(token, payload);
-
-      console.log("✅ Push enviado:", res);
-
-      return res;
-
-    } catch (err) {
-
-      console.error("❌ Erro push:", err);
-
+      await transporter.sendMail(mailOptions);
+      console.log("E-mail enviado para:", emailComercio);
+    } catch (error) {
+      console.error("Erro ao enviar e-mail:", error);
     }
-
   });
