@@ -1,210 +1,227 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8">
-  <title>Editar Perfil</title>
-  <style>
-    body {
-      font-family: "Segoe UI", Arial, sans-serif;
-      background: #f9f9f9;
-      margin: 0;
-      padding: 0;
-    }
+<meta charset="UTF-8">
+<title>Tôcomfome | Editar Perfil</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    .header {
-      background: #fff;
-      padding: 15px;
-      border-bottom: 1px solid #eee;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
+<style>
+:root{
+  --laranja:#ff8c1a;
+  --cinza:#f4f5f7;
+  --branco:#ffffff;
+  --texto:#333;
+}
 
-    .header h2 {
-      margin: 0;
-      font-size: 1.4em;
-      color: #333;
-    }
+*{
+  margin:0;
+  padding:0;
+  box-sizing:border-box;
+  font-family:'Segoe UI',Arial;
+}
 
-    .voltar {
-      cursor: pointer;
-      color: #007bff;
-      font-weight: bold;
-    }
+body{
+  background:var(--cinza);
+  min-height:100vh;
+  display:flex;
+  justify-content:center;
+  align-items:flex-start;
+  padding:20px;
+}
 
-    .container {
-      max-width: 800px;
-      margin: 30px auto;
-      background: #fff;
-      padding: 25px;
-      border-radius: 10px;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
-    }
+.box{
+  background:var(--branco);
+  width:100%;
+  max-width:450px;
+  padding:24px;
+  border-radius:20px;
+  box-shadow:0 10px 24px rgba(0,0,0,.12);
+}
 
-    .foto-perfil {
-      text-align: center;
-      margin-bottom: 20px;
-    }
+h2{
+  text-align:center;
+  color:var(--laranja);
+  margin-bottom:20px;
+}
 
-    .foto-perfil img {
-      width: 120px;
-      height: 120px;
-      border-radius: 50%;
-      object-fit: cover;
-      border: 3px solid #eee;
-    }
+/* Foto */
+.foto-perfil{
+  text-align:center;
+  margin-bottom:20px;
+}
+.foto-perfil img{
+  width:120px;
+  height:120px;
+  border-radius:50%;
+  object-fit:cover;
+  border:3px solid #eee;
+}
+.foto-perfil input{
+  margin-top:10px;
+}
 
-    .foto-perfil input {
-      margin-top: 10px;
-    }
+/* Formulário */
+label{
+  display:block;
+  margin-top:12px;
+  font-weight:600;
+  color:var(--texto);
+}
+input{
+  width:100%;
+  padding:10px;
+  margin-top:5px;
+  border:1px solid #ddd;
+  border-radius:10px;
+  font-size:.95em;
+}
 
-    label {
-      display: block;
-      margin-top: 15px;
-      font-weight: 600;
-      color: #444;
-    }
+/* Botão salvar */
+.salvar{
+  width:100%;
+  border:none;
+  background:var(--laranja);
+  color:#fff;
+  padding:12px;
+  border-radius:12px;
+  font-weight:600;
+  margin-top:20px;
+  cursor:pointer;
+  transition:.3s;
+}
+.salvar:hover{
+  background:#e67600;
+}
 
-    input {
-      width: 100%;
-      padding: 10px;
-      margin-top: 5px;
-      border: 1px solid #ddd;
-      border-radius: 6px;
-      font-size: 1em;
-    }
-
-    button {
-      margin-top: 25px;
-      width: 100%;
-      padding: 12px;
-      background: #007bff;
-      color: #fff;
-      border: none;
-      border-radius: 6px;
-      font-size: 1.1em;
-      cursor: pointer;
-      transition: background 0.3s;
-    }
-
-    button:hover {
-      background: #0056b3;
-    }
-  </style>
+/* Voltar */
+.voltar{
+  margin-top:20px;
+  text-align:center;
+  font-size:.9em;
+  color:#666;
+  cursor:pointer;
+}
+</style>
 </head>
+
 <body>
-  <div class="header">
-    <h2>Editar Perfil</h2>
-    <div class="voltar" onclick="history.back()">← Voltar</div>
+<div class="box">
+
+  <h2>🏪 Editar Perfil</h2>
+
+  <!-- Foto -->
+  <div class="foto-perfil">
+    <img id="previewFoto" src="default.jpg" alt="Foto do comércio">
+    <input type="file" id="fotoInput" accept="image/*">
   </div>
 
-  <div class="container">
-    <div class="foto-perfil">
-      <img id="previewFoto" src="default.jpg" alt="Foto do comércio">
-      <input type="file" id="fotoInput" accept="image/*">
-    </div>
+  <!-- Formulário -->
+  <form id="formPerfil">
+    <label>Nome do Comércio</label>
+    <input type="text" id="nomeComercio">
 
-    <form id="formPerfil">
-      <label>Nome do Comércio</label>
-      <input type="text" id="nomeComercio">
+    <label>Categoria</label>
+    <input type="text" id="categoriaComercio">
 
-      <label>Categoria</label>
-      <input type="text" id="categoriaComercio">
+    <label>Rua</label>
+    <input type="text" id="rua">
 
-      <label>Rua</label>
-      <input type="text" id="rua">
-      <label>Número</label>
-      <input type="text" id="numero">
-      <label>Bairro</label>
-      <input type="text" id="bairro">
-      <label>Cidade</label>
-      <input type="text" id="cidade">
+    <label>Número</label>
+    <input type="text" id="numero">
 
-      <label>Telefone</label>
-      <input type="text" id="telefone">
+    <label>Bairro</label>
+    <input type="text" id="bairro">
 
-      <button type="submit">Salvar alterações</button>
-    </form>
-  </div>
+    <label>Cidade</label>
+    <input type="text" id="cidade">
 
-  <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-    import { getFirestore, doc, getDoc, updateDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+    <label>Telefone</label>
+    <input type="text" id="telefone">
 
-    const firebaseConfig = {
-      apiKey: "AIzaSyD6a29L24aFSgVjmC7NFGXpdWW4g1uQsio",
-      authDomain: "tocomfome-754e1.firebaseapp.com",
-      projectId: "tocomfome-754e1",
-      appId: "1:997975886937:web:9bf408c35f1ed8aea13548"
-    };
+    <button type="submit" class="salvar">💾 Salvar Alterações</button>
+  </form>
 
-    const app = initializeApp(firebaseConfig);
-    const auth = getAuth(app);
-    const db = getFirestore(app);
+  <div class="voltar" onclick="history.back()">← Voltar</div>
 
-    const CLOUD_NAME = "daqyssjdj";
-    const UPLOAD_PRESET = "TOCOMFOME";
+</div>
 
-    async function uploadCloudinary(file){
-      const fd = new FormData();
-      fd.append("file", file);
-      fd.append("upload_preset", UPLOAD_PRESET);
-      const res = await fetch(`https://api.cloudinary.com/v1_1/${CLOUD_NAME}/image/upload`, { method:"POST", body:fd });
-      const data = await res.json();
-      return data.secure_url;
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+import { getFirestore, doc, getDoc, updateDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyD6a29L24aFSgVjmC7NFGXpdWW4g1uQsio",
+  authDomain: "tocomfome-754e1.firebaseapp.com",
+  projectId: "tocomfome-754e1",
+};
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
+
+/* Cloudinary */
+const CLOUD_NAME = "daqyssjdj";
+const UPLOAD_PRESET = "TOCOMFOME";
+
+async function uploadCloudinary(file){
+  const fd = new FormData();
+  fd.append("file", file);
+  fd.append("upload_preset", UPLOAD_PRESET);
+  const res = await fetch(`https://api.cloudinary.com/v1_1/${CLOUD_NAME}/image/upload`, { method:"POST", body:fd });
+  const data = await res.json();
+  return data.secure_url;
+}
+
+const fotoInput = document.getElementById("fotoInput");
+const previewFoto = document.getElementById("previewFoto");
+fotoInput.addEventListener("change", e=>{
+  const file = e.target.files[0];
+  if(file) previewFoto.src = URL.createObjectURL(file);
+});
+
+const formPerfil = document.getElementById("formPerfil");
+
+onAuthStateChanged(auth, async user=>{
+  if(!user) location.href="login-comercio.html";
+
+  const ref = doc(db,"comercios",user.uid);
+  const snap = await getDoc(ref);
+  if(snap.exists()){
+    const c = snap.data();
+    document.getElementById("nomeComercio").value = c.nome || "";
+    document.getElementById("categoriaComercio").value = c.categoria || "";
+    document.getElementById("rua").value = c.endereco?.rua || "";
+    document.getElementById("numero").value = c.endereco?.numero || "";
+    document.getElementById("bairro").value = c.endereco?.bairro || "";
+    document.getElementById("cidade").value = c.endereco?.cidade || "";
+    document.getElementById("telefone").value = c.telefone || "";
+    if(c.fotoPerfil) previewFoto.src = c.fotoPerfil;
+  }
+
+  formPerfil.addEventListener("submit", async e=>{
+    e.preventDefault();
+
+    let fotoUrl = previewFoto.src;
+    if(fotoInput.files[0]){
+      fotoUrl = await uploadCloudinary(fotoInput.files[0]);
     }
 
-    const fotoInput = document.getElementById("fotoInput");
-    const previewFoto = document.getElementById("previewFoto");
-    fotoInput.addEventListener("change", e=>{
-      const file = e.target.files[0];
-      if(file) previewFoto.src = URL.createObjectURL(file);
+    await updateDoc(ref,{
+      nome: document.getElementById("nomeComercio").value,
+      categoria: document.getElementById("categoriaComercio").value,
+      endereco: {
+        rua: document.getElementById("rua").value,
+        numero: document.getElementById("numero").value,
+        bairro: document.getElementById("bairro").value,
+        cidade: document.getElementById("cidade").value
+      },
+      telefone: document.getElementById("telefone").value,
+      fotoPerfil: fotoUrl
     });
 
-    const formPerfil = document.getElementById("formPerfil");
-
-    onAuthStateChanged(auth, async user=>{
-      if(!user) location.href="login-comercio.html";
-
-      const ref = doc(db,"comercios",user.uid);
-      const snap = await getDoc(ref);
-      if(snap.exists()){
-        const c = snap.data();
-        document.getElementById("nomeComercio").value = c.nome || "";
-        document.getElementById("categoriaComercio").value = c.categoria || "";
-        document.getElementById("rua").value = c.endereco?.rua || "";
-        document.getElementById("numero").value = c.endereco?.numero || "";
-        document.getElementById("bairro").value = c.endereco?.bairro || "";
-        document.getElementById("cidade").value = c.endereco?.cidade || "";
-        document.getElementById("telefone").value = c.telefone || "";
-        if(c.fotoPerfil) previewFoto.src = c.fotoPerfil;
-      }
-
-      formPerfil.addEventListener("submit", async e=>{
-        e.preventDefault();
-
-        let fotoUrl = previewFoto.src;
-        if(fotoInput.files[0]){
-          fotoUrl = await uploadCloudinary(fotoInput.files[0]);
-        }
-
-        await updateDoc(ref,{
-          nome: document.getElementById("nomeComercio").value,
-          categoria: document.getElementById("categoriaComercio").value,
-          endereco: {
-            rua: document.getElementById("rua").value,
-            numero: document.getElementById("numero").value,
-            bairro: document.getElementById("bairro").value,
-            cidade: document.getElementById("cidade").value
-          },
-          telefone: document.getElementById("telefone").value,
-          fotoPerfil: fotoUrl
-        });
-
-        alert("✅ Perfil atualizado com sucesso!");
-      });
-    });
-  </script>
+    alert("✅ Perfil atualizado com sucesso!");
+  });
+});
+</script>
 </body>
 </html>
