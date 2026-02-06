@@ -142,58 +142,49 @@ const lista = document.getElementById("listaPedidos");
 
 
 /* Atualizar status COM confirmação */
-window.mudarStatus = async (id, status)=>{
-
+window.mudarStatus = async (id, status) => {
   let mensagem = "";
 
-  if(status === "preparando"){
+  if (status === "preparando") {
     mensagem = "👨‍🍳 Deseja marcar este pedido como PREPARANDO?";
   }
 
-  if(status === "saiu"){
+  if (status === "saiu") {
     mensagem = "🛵 Deseja marcar este pedido como SAIU PARA ENTREGA?";
   }
 
-  if(status === "entregue"){
+  if (status === "entregue") {
     mensagem = "✅ Deseja marcar este pedido como ENTREGUE?";
   }
 
   const confirmar = confirm(mensagem);
 
-  if(!confirmar){
+  if (!confirmar) {
     return;
   }
 
-  try{
-
-    await updateDoc(doc(db,"pedidos",id),{
+  try {
+    await updateDoc(doc(db, "pedidos", id), {
       status
     });
-
     alert("✅ Status atualizado com sucesso!");
-
-  }catch(error){
-
+  } catch (error) {
     alert("❌ Erro ao atualizar: " + error.message);
-
   }
-
 };
 
 
 /* Carregar pedidos */
-function carregarPedidos(uid){
-
+function carregarPedidos(uid) {
   const q = query(
-    collection(db,"pedidos"),
-    where("comercioId","==",uid)
+    collection(db, "pedidos"),
+    where("comercioId", "==", uid)
   );
 
-  onSnapshot(q, snap=>{
-
+  onSnapshot(q, snap => {
     lista.innerHTML = "";
 
-    if(snap.empty){
+    if (snap.empty) {
       lista.innerHTML = `
         <div class="vazio">
           📭 Nenhum pedido no momento
@@ -202,73 +193,54 @@ function carregarPedidos(uid){
       return;
     }
 
-    snap.forEach(d=>{
+    let pedidosExibidos = 0;
 
+    snap.forEach(d => {
       const p = d.data();
 
-      if(p.status === "entregue") return;
+      if (p.status === "entregue") return;
+
+      pedidosExibidos++;
 
       lista.innerHTML += `
         <div class="card">
-
           <h4>${p.produtoNome}</h4>
-
-          <div class="preco">
-            R$ ${Number(p.valor).toFixed(2)}
-          </div>
-
-          <div class="info">
-            👤 Cliente: ${p.clienteNome || "-"}
-          </div>
-
-          <div class="status ${p.status || "novo"}">
-            ${p.status || "novo"}
-          </div>
-
+          <div class="preco">R$ ${Number(p.valor).toFixed(2)}</div>
+          <div class="info">👤 Cliente: ${p.clienteNome || "-"}</div>
+          <div class="status ${p.status || "novo"}">${p.status || "novo"}</div>
           <div class="acoes">
-
             ${p.status === "novo" ? `
-              <button class="btn-preparar"
-                onclick="mudarStatus('${d.id}','preparando')">
-                👨‍🍳 Preparar
-              </button>
+              <button class="btn-preparar" onclick="mudarStatus('${d.id}','preparando')">👨‍🍳 Preparar</button>
             ` : ""}
-
             ${p.status === "preparando" ? `
-              <button class="btn-saiu"
-                onclick="mudarStatus('${d.id}','saiu')">
-                🛵 Saiu
-              </button>
+              <button class="btn-saiu" onclick="mudarStatus('${d.id}','saiu')">🛵 Saiu</button>
             ` : ""}
-
             ${p.status === "saiu" ? `
-              <button class="btn-entregue"
-                onclick="mudarStatus('${d.id}','entregue')">
-                ✅ Entregue
-              </button>
+              <button class="btn-entregue" onclick="mudarStatus('${d.id}','entregue')">✅ Entregue</button>
             ` : ""}
-
           </div>
-
         </div>
       `;
     });
 
+    if (pedidosExibidos === 0) {
+      lista.innerHTML = `
+        <div class="vazio">
+          📭 Nenhum pedido no momento
+        </div>
+      `;
+    }
   });
-
 }
 
 
 /* Auth */
-onAuthStateChanged(auth,user=>{
-
-  if(!user){
-    location.href="Comercio/login-comercio.html";
+onAuthStateChanged(auth, user => {
+  if (!user) {
+    location.href = "Comercio/login-comercio.html";
     return;
   }
-
   carregarPedidos(user.uid);
-
 });
 
 </script>
