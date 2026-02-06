@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<title>Tô com fome 🍔 | Relatórios</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<style>
+:root{
+  --laranja:#ff8c1a;
+  --cinza:#f5f5f5;
+  --card:#ffffff;
+  --texto:#333;
+  --texto-sec:#666;
+}
+
+*{
+  margin:0;
+  padding:0;
+  box-sizing:border-box;
+  font-family:'Segoe UI', Arial;
+}
+
+body{
+  background:var(--cinza);
+  color:var(--texto);
+}
+
+.header{
+  background:var(--laranja);
+  color:#fff;
+  padding:16px;
+  text-align:center;
+  font-size:1.1em;
+  font-weight:600;
+}
+
+.container{
+  padding:20px;
+}
+
+canvas{
+  background:#fff;
+  border-radius:12px;
+  padding:10px;
+  box-shadow:0 4px 10px rgba(0,0,0,.08);
+  margin-bottom:20px;
+}
+</style>
+</head>
+
+<body>
+
+<div class="header">📊 Relatórios de Vendas</div>
+
+<div class="container">
+  <canvas id="graficoVendas"></canvas>
+  <canvas id="graficoFluxo"></canvas>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+import {
+  getFirestore, collection, query, where, onSnapshot
+} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+/* Firebase */
+const firebaseConfig = {
+  apiKey: "AIzaSyD6a29L24aFSgVjmC7NFGXpdWW4g1uQsio",
+  authDomain: "tocomfome-754e1.firebaseapp.com",
+  projectId: "tocomfome-754e1",
+};
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
+
+/* Função para carregar dados */
+function carregarRelatorios(uid){
+  const q = query(
+    collection(db,"pedidos"),
+    where("comercioId","==",uid),
+    where("status","==","entregue")
+  );
+
+  onSnapshot(q, snap=>{
+    if(snap.empty){
+      alert("📭 Nenhuma venda registrada ainda");
+      return;
+    }
+
+    // Agrupar vendas por dia
+    const vendasPorDia = {};
+    let fluxoTotal = 0;
+
+    snap.forEach(d=>{
+      const p = d.data();
+      const data = new Date(p.dataHora?.seconds*1000 || Date.now());
+      const dia = data.toLocaleDateString("pt-BR");
+
+      if(!vendasPorDia[dia]) vendasPorDia[dia] = 0;
+      vendasPorDia[dia] += Number(p.valor);
+
+      fluxoTotal += Number(p.valor);
+    });
+
+    // Dados para gráfico de vendas por dia
+    const labels = Object.keys(vendasPorDia);
+    const valores = Object.values(vendasPorDia);
+
+    new Chart(document.getElementById("graficoVendas"), {
+      type: "bar",
+      data: {
+        labels,
+        datasets: [{
+          label: "Vendas por Dia (R$)",
+          data: valores,
+          backgroundColor: "#ff8c1a"
+        }]
+      }
+    });
+
+    // Fluxo de caixa acumulado
+    new Chart(document.getElementById("graficoFluxo"), {
+      type: "doughnut",
+      data: {
+        labels: ["Total Recebido"],
+        datasets: [{
+          data: [fluxoTotal],
+          backgroundColor: ["#28a745"]
+        }]
+      }
+    });
+  });
+}
+
+/* Auth */
+onAuthStateChanged(auth,user=>{
+  if(!user){
+    location.href="Comercio/login-comercio.html";
+    return;
+  }
+  carregarRelatorios(user.uid);
+});
+</script>
+
+</body>
+</html>
