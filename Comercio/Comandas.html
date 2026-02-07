@@ -126,32 +126,93 @@ window.mudarStatus = async (id,status)=>{
 
 /* Carregar pedidos */
 function carregarPedidos(uid){
-  const q = query(collection(db,"pedidos"), where("comercioId","==",uid));
-  onSnapshot(q,snap=>{
-    lista.innerHTML="";
-    if(snap.empty){ lista.innerHTML=`<div class="vazio">📭 Nenhum pedido</div>`; return; }
 
-    let ativos=0;
-    snap.forEach(d=>{
-      const p=d.data();
-      if(p.status==="entregue") return;
+  const q = query(
+    collection(db,"pedidos"),
+    where("comercioId","==",uid)
+  );
+
+  let primeiraVez = true;
+
+  onSnapshot(q, snap => {
+
+    // 🔔 Detecta pedido novo
+    if(!primeiraVez){
+      snap.docChanges().forEach(change => {
+
+        if(change.type === "added"){
+
+          const p = change.doc.data();
+
+          // Notificação visual
+          new Notification("📦 Novo Pedido!",{
+            body: `${p.clienteNome} pediu ${p.produtoNome}`,
+            icon: "/img/logo.png"
+          });
+
+          // Som (opcional)
+          const audio = new Audio("/audio/alerta.mp3");
+          audio.play().catch(()=>{});
+
+        }
+
+      });
+    }
+
+    primeiraVez = false;
+
+    // Renderizar lista
+    lista.innerHTML = "";
+
+    if(snap.empty){
+      lista.innerHTML = `<div class="vazio">📭 Nenhum pedido</div>`;
+      return;
+    }
+
+    let ativos = 0;
+
+    snap.forEach(d => {
+
+      const p = d.data();
+
+      if(p.status === "entregue") return;
+
       ativos++;
-      lista.innerHTML+=`
+
+      lista.innerHTML += `
         <div class="card">
           <h4>${p.produtoNome}</h4>
           <div class="preco">R$ ${Number(p.valor).toFixed(2)}</div>
           <div class="info">👤 ${p.clienteNome||"-"}</div>
           <div class="status ${p.status||"novo"}">${p.status||"novo"}</div>
+
           <div class="acoes">
-            ${p.status==="novo"?`<button class="btn-preparar" onclick="mudarStatus('${d.id}','preparando')">👨‍🍳 Preparar</button>`:""}
-            ${p.status==="preparando"?`<button class="btn-saiu" onclick="mudarStatus('${d.id}','saiu')">🛵 Saiu</button>`:""}
-            ${p.status==="saiu"?`<button class="btn-entregue" onclick="mudarStatus('${d.id}','entregue')">✅ Entregue</button>`:""}
+            ${p.status==="novo"
+              ? `<button class="btn-preparar" onclick="mudarStatus('${d.id}','preparando')">👨‍🍳 Preparar</button>`
+              : ""
+            }
+
+            ${p.status==="preparando"
+              ? `<button class="btn-saiu" onclick="mudarStatus('${d.id}','saiu')">🛵 Saiu</button>`
+              : ""
+            }
+
+            ${p.status==="saiu"
+              ? `<button class="btn-entregue" onclick="mudarStatus('${d.id}','entregue')">✅ Entregue</button>`
+              : ""
+            }
           </div>
         </div>
       `;
+
     });
-    if(ativos===0) lista.innerHTML=`<div class="vazio">📭 Nenhum pedido</div>`;
+
+    if(ativos === 0){
+      lista.innerHTML = `<div class="vazio">📭 Nenhum pedido</div>`;
+    }
+
   });
+
 }
 
 /* Auth */
