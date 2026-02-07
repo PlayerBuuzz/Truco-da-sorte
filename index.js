@@ -3,7 +3,6 @@ const admin = require("firebase-admin");
 
 admin.initializeApp();
 
-/* 🔔 Notificar comércio quando criar pedido */
 exports.notificarComercio = functions.firestore
   .document("pedidos/{pedidoId}")
   .onCreate(async (snap) => {
@@ -12,36 +11,42 @@ exports.notificarComercio = functions.firestore
 
     if (!pedido.comercioId) return;
 
-    /* Busca token do comércio */
-    const tokenSnap = await admin.firestore()
+    const tokenDoc = await admin.firestore()
       .collection("tokens")
       .doc(pedido.comercioId)
       .get();
 
-    if (!tokenSnap.exists) {
-      console.log("Comércio sem token");
+    if (!tokenDoc.exists) {
+      console.log("Sem token");
       return;
     }
 
-    const token = tokenSnap.data().token;
+    const token = tokenDoc.data().token;
 
-    /* Monta notificação */
-    const payload = {
+    const message = {
+      token: token,
+
       notification: {
         title: "📦 Novo Pedido!",
         body: `${pedido.produtoNome} - R$ ${pedido.valor}`
       },
-      data: {
-        pedidoId: snap.id
+
+      webpush: {
+        headers: {
+          Urgency: "high"
+        },
+        notification: {
+          icon: "/img/logo.png",
+          requireInteraction: true
+        }
       }
     };
 
-    /* Envia */
     try {
-      await admin.messaging().sendToDevice(token, payload);
-      console.log("✅ Push enviado para comércio");
-    } catch (err) {
-      console.error("❌ Erro push:", err);
+      await admin.messaging().send(message);
+      console.log("✅ Push enviado");
+    } catch (e) {
+      console.error("❌ Erro push:", e);
     }
 
   });
