@@ -149,10 +149,87 @@ body{
   </div>
 </div>
 
-<script>
-function irPara(pagina){
-  window.location.href = `/comercio/${pagina}`;
+<script type="module">
+
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+import { getFirestore, collection, query, where, onSnapshot } 
+from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+
+/* 🔥 CONFIG FIREBASE (igual o seu) */
+const firebaseConfig = {
+  apiKey: "AIzaSyD6a29L24aFSgVjmC7NFGXpdWW4g1uQsio",
+  authDomain: "tocomfome-754e1.firebaseapp.com",
+  projectId: "tocomfome-754e1",
+  storageBucket: "tocomfome-754e1.appspot.com",
+  messagingSenderId: "997975886937",
+  appId: "1:997975886937:web:9bf408c35f1ed8aea13548"
+};
+
+
+/* INIT */
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
+
+
+/* 🔔 PEDIR PERMISSÃO UMA VEZ */
+if(Notification.permission !== "granted"){
+  Notification.requestPermission();
 }
+
+
+/* 👂 ESCUTAR PEDIDOS NOVOS */
+function escutarPedidos(uid){
+
+  const q = query(
+    collection(db,"pedidos"),
+    where("comercioId","==",uid)
+  );
+
+  let iniciou = false;
+
+  onSnapshot(q, snap => {
+
+    if(!iniciou){
+      iniciou = true;
+      return;
+    }
+
+    snap.docChanges().forEach(change => {
+
+      if(change.type === "added"){
+
+        const p = change.doc.data();
+
+        new Notification("📦 Novo Pedido!",{
+          body: `${p.clienteNome} pediu ${p.produtoNome}`,
+          icon: "/img/logo.png"
+        });
+
+        console.log("🔔 Pedido novo notificado");
+
+      }
+
+    });
+
+  });
+
+}
+
+
+/* 🔐 QUANDO LOGAR */
+onAuthStateChanged(auth, user => {
+
+  if(!user) return;
+
+  console.log("✅ Comércio logado:", user.uid);
+
+  escutarPedidos(user.uid);
+
+});
+
 </script>
 
 </body>
