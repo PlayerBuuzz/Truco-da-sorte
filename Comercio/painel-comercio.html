@@ -109,6 +109,7 @@ body{
   </div>
 
   <div class="menu">
+
     <div class="card" onclick="irPara('comandas.html')">
       <span>📦</span>
       <p>Comandas Ativas</p>
@@ -138,98 +139,25 @@ body{
       <span>✎</span>
       <p>Alterar Perfil</p>
     </div>
+
     <div class="card" onclick="irPara('visao-cliente.html')">
-  <span>👁️</span>
-  <p>Visão do Cliente</p>
-</div>
-<div class="card" onclick="irPara('grafico-vendas.html')">
-  <span>📊</span>
-  <p>Gráfico de Vendas</p>
-</div>
+      <span>👁️</span>
+      <p>Visão do Cliente</p>
+    </div>
+
+    <div class="card" onclick="irPara('grafico-vendas.html')">
+      <span>📊</span>
+      <p>Gráfico de Vendas</p>
+    </div>
+
   </div>
 </div>
 
-<script type="module">
-
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-import { getFirestore, collection, query, where, onSnapshot } 
-from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
-
-
-/* 🔥 CONFIG FIREBASE (igual o seu) */
-const firebaseConfig = {
-  apiKey: "AIzaSyD6a29L24aFSgVjmC7NFGXpdWW4g1uQsio",
-  authDomain: "tocomfome-754e1.firebaseapp.com",
-  projectId: "tocomfome-754e1",
-  storageBucket: "tocomfome-754e1.appspot.com",
-  messagingSenderId: "997975886937",
-  appId: "1:997975886937:web:9bf408c35f1ed8aea13548"
-};
-
-
-/* INIT */
-const app = initializeApp(firebaseConfig);
-const auth = getAuth(app);
-const db = getFirestore(app);
-
-
-/* 🔔 PEDIR PERMISSÃO UMA VEZ */
-if(Notification.permission !== "granted"){
-  Notification.requestPermission();
+<!-- FUNÇÃO GLOBAL -->
+<script>
+window.irPara = function(pagina){
+  window.location.href = `/comercio/${pagina}`;
 }
-
-
-/* 👂 ESCUTAR PEDIDOS NOVOS */
-function escutarPedidos(uid){
-
-  const q = query(
-    collection(db,"pedidos"),
-    where("comercioId","==",uid)
-  );
-
-  let iniciou = false;
-
-  onSnapshot(q, snap => {
-
-    if(!iniciou){
-      iniciou = true;
-      return;
-    }
-
-    snap.docChanges().forEach(change => {
-
-      if(change.type === "added"){
-
-        const p = change.doc.data();
-
-        new Notification("📦 Novo Pedido!",{
-          body: `${p.clienteNome} pediu ${p.produtoNome}`,
-          icon: "/img/logo.png"
-        });
-
-        console.log("🔔 Pedido novo notificado");
-
-      }
-
-    });
-
-  });
-
-}
-
-
-/* 🔐 QUANDO LOGAR */
-onAuthStateChanged(auth, user => {
-
-  if(!user) return;
-
-  console.log("✅ Comércio logado:", user.uid);
-
-  escutarPedidos(user.uid);
-
-});
-
 </script>
 
 </body>
