@@ -157,7 +157,7 @@ body{
   padding:16px;
 }
 
-/* CARD COMÉRCIO */
+/* CARD */
 .card-comercio{
   background:#fff;
   border-radius:20px;
@@ -166,11 +166,6 @@ body{
   display:flex;
   gap:14px;
   box-shadow:0 6px 16px var(--sombra);
-  transition:transform .2s ease;
-}
-
-.card-comercio:hover{
-  transform:translateY(-2px);
 }
 
 .card-comercio img{
@@ -178,22 +173,6 @@ body{
   height:92px;
   border-radius:16px;
   object-fit:cover;
-}
-
-.card-comercio h4{
-  font-size:1.05em;
-  margin-bottom:4px;
-}
-
-.card-comercio .tipo{
-  font-size:.8em;
-  color:#777;
-}
-
-.card-comercio .local{
-  font-size:.75em;
-  color:#aaa;
-  margin:6px 0 10px;
 }
 
 .btn{
@@ -207,17 +186,17 @@ body{
   cursor:pointer;
 }
 
-/* MENU INFERIOR – VERSÃO PRO */
+/* MENU INFERIOR — MAIS VIVO */
 .menu-inferior{
   position:fixed;
   bottom:0;
   left:0;
   width:100%;
-  background:#fff;
+  background:linear-gradient(to top,#fff,#fafafa);
   display:flex;
   justify-content:space-around;
   padding:12px 0 10px;
-  box-shadow:0 -4px 16px rgba(0,0,0,.1);
+  box-shadow:0 -6px 18px rgba(0,0,0,.12);
   border-top:1px solid #eee;
   z-index:5;
 }
@@ -226,45 +205,25 @@ body{
   flex:1;
   text-align:center;
   font-size:.75em;
-  color:#777;
+  color:#666;
   cursor:pointer;
-  position:relative;
-  transition:.25s;
+  transition:.2s ease;
 }
 
 .menu-inferior .icon{
-  width:24px;
+  width:26px;
   display:block;
   margin:0 auto 4px;
-  transition:.25s;
+  transition:.2s ease;
 }
 
-/* ATIVO */
-.menu-inferior .ativo{
-  color:var(--laranja);
-  font-weight:700;
-}
-
-.menu-inferior .ativo .icon{
-  transform:scale(1.15);
-}
-
-/* INDICADOR */
-.menu-inferior .ativo::after{
-  content:'';
-  position:absolute;
-  bottom:-6px;
-  left:50%;
-  transform:translateX(-50%);
-  width:6px;
-  height:6px;
-  background:var(--laranja);
-  border-radius:50%;
-}
-
-/* CLIQUE */
+/* FEEDBACK */
 .menu-inferior div:active{
-  transform:scale(.95);
+  transform:scale(.92);
+}
+
+.menu-inferior div:active .icon{
+  transform:translateY(-3px);
 }
 
 /* CHAT */
@@ -292,28 +251,12 @@ body{
 
 <body>
 
-<!-- SIDEBAR -->
-<div class="sidebar" id="sidebar">
-  <h3><img src="img/menu.png"> Menu</h3>
-
-  <a href="#" onclick="filtrarTipoComercio('Hamburgueria')">Hamburgueria</a>
-  <a href="#" onclick="filtrarTipoComercio('Pizzaria')">Pizzaria</a>
-  <a href="#" onclick="filtrarTipoComercio('Pastelaria')">Pastelaria</a>
-  <a href="#" onclick="filtrarTipoComercio('Açai / Sorveteria')">Açai / Sorveteria</a>
-  <a href="#" onclick="filtrarTipoComercio('Lanchonete')">Lanchonete</a>
-
-  <a href="#" onclick="irPerfil();fecharMenu()">Meu Perfil</a>
-  <a href="#" onclick="logoff()">Sair</a>
-</div>
-
-<div class="overlay" id="overlay" onclick="fecharMenu()"></div>
-
 <!-- HEADER -->
 <div class="header">
   <div class="menu-btn" onclick="toggleMenu()">
     <img src="img/menu.png">
   </div>
-  <input id="buscaInput" placeholder="Buscar restaurantes ou comidas...">
+  <input placeholder="Buscar restaurantes ou comidas...">
   <div class="usuario">Olá 👋</div>
 </div>
 
@@ -323,32 +266,17 @@ body{
   <span>Entregar em <strong>Colina - SP</strong></span>
 </div>
 
-<!-- CARROSSEL -->
-<div class="carrossel">
-  <div class="carrossel-track">
-    <img src="img/banner1.jpg">
-    <img src="img/banner2.jpg">
-    <img src="img/banner3.jpg">
-  </div>
-</div>
-
-<!-- LISTA -->
-<div class="lista" id="listaProdutos"></div>
-
 <!-- MENU INFERIOR -->
 <div class="menu-inferior">
   <div onclick="irInicio()">
     <img src="img/home.png" class="icon">Início
   </div>
-
-  <div class="ativo" onclick="irBusca()">
+  <div onclick="irBusca()">
     <img src="img/buscar.png" class="icon">Buscar
   </div>
-
   <div onclick="irPedidos()">
     <img src="img/pedidos.png" class="icon">Pedidos
   </div>
-
   <div onclick="irPerfil()">
     <img src="img/perfil.png" class="icon">Perfil
   </div>
