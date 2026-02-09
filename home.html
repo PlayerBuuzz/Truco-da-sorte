@@ -8,19 +8,22 @@
 <style>
 :root{
   --laranja:#ff8c1a;
-  --cinza:#f9f9f9;
+  --laranja-escuro:#e67300;
+  --cinza:#f7f7f7;
   --texto:#333;
   --sombra:rgba(0,0,0,.08);
 }
+
 *{
   margin:0;
   padding:0;
   box-sizing:border-box;
-  font-family:'Segoe UI',Arial;
+  font-family:'Segoe UI',Arial,sans-serif;
 }
+
 body{
   background:var(--cinza);
-  padding-bottom:70px;
+  padding-bottom:90px;
 }
 
 /* HEADER */
@@ -30,22 +33,33 @@ body{
   display:flex;
   align-items:center;
   gap:10px;
-  box-shadow:0 2px 6px var(--sombra);
+  box-shadow:0 3px 8px var(--sombra);
+  position:sticky;
+  top:0;
+  z-index:5;
 }
+
 .menu-btn img{
-  width:24px;
-  height:24px;
+  width:26px;
   cursor:pointer;
 }
+
 .header input{
   flex:1;
-  padding:10px;
-  border-radius:12px;
-  border:1px solid #ddd;
+  padding:12px 14px;
+  border-radius:14px;
+  border:1.4px solid #ddd;
+  font-size:.9em;
 }
+
+.header input:focus{
+  outline:none;
+  border-color:var(--laranja);
+}
+
 .usuario{
-  font-size:.85em;
-  font-weight:600;
+  font-size:.8em;
+  font-weight:700;
   color:var(--laranja);
 }
 
@@ -55,14 +69,15 @@ body{
   padding:12px 16px;
   display:flex;
   align-items:center;
-  gap:8px;
+  gap:10px;
   font-size:.9em;
-  box-shadow:0 2px 4px var(--sombra);
-  color:#777;
-  margin-bottom:6px;
+  box-shadow:0 2px 6px var(--sombra);
+  color:#666;
+  margin-bottom:10px;
 }
+
 .endereco .icon{
-  width:20px;
+  width:22px;
 }
 
 /* SIDEBAR */
@@ -73,28 +88,31 @@ body{
   width:260px;
   height:100%;
   background:#fff;
-  box-shadow:2px 0 10px rgba(0,0,0,.2);
+  box-shadow:2px 0 12px rgba(0,0,0,.2);
   padding:20px;
   transition:.3s;
   z-index:10;
 }
+
 .sidebar.active{ left:0; }
+
 .sidebar h3{
   color:var(--laranja);
-  margin-bottom:12px;
+  margin-bottom:16px;
   display:flex;
   align-items:center;
-  gap:6px;
+  gap:8px;
 }
-.sidebar h3 img{
-  width:20px;
-}
+
+.sidebar h3 img{ width:20px; }
+
 .sidebar a{
   display:block;
-  padding:10px 0;
+  padding:12px 0;
   color:var(--texto);
   text-decoration:none;
   border-bottom:1px solid #eee;
+  font-weight:500;
 }
 
 /* OVERLAY */
@@ -107,6 +125,7 @@ body{
   transition:.3s;
   z-index:9;
 }
+
 .overlay.active{
   opacity:1;
   pointer-events:auto;
@@ -114,70 +133,77 @@ body{
 
 /* CARROSSEL */
 .carrossel{
-  width:100%;
-  overflow:hidden;
   padding:10px 0;
 }
+
 .carrossel-track{
   display:flex;
-  gap:12px;
+  gap:14px;
   overflow-x:auto;
-  scroll-snap-type:x mandatory;
-  padding:0 15px;
+  padding:0 16px;
 }
+
 .carrossel-track img{
-  width:200px;
-  height:100px;
+  width:240px;
+  height:120px;
   object-fit:cover;
-  border-radius:16px;
+  border-radius:18px;
   flex-shrink:0;
-  scroll-snap-align:start;
-  box-shadow:0 4px 10px var(--sombra);
+  box-shadow:0 6px 14px var(--sombra);
 }
 
 /* LISTA */
 .lista{
-  padding:15px;
+  padding:16px;
 }
 
 /* CARD COMÉRCIO */
 .card-comercio{
   background:#fff;
-  border-radius:18px;
+  border-radius:20px;
   padding:14px;
-  margin-bottom:16px;
+  margin-bottom:18px;
   display:flex;
   gap:14px;
-  box-shadow:0 4px 12px var(--sombra);
+  box-shadow:0 6px 16px var(--sombra);
+  transition:transform .2s ease;
 }
+
+.card-comercio:hover{
+  transform:translateY(-2px);
+}
+
 .card-comercio img{
-  width:90px;
-  height:90px;
-  border-radius:14px;
+  width:92px;
+  height:92px;
+  border-radius:16px;
   object-fit:cover;
 }
+
 .card-comercio h4{
   font-size:1.05em;
   margin-bottom:4px;
 }
+
 .card-comercio .tipo{
   font-size:.8em;
   color:#777;
-  margin-bottom:6px;
 }
+
 .card-comercio .local{
-  font-size:.8em;
-  color:#999;
-  margin-bottom:10px;
+  font-size:.75em;
+  color:#aaa;
+  margin:6px 0 10px;
 }
+
 .btn{
   width:100%;
   padding:10px;
   border:none;
-  border-radius:12px;
-  background:var(--laranja);
+  border-radius:14px;
+  background:linear-gradient(135deg,var(--laranja),var(--laranja-escuro));
   color:#fff;
-  font-weight:600;
+  font-weight:700;
   cursor:pointer;
 }
 
@@ -191,39 +217,42 @@ body{
   display:flex;
   justify-content:space-around;
   padding:10px 0;
-  box-shadow:0 -2px 8px var(--sombra);
+  box-shadow:0 -3px 10px var(--sombra);
 }
-.menu-inferior .icon{
-  width:24px;
-  height:24px;
-  display:block;
-  margin:0 auto 4px;
-}
+
 .menu-inferior div{
   flex:1;
   text-align:center;
-  font-size:.8em;
-  color:#333;
+  font-size:.75em;
+  color:#444;
   cursor:pointer;
 }
 
-/* TEMA ESCURO */
-body.dark-theme{
-  --cinza:#1e1e1e;
-  --texto:#f5f5f5;
-  --sombra:rgba(0,0,0,.4);
-  background:var(--cinza);
+.menu-inferior .icon{
+  width:24px;
+  display:block;
+  margin:0 auto 4px;
 }
-body.dark-theme .header,
-body.dark-theme .sidebar,
-body.dark-theme .endereco,
-body.dark-theme .card-comercio,
-body.dark-theme .menu-inferior{
-  background:#2a2a2a;
+
+/* CHAT */
+#chat-balao{
+  position:fixed;
+  bottom:86px;
+  right:18px;
+  background:linear-gradient(135deg,var(--laranja),var(--laranja-escuro));
+  color:#fff;
+  padding:14px 18px;
+  border-radius:50px;
+  font-weight:700;
+  cursor:pointer;
+  box-shadow:0 6px 18px rgba(0,0,0,.25);
+  display:flex;
+  align-items:center;
+  gap:8px;
 }
-body.dark-theme .sidebar a{
-  color:#ddd;
-  border-color:#444;
+
+#chat-balao img{
+  width:20px;
 }
 </style>
 </head>
@@ -251,14 +280,14 @@ body.dark-theme .sidebar a{
   <div class="menu-btn" onclick="toggleMenu()">
     <img src="img/menu.png">
   </div>
-  <input id="buscaInput" placeholder="Buscar restaurantes...">
-  <div class="usuario">...</div>
+  <input id="buscaInput" placeholder="Buscar restaurantes ou comidas...">
+  <div class="usuario">Olá 👋</div>
 </div>
 
 <!-- ENDEREÇO -->
 <div class="endereco">
   <img src="img/endereco.png" class="icon">
-  <span>Carregando endereço...</span>
+  <span>Entregar em <strong>Colina - SP</strong></span>
 </div>
 
 <!-- CARROSSEL -->
@@ -289,23 +318,9 @@ body.dark-theme .sidebar a{
   </div>
 </div>
 
-<!-- BALÃO DE CHAT -->
-<div id="chat-balao" style="
-  position:fixed;
-  bottom:80px;
-  right:20px;
-  background:#ff8c1a;
-  color:#fff;
-  padding:12px 16px;
-  border-radius:50px;
-  font-weight:600;
-  cursor:pointer;
-  box-shadow:0 4px 12px rgba(0,0,0,.2);
-  display:flex;
-  align-items:center;
-  gap:8px;
-">
-  <img src="img/suporte.png" style="width:20px">
+<!-- CHAT -->
+<div id="chat-balao">
+  <img src="img/suporte.png">
   Suporte
 </div>
 <script type="module">
