@@ -174,7 +174,7 @@ button:active{
   </form>
 
   <div class="link">
-    Não tem conta? <a href="Cliente/cadastro-cliente.html">Criar agora</a>
+    Não tem conta? <a href="cadastro-cliente.html">Criar agora</a>
   </div>
 
   <div class="link">
@@ -225,13 +225,13 @@ document.getElementById("loginCliente").addEventListener("submit", async (e) => 
 
     const snap = await getDoc(doc(db, "clientes", cred.user.uid));
     if (!snap.exists()) {
-      alert("❌ Conta não é de cliente");
+      alert("⚠️ Conta não é de cliente");
       return;
     }
 
     window.location.href = "/index.html/";
   } catch (err) {
-    alert("❌ Email ou senha inválidos");
+    alert("⚠️ Email ou senha inválidos");
   }
 });
 
@@ -244,7 +244,7 @@ document.getElementById("resetSenhaBtn").addEventListener("click", async ()=>{
   }
   try{
     await sendPasswordResetEmail(auth, email);
-    alert("📧 Email de redefinição enviado! Verifique sua caixa de spam.");
+    alert("Email de redefinição enviado! Verifique sua caixa de spam.");
   }catch(err){
     alert("Erro ao enviar redefinição: " + err.message);
   }
