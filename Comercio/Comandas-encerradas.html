@@ -72,7 +72,7 @@ body{
 
 <body>
 
-<div class="header">✅ Comandas Encerradas</div>
+<div class="header">Comandas encerradas</div>
 <div class="lista" id="listaPedidos"></div>
 
 <script type="module">
@@ -107,7 +107,7 @@ function carregarPedidos(uid){
     lista.innerHTML = "";
 
     if(snap.empty){
-      lista.innerHTML = `<div class="vazio">📭 Nenhuma comanda encerrada</div>`;
+      lista.innerHTML = `<div class="vazio"> </div>`;
       return;
     }
 
