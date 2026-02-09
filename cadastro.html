@@ -23,21 +23,22 @@
 }
 
 body{
-  background:var(--laranja);
+  background:linear-gradient(180deg, #ff8c1a 0%, #ff6a00 100%);
   min-height:100vh;
   display:flex;
   justify-content:center;
   align-items:flex-end;
 }
 
+/* CONTAINER PRINCIPAL */
 .container{
   background:var(--branco);
   width:100%;
   max-width:420px;
-  border-radius:24px 24px 0 0;
-  padding:30px 24px 35px;
+  border-radius:26px 26px 0 0;
+  padding:34px 26px 38px;
   text-align:center;
-  box-shadow:0 -6px 18px rgba(0,0,0,0.12);
+  box-shadow:0 -8px 22px rgba(0,0,0,0.15);
   animation:slideUp 0.6s ease;
 }
 
@@ -46,55 +47,71 @@ body{
   to{transform:translateY(0);opacity:1;}
 }
 
+/* LOGO */
+.logo{
+  margin-top:6px;
+}
+
 .logo img{
-  width:140px;   /* aumenta o tamanho da logo */
+  width:150px;
   height:auto;
-  margin-bottom:15px;
+  margin-bottom:10px;
 }
 
-.logo-text{
-  display:none;  /* oculta o nome */
-}
-
+/* SLOGAN */
 .slogan{
-  font-size:1em;
+  font-size:0.95em;
   color:#555;
-  margin-top:8px;
-  margin-bottom:18px;
+  margin:12px 0 20px;
 }
 
+/* ÁREAS / DIVISORES */
 .area{
-  margin-top:24px;
-  font-size:0.9em;
-  font-weight:600;
-  color:#666;
+  margin:28px 0 14px;
+  font-size:0.75em;
+  font-weight:700;
+  color:#999;
+  letter-spacing:1px;
   text-transform:uppercase;
-  letter-spacing:0.8px;
+  position:relative;
 }
 
+.area::after{
+  content:"";
+  display:block;
+  width:42px;
+  height:3px;
+  background:var(--laranja);
+  border-radius:3px;
+  margin:7px auto 0;
+}
+
+/* BOTÕES */
 .btn{
   width:100%;
   padding:15px;
   margin-top:14px;
   border:none;
-  border-radius:14px;
+  border-radius:15px;
   font-size:1em;
   font-weight:600;
   cursor:pointer;
   transition:all 0.3s ease;
-  box-shadow:0 3px 6px rgba(0,0,0,0.08);
+  box-shadow:0 3px 6px rgba(0,0,0,0.1);
 }
 
+/* BOTÃO PRINCIPAL */
 .btn-cliente{
-  background:var(--laranja);
+  background:linear-gradient(135deg, var(--laranja), var(--laranja-escuro));
   color:#fff;
+  font-size:1.05em;
 }
 
 .btn-cliente:hover{
-  background:var(--laranja-escuro);
-  box-shadow:0 4px 10px rgba(0,0,0,0.15);
+  box-shadow:0 6px 14px rgba(0,0,0,0.18);
 }
 
+/* BOTÃO COMÉRCIO */
 .btn-comercio{
   background:var(--cinza);
   color:var(--texto);
@@ -102,19 +119,20 @@ body{
 
 .btn-comercio:hover{
   background:var(--cinza-claro);
-  box-shadow:0 4px 10px rgba(0,0,0,0.1);
+  box-shadow:0 4px 12px rgba(0,0,0,0.12);
 }
 
+/* BOTÕES LOGIN */
 .btn-login{
   background:transparent;
   color:var(--laranja);
-  border:1.8px solid var(--laranja);
+  border:2px solid var(--laranja);
 }
 
 .btn-login:hover{
   background:var(--laranja);
   color:#fff;
-  box-shadow:0 4px 10px rgba(0,0,0,0.15);
+  box-shadow:0 4px 12px rgba(0,0,0,0.18);
 }
 
 .btn:active{
@@ -125,23 +143,26 @@ body{
 
 <body>
   <div class="container">
+
     <div class="logo">
       <img src="img/logo.png" alt="Logo Tôcomfome">
-      <!-- nome removido -->
     </div>
-    <div class="slogan">Deixa que a gente te ajuda a matar sua fome!</div>
+
+    <div class="slogan">
+      Deixa que a gente te ajuda a matar sua fome!
+    </div>
 
     <div class="area">Cadastro</div>
 
     <button class="btn btn-cliente" onclick="location.href='Cliente/cadastro-cliente.html'">
-      Sou Cliente
+      🍔 Quero pedir comida
     </button>
 
     <button class="btn btn-comercio" onclick="location.href='Comercio/cadastro-comercio.html'">
-      Sou Comércio
+      🏪 Quero vender no Tôcomfome
     </button>
 
-    <div class="area" style="margin-top:28px;">Já tenho conta</div>
+    <div class="area" style="margin-top:32px;">Já tenho conta</div>
 
     <button class="btn btn-login" onclick="location.href='Cliente/login-cliente.html'">
       Entrar como Cliente
