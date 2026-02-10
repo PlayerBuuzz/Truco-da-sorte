@@ -314,21 +314,46 @@ async function carregarProdutos(){
 }
 
 async function carregarAvaliacoes(){
-  listaAvaliacoes.innerHTML="";
-  const q = query(collection(db,"pedidos"),where("comercioId","==",comercioSelecionado.comercioId));
+  listaAvaliacoes.innerHTML = "";
+
+  const q = query(
+    collection(db,"pedidos"),
+    where("comercioId","==",comercioSelecionado.comercioId)
+  );
+
   const snap = await getDocs(q);
+
+  let total = 0;
+  let count = 0;
 
   snap.forEach(docu=>{
     const p = docu.data();
-    if(p.avaliacao){
-      listaAvaliacoes.innerHTML+=`
+
+    if(p.avaliacao && p.avaliacao.nota){
+      const nota = Number(p.avaliacao.nota);
+
+      if(!isNaN(nota)){
+        total += nota;
+        count++;
+      }
+
+      listaAvaliacoes.innerHTML += `
         <div class="avaliacao">
-          <strong>${p.clienteNome||"Cliente"}</strong>
-          <div class="estrelas">⭐ ${p.avaliacao.pedido}</div>
-          <small>Motoboy: ${p.avaliacao.motoboy} • ${p.avaliacao.tempo} min</small>
-        </div>`;
+          <strong>${p.clienteNome || "Cliente"}</strong>
+          <div class="estrelas">⭐ ${nota} / 5</div>
+          <small>${p.avaliacao.comentario || ""}</small>
+        </div>
+      `;
     }
   });
+
+  // opcional: média geral no topo (se existir elemento)
+  const mediaEl = document.getElementById("mediaAvaliacoes");
+  if(mediaEl){
+    mediaEl.innerText = count
+      ? `⭐ ${(total / count).toFixed(1)} de 5`
+      : "Sem avaliações";
+  }
 }
 
 window.pedir=(p)=>{
