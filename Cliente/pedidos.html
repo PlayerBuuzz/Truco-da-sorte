@@ -134,6 +134,7 @@ body{
   margin-bottom:6px;
 }
 
+/* ESTRELAS */
 .estrelas{
   display:flex;
   gap:6px;
@@ -143,6 +144,22 @@ body{
 }
 .estrelas span{color:#ccc}
 .estrelas span.ativa{color:#ffb300}
+
+/* TEXTO */
+textarea{
+  width:100%;
+  min-height:70px;
+  resize:none;
+  border-radius:12px;
+  border:1px solid var(--linha);
+  padding:10px;
+  font-size:.9em;
+  margin-bottom:12px;
+}
+textarea:focus{
+  outline:none;
+  border-color:var(--laranja);
+}
 
 /* VAZIO */
 .vazio{
@@ -161,11 +178,10 @@ body{
   <div class="vazio">Carregando pedidos…</div>
 </div>
 
-<!-- SCRIPT ORIGINAL (lógica preservada) -->
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
 import { 
-  getFirestore, collection, query, where, onSnapshot, doc, updateDoc, getDoc 
+  getFirestore, collection, query, where, onSnapshot, doc, updateDoc 
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
@@ -185,11 +201,15 @@ function statusClass(status){ return status || "aguardando"; }
 
 window.salvarAvaliacao = async (pedidoId)=>{
   const card = document.getElementById(`pedido-${pedidoId}`);
-  const pedido = card.querySelector(".pedido").dataset.valor;
-  const motoboy = card.querySelector(".motoboy").dataset.valor;
+  const nota = card.querySelector(".pedido").dataset.valor;
+  const comentario = card.querySelector(".comentario").value;
 
   await updateDoc(doc(db,"pedidos",pedidoId),{
-    avaliacao:{pedido,motoboy,criadoEm:new Date()}
+    avaliacao:{
+      nota,
+      comentario,
+      criadoEm:new Date()
+    }
   });
 
   location.reload();
@@ -197,7 +217,7 @@ window.salvarAvaliacao = async (pedidoId)=>{
 
 function carregarPedidos(uid){
   const q = query(collection(db,"pedidos"), where("clienteId","==",uid));
-  onSnapshot(q, async snap=>{
+  onSnapshot(q, snap=>{
     lista.innerHTML="";
     if(snap.empty){
       lista.innerHTML=`<div class="vazio">Você ainda não fez nenhum pedido</div>`;
@@ -228,15 +248,18 @@ function carregarPedidos(uid){
         ${p.status==="entregue"&&!p.avaliacao?`
         <div class="avaliacao">
           <label>Avaliação do pedido</label>
-          <div class="estrelas pedido">${[1,2,3,4,5].map(n=>`<span onclick="avaliar(this,${n})">★</span>`).join("")}</div>
+          <div class="estrelas pedido">
+            ${[1,2,3,4,5].map(n=>`<span onclick="avaliar(this,${n})">★</span>`).join("")}
+          </div>
 
-          <label>Avaliação do motoboy</label>
-          <div class="estrelas motoboy">${[1,2,3,4,5].map(n=>`<span onclick="avaliar(this,${n})">★</span>`).join("")}</div>
+          <label>O que achou?</label>
+          <textarea class="comentario" placeholder="Conte como foi sua experiência"></textarea>
 
           <button class="btn-sec" onclick="salvarAvaliacao('${id}')">Enviar avaliação</button>
         </div>`:p.avaliacao?`
         <div class="avaliacao-resumo">
-          Avaliação enviada • Pedido ${p.avaliacao.pedido} ★ • Motoboy ${p.avaliacao.motoboy} ★
+          Avaliação enviada • ${p.avaliacao.nota} ★<br>
+          "${p.avaliacao.comentario || "Sem comentário"}"
         </div>`:""}
       </div>`;
     });
