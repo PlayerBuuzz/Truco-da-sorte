@@ -5,7 +5,7 @@
 <title>Tô com fome 🍔 | Produto</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<link rel="icon" href="/img/Logo.png">
+<link rel="icon" type="image/ico" href="/img/Logo.png">
 
 <style>
 :root{
@@ -56,25 +56,20 @@ h2{margin:0 0 6px}
   color:var(--laranja);
   font-size:1.6em;
   font-weight:800;
+  margin-bottom:10px;
+}
+
+.media{
+  font-size:1em;
   margin-bottom:12px;
+  color:#ffb400;
+  font-weight:600;
 }
 
 .descricao{
   color:var(--texto-sec);
   line-height:1.5;
   margin-bottom:20px;
-}
-
-.avaliacoes{margin-top:25px}
-
-.avaliacoes h3{margin-bottom:10px}
-
-.comentario{
-  background:#fafafa;
-  border-radius:12px;
-  padding:10px 12px;
-  margin-bottom:8px;
-  font-size:.95em;
 }
 
 .btn{
@@ -90,6 +85,20 @@ h2{margin:0 0 6px}
   margin-top:15px;
 }
 
+.avaliacoes{margin-top:25px}
+
+.avaliacoes h3{margin-bottom:12px}
+
+.comentario{
+  background:#fafafa;
+  border-radius:12px;
+  padding:12px;
+  margin-bottom:10px;
+  font-size:.95em;
+}
+
+.comentario strong{color:#000}
+
 .loading{
   text-align:center;
   margin-top:40px;
@@ -103,12 +112,16 @@ h2{margin:0 0 6px}
 <header>🍔 Confirmar Pedido</header>
 
 <div class="container">
-  <div id="loading" class="loading">Carregando produto...</div>
+
+  <div class="loading" id="loading">Carregando produto...</div>
 
   <div class="card" id="conteudo" style="display:none">
     <img id="fotoProduto" class="produto-img">
+
     <h2 id="nome"></h2>
     <div class="preco" id="preco"></div>
+    <div class="media" id="media"></div>
+
     <p class="descricao" id="descricao"></p>
 
     <button class="btn" onclick="finalizarPedido()">✅ Finalizar Pedido</button>
@@ -118,31 +131,22 @@ h2{margin:0 0 6px}
       <div id="listaAvaliacoes"></div>
     </div>
   </div>
+
 </div>
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
 import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-import {
-  getFirestore,
-  doc,
-  getDoc,
-  addDoc,
-  collection,
-  query,
-  where,
-  getDocs,
-  serverTimestamp
+import { 
+  getFirestore, doc, getDoc, addDoc, collection, 
+  query, where, getDocs, serverTimestamp 
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-/* 🔥 FIREBASE */
+/* FIREBASE */
 const firebaseConfig = {
   apiKey: "AIzaSyD6a29L24aFSgVjmC7NFGXpdWW4g1uQsio",
   authDomain: "tocomfome-754e1.firebaseapp.com",
-  projectId: "tocomfome-754e1",
-  storageBucket: "tocomfome-754e1.appspot.com",
-  messagingSenderId: "997975886937",
-  appId: "1:997975886937:web:9bf408c35f1ed8aea13548"
+  projectId: "tocomfome-754e1"
 };
 
 const app = initializeApp(firebaseConfig);
@@ -152,82 +156,115 @@ const db = getFirestore(app);
 let produto = null;
 let clienteNome = "";
 
-/* 🔐 LOGIN */
+/* AUTH */
 onAuthStateChanged(auth, async (user)=>{
   if(!user){
-    window.location.href = "/Cadastro.html/";
+    location.href = "/Cadastro.html/";
     return;
   }
 
-  const clienteSnap = await getDoc(doc(db, "clientes", user.uid));
-  clienteNome = clienteSnap.data().nome || "Cliente";
+  const clienteSnap = await getDoc(doc(db,"clientes",user.uid));
+  if(!clienteSnap.exists()){
+    location.href = "/index.html/";
+    return;
+  }
 
+  clienteNome = clienteSnap.data().nome || "Cliente";
   carregarProduto();
 });
 
-/* 🍔 PRODUTO */
+/* PRODUTO */
 async function carregarProduto(){
-  produto = JSON.parse(localStorage.getItem("produtoSelecionado"));
+  try{
+    produto = JSON.parse(localStorage.getItem("produtoSelecionado"));
+  }catch{
+    produto = null;
+  }
 
-  if(!produto){
+  if(!produto || !produto.produtoId || !produto.comercioId){
     alert("Produto não encontrado.");
+    location.href = "/index.html/";
     return;
   }
 
   document.getElementById("nome").innerText = produto.nome;
-  document.getElementById("preco").innerText = "R$ " + Number(produto.valor).toFixed(2);
+  document.getElementById("preco").innerText =
+    "R$ " + Number(produto.valor).toFixed(2);
+
   document.getElementById("fotoProduto").src =
-    produto.img || produto.imagemUrl || "/img/produto.png";
+    produto.img || "/img/produto.png";
 
-  /* 🔎 Buscar descrição real */
-  const produtoRef = doc(db, "comercios", produto.comercioId, "produtos", produto.produtoId);
-  const produtoSnap = await getDoc(produtoRef);
+  /* descrição real */
+  const prodRef = doc(
+    db,
+    "comercios",
+    produto.comercioId,
+    "produtos",
+    produto.produtoId
+  );
+
+  const prodSnap = await getDoc(prodRef);
   document.getElementById("descricao").innerText =
-    produtoSnap.exists()
-      ? produtoSnap.data().descricao
+    prodSnap.exists()
+      ? prodSnap.data().descricao
       : "Produto delicioso 😋";
-
-  carregarAvaliacoes();
 
   document.getElementById("loading").style.display = "none";
   document.getElementById("conteudo").style.display = "block";
+
+  carregarAvaliacoes();
 }
 
-/* ⭐ AVALIAÇÕES */
+/* ⭐ AVALIAÇÕES + MÉDIA */
 async function carregarAvaliacoes(){
-  const lista = document.getElementById("listaAvaliacoes");
-  lista.innerHTML = "";
-
   const q = query(
-    collection(db, "pedidos"),
-    where("produtoNome", "==", produto.nome),
-    where("avaliacaoTexto", "!=", "")
+    collection(db,"pedidos"),
+    where("produtoNome","==",produto.nome),
+    where("comercioId","==",produto.comercioId)
   );
 
   const snap = await getDocs(q);
+  const lista = document.getElementById("listaAvaliacoes");
+  const mediaEl = document.getElementById("media");
 
-  if(snap.empty){
+  lista.innerHTML = "";
+
+  let soma = 0;
+  let total = 0;
+
+  snap.forEach(docSnap=>{
+    const p = docSnap.data();
+    if(p.avaliacao && p.avaliacao.pedido){
+      soma += Number(p.avaliacao.pedido);
+      total++;
+
+      const nome = (p.clienteNome || "Cliente").split(" ")[0];
+      const texto = p.avaliacao.texto || "Sem comentário";
+
+      lista.innerHTML += `
+        <div class="comentario">
+          <strong>${nome}:</strong> ${texto}
+        </div>
+      `;
+    }
+  });
+
+  if(total === 0){
     lista.innerHTML = "<p style='color:#777'>Este produto ainda não possui avaliações.</p>";
+    mediaEl.innerText = "";
     return;
   }
 
-  snap.forEach(doc=>{
-    const d = doc.data();
-    const nome = (d.clienteNome || "Cliente").split(" ")[0];
-
-    const div = document.createElement("div");
-    div.className = "comentario";
-    div.innerHTML = `<strong>${nome}:</strong> ${d.avaliacaoTexto}`;
-    lista.appendChild(div);
-  });
+  const media = (soma / total).toFixed(1);
+  mediaEl.innerText = `⭐ ${media} de 5 (${total} avaliações)`;
 }
 
-/* ✅ FINALIZAR */
+/* FINALIZAR */
 window.finalizarPedido = async ()=>{
   const user = auth.currentUser;
   if(!user || !produto) return;
 
-  await addDoc(collection(db, "pedidos"), {
+  await addDoc(collection(db,"pedidos"),{
     comercioId: produto.comercioId,
     comercioNome: produto.comercioNome || "",
     clienteId: user.uid,
@@ -239,8 +276,9 @@ window.finalizarPedido = async ()=>{
   });
 
   localStorage.removeItem("produtoSelecionado");
+
   alert("✅ Pedido enviado com sucesso!");
-  window.location.href = "/index.html/";
+  location.href = "/index.html/";
 };
 </script>
 
