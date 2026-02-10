@@ -232,8 +232,7 @@ async function carregarAvaliacoes(comercioId, produtoNome){
   const q = query(
     collection(db, "pedidos"),
     where("comercioId", "==", comercioId),
-    where("produtoNome", "==", produtoNome),
-    where("avaliacao", ">", 0)
+    where("produtoNome", "==", produtoNome)
   );
 
   const snap = await getDocs(q);
@@ -244,13 +243,17 @@ async function carregarAvaliacoes(comercioId, produtoNome){
 
   snap.forEach(doc=>{
     const d = doc.data();
-    total += d.avaliacao;
-    count++;
 
-    if(d.comentario){
-      comentariosHTML += `
-        <p><strong>${d.clienteNome || "Cliente"}:</strong> ${d.comentario}</p>
-      `;
+    // só considera pedidos que REALMENTE têm avaliação
+    if(typeof d.avaliacao === "number"){
+      total += d.avaliacao;
+      count++;
+
+      if(d.comentario){
+        comentariosHTML += `
+          <p><strong>${d.clienteNome || "Cliente"}:</strong> ${d.comentario}</p>
+        `;
+      }
     }
   });
 
@@ -262,6 +265,7 @@ async function carregarAvaliacoes(comercioId, produtoNome){
     ${comentariosHTML || "<p>Sem comentários ainda.</p>"}
   `;
 }
+
 
 /* ✅ FINALIZAR PEDIDO */
 window.finalizarPedido = async ()=>{
