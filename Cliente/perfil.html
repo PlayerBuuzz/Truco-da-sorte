@@ -148,9 +148,6 @@ html.dark-theme .btn-tema{background:#333;color:#fff;border-color:#fff}
     <button class="btn-sair" onclick="sair()">
       <img src="/img/sair.png" alt="Sair"> Sair da conta
     </button>
-    <button class="btn-tema" onclick="toggleTema()">
-      🌙 Alternar Tema
-    </button>
 
   </div>
 </div>
@@ -231,14 +228,6 @@ window.salvar = async ()=>{
 window.sair = async ()=>{
   await signOut(auth);
   location.href = "Cliente/login-cliente.html";
-}
-
-/* 🌙 Alternar Tema */
-window.toggleTema = async ()=>{
-  const dark = document.documentElement.classList.toggle("dark-theme");
-  await updateDoc(doc(db,"clientes",usuarioAtual.uid),{
-    tema: dark ? "dark" : "light"
-  });
 }
 </script>
 
