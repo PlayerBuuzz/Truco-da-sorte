@@ -179,7 +179,7 @@ onAuthStateChanged(auth, async (user)=>{
   carregarProduto();
 });
 
-/* 🍔 PRODUTO */
+/* 🍔 PRODUTO (compatível com a outra tela) */
 async function carregarProduto(){
   try{
     produto = JSON.parse(localStorage.getItem("produtoSelecionado"));
@@ -187,46 +187,52 @@ async function carregarProduto(){
     produto = null;
   }
 
-  if(!produto || !produto.id || !produto.comercioId){
+  if(!produto || !produto.nome || !produto.comercioId){
     alert("Produto não encontrado.");
     window.location.href = "/index.html/";
     return;
   }
 
-  const produtoRef = doc(
-    db,
-    "comercios",
-    produto.comercioId,
-    "produtos",
-    produto.id
-  );
-
-  const snap = await getDoc(produtoRef);
-
-  if(!snap.exists()){
-    alert("Produto não encontrado no comércio.");
-    return;
-  }
-
-  const dados = snap.data();
-
   document.getElementById("loading").style.display = "none";
   document.getElementById("conteudo").style.display = "block";
 
-  document.getElementById("nome").innerText = dados.nome;
-  document.getElementById("preco").innerText = "R$ " + Number(dados.valor).toFixed(2);
-  document.getElementById("descricao").innerText = dados.descricao || "Sem descrição";
-  document.getElementById("fotoProduto").src = dados.img || "img/produto.png";
+  document.getElementById("nome").innerText = produto.nome;
+  document.getElementById("preco").innerText =
+    "R$ " + Number(produto.valor || 0).toFixed(2);
 
-  carregarAvaliacoes(produto.comercioId, produto.id);
+  document.getElementById("fotoProduto").src =
+    produto.img || produto.imagemUrl || "img/produto.png";
+
+  /* 🔎 BUSCA DESCRIÇÃO REAL NO FIREBASE (SEM QUEBRAR FLUXO) */
+  try{
+    const q = query(
+      collection(db, "comercios", produto.comercioId, "produtos"),
+      where("nome", "==", produto.nome)
+    );
+
+    const snap = await getDocs(q);
+
+    if(!snap.empty){
+      document.getElementById("descricao").innerText =
+        snap.docs[0].data().descricao || "Sem descrição";
+    }else{
+      document.getElementById("descricao").innerText =
+        produto.descricao || "Sem descrição";
+    }
+  }catch{
+    document.getElementById("descricao").innerText =
+      produto.descricao || "Sem descrição";
+  }
+
+  carregarAvaliacoes(produto.comercioId, produto.nome);
 }
 
-/* ⭐ AVALIAÇÕES */
-async function carregarAvaliacoes(comercioId, produtoId){
+/* ⭐ AVALIAÇÕES VINDAS DE PEDIDOS */
+async function carregarAvaliacoes(comercioId, produtoNome){
   const q = query(
     collection(db, "pedidos"),
     where("comercioId", "==", comercioId),
-    where("produtoId", "==", produtoId),
+    where("produtoNome", "==", produtoNome),
     where("avaliacao", ">", 0)
   );
 
@@ -249,7 +255,7 @@ async function carregarAvaliacoes(comercioId, produtoId){
   });
 
   document.getElementById("avaliacao").innerText =
-    count ? `⭐ ${(total/count).toFixed(1)} / 5` : "Sem avaliações";
+    count ? `⭐ ${(total / count).toFixed(1)} / 5` : "Sem avaliações";
 
   document.querySelector(".comentarios").innerHTML = `
     <h3>Comentários de clientes</h3>
@@ -267,9 +273,8 @@ window.finalizarPedido = async ()=>{
     comercioNome: produto.comercioNome || "",
     clienteId: user.uid,
     clienteNome: clienteNome,
-    produtoId: produto.id,
     produtoNome: produto.nome,
-    valor: Number(produto.valor),
+    valor: Number(produto.valor || 0),
     status: "novo",
     criadoEm: serverTimestamp()
   });
