@@ -4,99 +4,142 @@
 <meta charset="UTF-8">
 <title>Tôcomfome 🍔 | Meus Cupons</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
 <link rel="icon" type="image/ico" href="/img/Logo.png">
-  
+
 <style>
 :root{
   --laranja:#ff8c1a;
-  --cinza:#f4f5f7;
-  --branco:#ffffff;
-  --texto:#333;
+  --laranja-esc:#ff6f00;
+  --cinza:#f2f2f2;
+  --branco:#fff;
+  --texto:#222;
+  --texto-sec:#666;
 }
 
-*{
-  margin:0;
-  padding:0;
-  box-sizing:border-box;
-  font-family:'Segoe UI',Arial;
-}
+*{box-sizing:border-box;font-family:'Segoe UI',Arial}
 
 body{
   background:var(--cinza);
-  min-height:100vh;
+  margin:0;
+  padding:20px;
   display:flex;
   justify-content:center;
-  align-items:flex-start;
-  padding:20px;
 }
 
+/* CONTAINER */
 .box{
+  width:100%;
+  max-width:460px;
   background:var(--branco);
-  width:100%;
-  max-width:450px;
-  padding:24px;
-  border-radius:20px;
-  box-shadow:0 10px 24px rgba(0,0,0,.12);
+  border-radius:22px;
+  box-shadow:0 12px 30px rgba(0,0,0,.12);
+  overflow:hidden;
 }
 
-h2{
+/* HEADER */
+.header{
+  background:linear-gradient(135deg,var(--laranja),var(--laranja-esc));
+  color:#fff;
+  padding:18px;
   text-align:center;
-  color:var(--laranja);
-  margin-bottom:15px;
+  font-size:1.2em;
+  font-weight:700;
 }
 
-/* Criar */
+/* AÇÕES */
+.topo{
+  padding:16px;
+  display:flex;
+  flex-direction:column;
+  gap:10px;
+}
+
 .criar{
-  width:100%;
   border:none;
   background:var(--laranja);
   color:#fff;
-  padding:12px;
-  border-radius:12px;
-  font-weight:600;
-  margin-bottom:18px;
+  padding:13px;
+  border-radius:14px;
+  font-weight:700;
   cursor:pointer;
+  transition:.2s;
+}
+.criar:hover{filter:brightness(1.05)}
+
+/* FILTRO */
+.filtro{
+  padding:10px;
+  border-radius:12px;
+  border:1px solid #ddd;
+  font-size:.9em;
 }
 
-/* Lista */
+/* RESUMO */
+.resumo{
+  display:flex;
+  gap:10px;
+  padding:0 16px 16px;
+}
+
+.box-resumo{
+  flex:1;
+  background:#fafafa;
+  border-radius:14px;
+  padding:10px;
+  text-align:center;
+  border:1px solid #eee;
+}
+
+.box-resumo strong{
+  display:block;
+  color:var(--laranja);
+  font-size:1.1em;
+}
+
+/* LISTA */
 .lista{
+  padding:16px;
   display:flex;
   flex-direction:column;
   gap:14px;
 }
 
-/* Card */
+/* CUPOM */
 .cupom{
-  background:#fafafa;
-  border:1px solid #eee;
-  border-radius:14px;
+  background:#fff;
+  border-radius:16px;
   padding:14px;
+  box-shadow:0 6px 14px rgba(0,0,0,.08);
+  border-left:6px solid #ccc;
 }
 
+.cupom.ativo{border-color:#22c55e}
+.cupom.inativo{border-color:#ef4444}
+
 .cupom h3{
-  color:#222;
+  margin:0;
   font-size:1.1em;
 }
 
-.cupom p{
+.badge{
+  display:inline-block;
+  padding:4px 10px;
+  border-radius:999px;
+  font-size:.7em;
+  font-weight:700;
+  margin-top:6px;
+}
+
+.badge.ativo{background:#dcfce7;color:#166534}
+.badge.inativo{background:#fee2e2;color:#7f1d1d}
+
+.info{
   font-size:.85em;
-  color:#555;
+  color:var(--texto-sec);
   margin-top:4px;
 }
 
-/* Status */
-.ativo{
-  color:green;
-  font-weight:600;
-}
-
-.inativo{
-  color:red;
-  font-weight:600;
-}
-
-/* Ações */
+/* AÇÕES */
 .acoes{
   display:flex;
   gap:8px;
@@ -106,34 +149,30 @@ h2{
 .acoes button{
   flex:1;
   border:none;
-  padding:8px;
-  border-radius:8px;
+  padding:9px;
+  border-radius:10px;
   font-size:.8em;
-  font-weight:600;
+  font-weight:700;
   cursor:pointer;
+  transition:.2s;
 }
 
-.btn-editar{
-  background:#2563eb;
-  color:#fff;
-}
+.acoes button:hover{transform:translateY(-1px)}
 
-.btn-excluir{
-  background:#dc2626;
-  color:#fff;
-}
+.btn-editar{background:#2563eb;color:#fff}
+.btn-excluir{background:#dc2626;color:#fff}
 
-/* Mensagem vazia */
+/* VAZIO */
 .vazio{
   text-align:center;
   color:#777;
   font-size:.9em;
-  padding:20px 10px;
+  padding:30px 10px;
 }
 
-/* Voltar */
+/* VOLTAR */
 .voltar{
-  margin-top:20px;
+  padding:14px;
   text-align:center;
   font-size:.9em;
   color:#666;
@@ -146,12 +185,23 @@ h2{
 
 <div class="box">
 
-  <h2>🎟️ Meus Cupons</h2>
+  <div class="header">🎟️ Meus Cupons</div>
 
-  <!-- BOTÃO CRIAR -->
-  <button class="criar" onclick="criarCupom()">
-    ➕ Criar Novo Cupom
-  </button>
+  <div class="topo">
+    <button class="criar" onclick="criarCupom()">➕ Criar Novo Cupom</button>
+    <input id="filtro" class="filtro" placeholder="🔍 Buscar cupom">
+  </div>
+
+  <div class="resumo">
+    <div class="box-resumo">
+      <span>Total</span>
+      <strong id="total">0</strong>
+    </div>
+    <div class="box-resumo">
+      <span>Ativos</span>
+      <strong id="ativos">0</strong>
+    </div>
+  </div>
 
   <div id="lista" class="lista"></div>
 
@@ -159,26 +209,14 @@ h2{
 
 </div>
 
-
 <script type="module">
-
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-
 import {
-  getFirestore,
-  collection,
-  getDocs,
-  query,
-  orderBy,
-  doc,
-  deleteDoc,
-  updateDoc,
-  addDoc,
-  serverTimestamp
+  getFirestore, collection, getDocs, query, orderBy,
+  doc, deleteDoc, updateDoc, addDoc, serverTimestamp
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-
-/* FIREBASE */
+/* Firebase */
 const firebaseConfig = {
   apiKey: "AIzaSyD6a29L24aFSgVjmC7NFGXpdWW4g1uQsio",
   authDomain: "tocomfome-754e1.firebaseapp.com",
@@ -188,239 +226,87 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
-
-/* COMÉRCIO */
 const comercio = JSON.parse(localStorage.getItem("comercioSelecionado"));
-
-if(!comercio || !comercio.comercioId){
-  alert("Comércio não identificado.");
-  location.href = "/comercio/painel.html";
+if(!comercio?.comercioId){
+  alert("Comércio não identificado");
+  location.href="/comercio/painel.html";
 }
 
+const lista = document.getElementById("lista");
+const filtro = document.getElementById("filtro");
+const total = document.getElementById("total");
+const ativos = document.getElementById("ativos");
 
-/* CRIAR CUPOM */
+let cupons = [];
+
+/* CRIAR */
 window.criarCupom = async ()=>{
-
-  const nome = prompt("Nome do cupom (ex: PROMO10):");
+  const nome = prompt("Nome do cupom:");
   if(!nome) return;
-
   const desconto = prompt("Desconto (%):");
   if(!desconto) return;
-
   const validade = prompt("Validade (AAAA-MM-DD):");
   if(!validade) return;
+  const ativo = confirm("Ativar agora?");
 
-  const ativo = confirm("Deseja ativar agora?");
+  await addDoc(collection(db,"comercios",comercio.comercioId,"cupons"),{
+    nome:nome.toUpperCase(),
+    desconto:Number(desconto),
+    validade,
+    ativo,
+    criadoEm:serverTimestamp()
+  });
 
-  try{
-
-    await addDoc(
-      collection(
-        db,
-        "comercios",
-        comercio.comercioId,
-        "cupons"
-      ),
-      {
-        nome: nome.toUpperCase(),
-        desconto: Number(desconto),
-        validade: validade,
-        ativo: ativo,
-        criadoEm: serverTimestamp()
-      }
-    );
-
-    alert("🎉 Cupom criado!");
-    carregarCupons();
-
-  }catch(e){
-
-    alert("Erro ao criar.");
-    console.error(e);
-
-  }
-
+  carregar();
 };
 
+/* RENDER */
+function render(){
+  lista.innerHTML="";
+  let qtdAtivos = 0;
 
-/* CARREGAR CUPONS */
-async function carregarCupons(){
+  cupons
+    .filter(c=>c.nome.includes(filtro.value.toUpperCase()))
+    .forEach(c=>{
+      if(c.ativo) qtdAtivos++;
 
-  const lista = document.getElementById("lista");
-  lista.innerHTML = "";
-
-  try{
-
-    const ref = collection(
-      db,
-      "comercios",
-      comercio.comercioId,
-      "cupons"
-    );
-
-    const q = query(ref, orderBy("criadoEm","desc"));
-
-    const snapshot = await getDocs(q);
-
-    if(snapshot.empty){
-
-      lista.innerHTML = `
-        <div class="vazio">
-          😕 Nenhum cupom criado ainda
+      lista.innerHTML += `
+        <div class="cupom ${c.ativo?'ativo':'inativo'}">
+          <h3>${c.nome}</h3>
+          <span class="badge ${c.ativo?'ativo':'inativo'}">
+            ${c.ativo?'Ativo':'Inativo'}
+          </span>
+          <div class="info">💰 ${c.desconto}% de desconto</div>
+          <div class="info">📅 ${formatarData(c.validade)}</div>
         </div>
       `;
-      return;
-    }
-
-    snapshot.forEach(docu=>{
-
-      const c = docu.data();
-      const id = docu.id;
-
-      const status = c.ativo
-        ? '<span class="ativo">Ativo</span>'
-        : '<span class="inativo">Inativo</span>';
-
-      const div = document.createElement("div");
-      div.className = "cupom";
-
-      div.innerHTML = `
-        <h3>${c.nome}</h3>
-
-        <p>💰 Desconto: ${c.desconto}%</p>
-
-        <p>📅 Validade: ${formatarData(c.validade)}</p>
-
-        <p>Status: ${status}</p>
-
-        <div class="acoes">
-
-          <button class="btn-editar"
-            onclick="editarCupom('${id}',
-              '${c.nome}',
-              ${c.desconto},
-              '${c.validade}',
-              ${c.ativo})">
-
-            ✏️ Editar
-          </button>
-
-          <button class="btn-excluir"
-            onclick="excluirCupom('${id}')">
-
-            🗑️ Excluir
-          </button>
-
-        </div>
-      `;
-
-      lista.appendChild(div);
-
     });
 
-  }catch(e){
+  total.textContent = cupons.length;
+  ativos.textContent = qtdAtivos;
 
-    console.error(e);
-
-    lista.innerHTML = `
-      <div class="vazio">
-        ❌ Erro ao carregar cupons
-      </div>
-    `;
-
+  if(!cupons.length){
+    lista.innerHTML = `<div class="vazio">Nenhum cupom criado</div>`;
   }
-
 }
 
+filtro.addEventListener("input",render);
 
-/* EXCLUIR */
-window.excluirCupom = async (id)=>{
-
-  if(!confirm("Deseja excluir este cupom?")) return;
-
-  try{
-
-    await deleteDoc(
-      doc(
-        db,
-        "comercios",
-        comercio.comercioId,
-        "cupons",
-        id
-      )
-    );
-
-    alert("🗑️ Cupom excluído!");
-    carregarCupons();
-
-  }catch(e){
-
-    alert("Erro ao excluir.");
-    console.error(e);
-
-  }
-
-};
-
-
-/* EDITAR */
-window.editarCupom = async (id,nome,desconto,validade,ativo)=>{
-
-  const novoNome = prompt("Nome:", nome);
-  if(!novoNome) return;
-
-  const novoDesconto = prompt("Desconto (%):", desconto);
-  if(!novoDesconto) return;
-
-  const novaValidade = prompt("Validade (AAAA-MM-DD):", validade);
-  if(!novaValidade) return;
-
-  const novoStatus = confirm("Deseja deixar ATIVO?\nOK = Sim | Cancelar = Não");
-
-  try{
-
-    await updateDoc(
-      doc(
-        db,
-        "comercios",
-        comercio.comercioId,
-        "cupons",
-        id
-      ),
-      {
-        nome: novoNome.toUpperCase(),
-        desconto: Number(novoDesconto),
-        validade: novaValidade,
-        ativo: novoStatus
-      }
-    );
-
-    alert("✏️ Cupom atualizado!");
-    carregarCupons();
-
-  }catch(e){
-
-    alert("Erro ao atualizar.");
-    console.error(e);
-
-  }
-
-};
-
-
-/* FORMATAR DATA */
-function formatarData(data){
-
-  if(!data) return "-";
-
-  return new Date(data).toLocaleDateString("pt-BR");
-
+/* CARREGAR */
+async function carregar(){
+  cupons=[];
+  const ref = collection(db,"comercios",comercio.comercioId,"cupons");
+  const q = query(ref,orderBy("criadoEm","desc"));
+  const snap = await getDocs(q);
+  snap.forEach(d=> cupons.push({...d.data(),id:d.id}));
+  render();
 }
 
+function formatarData(d){
+  return new Date(d).toLocaleDateString("pt-BR");
+}
 
-/* START */
-carregarCupons();
-
+carregar();
 </script>
 
 </body>
