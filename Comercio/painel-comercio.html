@@ -2,10 +2,9 @@
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
-<title>Tôcomfome 🍔| Painel do Comércio</title>
+<title>Tôcomfome 🍔 | Painel do Comércio</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-<link rel="icon" type="image/ico" href="/img/Logo.png">
+<link rel="icon" href="/img/Logo.png">
 
 <style>
 :root{
@@ -13,9 +12,9 @@
   --laranja-hover:#ff7a00;
   --branco:#ffffff;
   --cinza:#f4f5f7;
-  --card:#ffffff;
   --texto:#2e2e2e;
   --subtexto:#777;
+  --verde:#2ecc71;
 }
 
 *{
@@ -33,7 +32,7 @@ body{
   align-items:center;
 }
 
-/* CONTAINER */
+/* PAINEL */
 .painel{
   background:var(--branco);
   width:100%;
@@ -41,90 +40,146 @@ body{
   border-radius:20px;
   overflow:hidden;
   box-shadow:0 12px 30px rgba(0,0,0,.12);
+  animation:entrar .4s ease;
+}
+
+@keyframes entrar{
+  from{opacity:0; transform:translateY(10px)}
+  to{opacity:1; transform:translateY(0)}
 }
 
 /* HEADER */
 .header{
   background:linear-gradient(135deg, var(--laranja), var(--laranja-hover));
-  padding:32px 20px;
-  text-align:center;
+  padding:26px 20px;
+  color:#fff;
 }
 
 .header h1{
-  color:#fff;
   font-size:1.4em;
-  font-weight:700;
-  letter-spacing:.3px;
 }
 
 .header p{
-  color:#ffe6cc;
   font-size:.85em;
-  margin-top:6px;
+  color:#ffe6cc;
+  margin-top:4px;
+}
+
+/* RESUMO */
+.resumo{
+  margin-top:14px;
+  background:rgba(255,255,255,.18);
+  border-radius:14px;
+  padding:12px;
+  display:flex;
+  justify-content:space-between;
+  font-size:.8em;
+}
+
+.resumo div{
+  text-align:center;
+}
+
+.resumo strong{
+  display:block;
+  font-size:1em;
 }
 
 /* MENU */
 .menu{
-  padding:26px 22px 30px;
-  margin-top:18px;
+  padding:22px;
   display:grid;
   grid-template-columns:1fr 1fr;
-  gap:18px;
+  gap:16px;
 }
 
 .card{
-  background:var(--card);
+  background:#fff;
   border-radius:16px;
-  padding:26px 16px;
+  padding:22px 14px;
   text-align:center;
   cursor:pointer;
-  transition:.25s ease;
+  transition:.2s;
   box-shadow:0 6px 14px rgba(0,0,0,.08);
+  position:relative;
 }
 
 .card:hover{
   transform:translateY(-4px);
-  box-shadow:0 10px 22px rgba(0,0,0,.12);
+}
+
+.card:active{
+  transform:scale(.96);
 }
 
 .card span{
   font-size:1.6em;
-  display:block;
   color:var(--laranja);
 }
 
 .card p{
-  margin-top:10px;
-  font-size:.95em;
+  margin-top:8px;
   font-weight:600;
   color:var(--texto);
+  font-size:.95em;
 }
+
+/* BADGE */
+.badge{
+  position:absolute;
+  top:10px;
+  right:12px;
+  background:var(--laranja);
+  color:#fff;
+  font-size:.7em;
+  padding:4px 7px;
+  border-radius:20px;
+}
+
 </style>
 </head>
 
 <body>
 
 <div class="painel">
+
   <div class="header">
     <h1>Tôcomfome</h1>
     <p>Painel do Comércio</p>
+
+    <div class="resumo">
+      <div>
+        <strong id="resPedidos">0</strong>
+        Pedidos
+      </div>
+      <div>
+        <strong id="resFaturamento">R$ 0</strong>
+        Hoje
+      </div>
+      <div>
+        <strong>🟢</strong>
+        Aberto
+      </div>
+    </div>
   </div>
 
   <div class="menu">
 
     <div class="card" onclick="irPara('comandas.html')">
+      <div class="badge" id="badgeAtivas">0</div>
       <span>📦</span>
       <p>Comandas Ativas</p>
     </div>
 
     <div class="card" onclick="irPara('comandas-encerradas.html')">
+      <div class="badge" id="badgeEncerradas">0</div>
       <span>✔️</span>
       <p>Encerradas</p>
     </div>
 
-    <div class="card" onclick="irPara('Criar-cupom.html')">
-      <span>🎟️</span>
-      <p>Cupons</p>
+    <div class="card" onclick="irPara('grafico-vendas.html')">
+      <span>📊</span>
+      <p>Gráfico de Vendas</p>
     </div>
 
     <div class="card" onclick="irPara('editar-produtos.html')">
@@ -137,9 +192,9 @@ body{
       <p>Adicionar Produto</p>
     </div>
 
-    <div class="card" onclick="irPara('alterar-perfil.html')">
-      <span>✎</span>
-      <p>Alterar Perfil</p>
+    <div class="card" onclick="irPara('Criar-cupom.html')">
+      <span>🎟️</span>
+      <p>Cupons</p>
     </div>
 
     <div class="card" onclick="irPara('visao-cliente.html')">
@@ -147,123 +202,69 @@ body{
       <p>Visão do Cliente</p>
     </div>
 
-    <div class="card" onclick="irPara('grafico-vendas.html')">
-      <span>📊</span>
-      <p>Gráfico de Vendas</p>
+    <div class="card" onclick="irPara('alterar-perfil.html')">
+      <span>✎</span>
+      <p>Alterar Perfil</p>
     </div>
 
   </div>
 </div>
 
-<!-- FUNÇÃO GLOBAL -->
 <script>
-window.irPara = function(pagina){
-  window.location.href = `/comercio/${pagina}`;
+function irPara(pagina){
+  location.href = `/comercio/${pagina}`;
 }
 </script>
-<script type="module">
 
+<script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
 import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-import { getFirestore, collection, query, where, onSnapshot, doc, setDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
-import { getMessaging, getToken } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-messaging.js";
+import { getFirestore, collection, query, where, onSnapshot } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-/* Firebase */
 const firebaseConfig = {
   apiKey: "AIzaSyD6a29L24aFSgVjmC7NFGXpdWW4g1uQsio",
   authDomain: "tocomfome-754e1.firebaseapp.com",
-  projectId: "tocomfome-754e1",
-  storageBucket: "tocomfome-754e1.appspot.com",
-  messagingSenderId: "997975886937",
-  appId: "1:997975886937:web:9bf408c35f1ed8aea13548"
+  projectId: "tocomfome-754e1"
 };
 
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
-const messaging = getMessaging(app);
 
-/* Service Worker */
-if ("serviceWorker" in navigator) {
-  navigator.serviceWorker.register("/firebase-messaging-sw.js");
-}
-
-/* Registrar Token */
-async function registrarToken(uid){
-
-  const perm = await Notification.requestPermission();
-  if(perm !== "granted") return;
-
-  const reg = await navigator.serviceWorker.ready;
-
-  const token = await getToken(messaging,{
-    vapidKey:"BB3N1EQpjWRYNQQpB_Dwo1lCScMl03xYIq_WrJo_nxs5HcKbRrUze3ATLLlW9B0xV3Trm6Fm_NwAMvQeLcJBTgU",
-    serviceWorkerRegistration: reg
-  });
-
-  if(!token) return;
-
-  await setDoc(doc(db,"tokens",uid),{
-    token,
-    atualizadoEm: serverTimestamp()
-  });
-
-}
-
-/* 🔔 Escutar pedidos (somente notificação) */
-function escutarPedidos(uid){
-
-  const q = query(
-    collection(db,"pedidos"),
-    where("comercioId","==",uid)
-  );
-
-  let primeira = true;
-
-  onSnapshot(q,snap=>{
-
-    if(!primeira){
-
-      snap.docChanges().forEach(change=>{
-
-        if(change.type === "added"){
-
-          const p = change.doc.data();
-
-          new Notification("📦 Novo Pedido!",{
-            body:`${p.clienteNome} pediu ${p.produtoNome}`,
-            icon:"/img/logo.png"
-          });
-
-          const audio = new Audio("/audio/alerta.mp3");
-          audio.play().catch(()=>{});
-
-        }
-
-      });
-
-    }
-
-    primeira = false;
-
-  });
-
-}
-
-/* Auth */
 onAuthStateChanged(auth,user=>{
-
   if(!user){
     location.href="/comercio/login-comercio.html";
     return;
   }
 
-  registrarToken(user.uid);
+  const q = query(
+    collection(db,"pedidos"),
+    where("comercioId","==",user.uid)
+  );
 
-  escutarPedidos(user.uid); // 🔥 AGORA NOTIFICA NESSA TELA
+  onSnapshot(q,snap=>{
+    let ativas = 0;
+    let encerradas = 0;
+    let total = 0;
 
+    snap.forEach(doc=>{
+      const p = doc.data();
+      total += Number(p.total || 0);
+
+      if(p.status === "encerrado"){
+        encerradas++;
+      }else{
+        ativas++;
+      }
+    });
+
+    document.getElementById("badgeAtivas").innerText = ativas;
+    document.getElementById("badgeEncerradas").innerText = encerradas;
+    document.getElementById("resPedidos").innerText = snap.size;
+    document.getElementById("resFaturamento").innerText =
+      total.toLocaleString("pt-BR",{style:"currency",currency:"BRL"});
+  });
 });
-
 </script>
 
 </body>
