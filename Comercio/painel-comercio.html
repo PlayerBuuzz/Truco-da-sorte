@@ -11,11 +11,11 @@
   --laranja:#ff8c1a;
   --laranja-hover:#ff7a00;
   --branco:#ffffff;
-  --cinza:#f2f3f5;
+  --cinza:#f4f5f7;
   --card:#ffffff;
   --texto:#2e2e2e;
   --subtexto:#777;
-  --sombra:0 10px 25px rgba(0,0,0,.12);
+  --borda:#eee;
 }
 
 *{
@@ -26,7 +26,7 @@
 }
 
 body{
-  background:linear-gradient(180deg,#f2f3f5,#e9ebef);
+  background:var(--cinza);
   min-height:100vh;
   display:flex;
   justify-content:center;
@@ -34,33 +34,25 @@ body{
 }
 
 .painel{
+  background:var(--branco);
   width:100%;
   max-width:420px;
-  border-radius:22px;
+  border-radius:20px;
   overflow:hidden;
-  background:var(--branco);
-  box-shadow:var(--sombra);
-  animation:fade .4s ease;
-}
-
-@keyframes fade{
-  from{opacity:0;transform:translateY(12px)}
-  to{opacity:1;transform:none}
+  box-shadow:0 12px 30px rgba(0,0,0,.12);
 }
 
 /* HEADER */
 .header{
-  background:linear-gradient(135deg,var(--laranja),var(--laranja-hover));
-  padding:28px 20px 60px;
+  background:linear-gradient(135deg, var(--laranja), var(--laranja-hover));
+  padding:26px 20px;
   text-align:center;
-  position:relative;
 }
 
 .header h1{
   color:#fff;
-  font-size:1.5em;
+  font-size:1.4em;
   font-weight:700;
-  letter-spacing:.5px;
 }
 
 .header p{
@@ -71,33 +63,34 @@ body{
 
 /* RESUMO */
 .resumo{
-  background:#fff;
-  margin:-38px 16px 10px;
-  padding:14px 10px;
-  border-radius:18px;
-  box-shadow:0 6px 18px rgba(0,0,0,.1);
+  padding:14px;
   display:grid;
   grid-template-columns:1fr 1fr 1fr;
-  gap:8px;
-  text-align:center;
-  font-size:.8em;
+  gap:10px;
+  background:#fff;
+  border-bottom:1px solid var(--borda);
 }
 
 .resumo div{
-  display:flex;
-  flex-direction:column;
-  gap:4px;
+  background:#fff7ef;
+  border-radius:12px;
+  padding:10px 6px;
+  text-align:center;
+  font-size:.8em;
+  font-weight:600;
+  color:var(--texto);
 }
 
 .resumo span{
+  display:block;
+  margin-top:4px;
+  font-size:1em;
   color:var(--laranja);
-  font-weight:700;
-  font-size:1.05em;
 }
 
 /* MENU */
 .menu{
-  padding:20px;
+  padding:18px;
   display:grid;
   grid-template-columns:1fr 1fr;
   gap:14px;
@@ -106,41 +99,28 @@ body{
 /* CARD */
 .card{
   background:var(--card);
-  border-radius:18px;
-  padding:18px 14px;
+  border-radius:16px;
+  padding:20px 14px;
   text-align:center;
   cursor:pointer;
-  transition:.25s ease;
-  box-shadow:0 6px 14px rgba(0,0,0,.08);
+  transition:.2s ease;
+  box-shadow:0 4px 10px rgba(0,0,0,.08);
   position:relative;
 }
 
 .card:hover{
-  transform:translateY(-5px);
-  box-shadow:0 12px 24px rgba(0,0,0,.14);
+  transform:translateY(-3px);
+  box-shadow:0 8px 18px rgba(0,0,0,.12);
 }
 
-.card:active{
-  transform:scale(.97);
-}
-
-/* ÍCONE */
 .card span{
-  width:48px;
-  height:48px;
-  margin:0 auto;
-  background:rgba(255,140,26,.15);
-  border-radius:14px;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  font-size:1.6em;
+  font-size:1.7em;
+  display:block;
   color:var(--laranja);
 }
 
-/* TEXTO */
 .card p{
-  margin-top:10px;
+  margin-top:8px;
   font-size:.95em;
   font-weight:600;
   color:var(--texto);
@@ -149,16 +129,16 @@ body{
 /* BADGE */
 .badge{
   position:absolute;
-  top:10px;
-  right:10px;
+  top:8px;
+  right:8px;
   font-size:.7em;
   background:var(--laranja);
   color:#fff;
   padding:4px 8px;
   border-radius:12px;
-  font-weight:600;
 }
 </style>
+
 </head>
 
 <body>
